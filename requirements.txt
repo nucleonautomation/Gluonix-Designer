@@ -1,0 +1,6 @@
+# Requirements file
+
+requests
+numpy
+pillow
+pycryptodome

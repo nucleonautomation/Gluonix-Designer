@@ -22,3 +22,6 @@ pip install -r requirements.txt
 
 # License
 - This project is licensed under a custom license. See the [LICENSE](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/LICENSE.md) file for details.
+
+# Change Log
+- See the [CHANGE_LOG](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/CHANGE_LOG.md) file for details.
