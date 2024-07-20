@@ -1,3 +1,7 @@
+# V(1.4)
+- Added Python 3.12 support for runtime files
+- Fixed Clear method in List & Select
+
 # V(1.3)
 - Multiple Python version support addition
 - Only includes Python 3.11
