@@ -8,6 +8,11 @@
 - Customization: Customize properties and behaviors of components directly through the interface.
 - Export to Python: Export your designed GUI to a Python script that can be integrated into your Python project.
 
+# Examples
+- [Kiosk](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/Examples/Kiosk)
+![Kiosk Home](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/Examples/Kiosk/Image/Image_01.jpg)
+![Kiosk Order](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/Examples/Kiosk/Image/Image_02.jpg)
+
 # Installation
 ```
 git clone https://github.com/nucleonautomation/Gluonix-Designer.git
