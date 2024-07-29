@@ -1,5 +1,8 @@
+# V(1.6)
+- Version control added to the software.
+
 # V(1.5)
-- Fixed Check Box and Radio Button color gradients and drag movements.
+- Fixed Check Box and Radio Button color gradients and drag movements
 
 # V(1.4)
 - Added Python 3.12 support for runtime files
