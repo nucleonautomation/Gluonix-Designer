@@ -1,5 +1,8 @@
 # Change Log
 
+## V(1.71)
+- Interative image zoom fixed. Image zooms at mouse center.
+
 ## V(1.7)
 - Canvas can be designed with rounded corners.
 
