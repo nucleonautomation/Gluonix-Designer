@@ -6,7 +6,7 @@
 - Objects of these classes are easy to manipulate.
 - Basic functions line Copy, Hide, Show, Delete, Config, and Config_Get all work in new objects.
 - Some of the Objects like Polyline, Polygon, Text & Image has some custom function. 
-- See the [Help](https://github.com/nucleonautomation/Gluonix-Source/blob/main/Help.pdf) file for details.
+- See the [Help](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/Help.pdf) file for details.
 
 ## V(1.71)
 - Interative image zoom fixed. Image zooms at mouse center.
