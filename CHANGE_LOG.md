@@ -1,5 +1,10 @@
 # Change Log
 
+## V(2.1)
+- All the items Line, Polyline, Circle, Oval, Rectangle, Polygon, Text & Image are auto resize.
+- Custom On_Resize function for Root, Popup, Frame, Canvas & Scroll
+- See the [Help](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/Help.pdf) file for details.
+
 ## V(2.0)
 - Updated Canvas & Scroll Objects
 - All the items Line, Polyline, Circle, Oval, Rectangle, Polygon, Text & Image are objects.
