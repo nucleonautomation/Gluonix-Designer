@@ -12,8 +12,8 @@
 - [Kiosk](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/Examples/Kiosk)
 
 
-![Kiosk Home](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/Examples/Kiosk/Image/Image_01.jpg)
-![Kiosk Order](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/Examples/Kiosk/Image/Image_02.jpg)
+![Kiosk Home](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/Examples/Kiosk/Image_01.jpg)
+![Kiosk Order](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/Examples/Kiosk/Image_02.jpg)
 
 ## Installation
 ```
