@@ -23,7 +23,8 @@ class Slider():
         self._Frame.Show()
         
     def Callback(self):
-        self._Callback()
+        if self._Callback:
+            self._Callback()
         
     def Get(self):
         return self._Bar.Get()
