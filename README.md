@@ -15,6 +15,9 @@
 ![Kiosk Home](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/Examples/Kiosk/Image_01.jpg)
 ![Kiosk Order](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/Examples/Kiosk/Image_02.jpg)
 
+## Tutorial
+- See the [VIDEO_TUTORIAL](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/VIDEO_TUTORIAL.md) file for details.
+
 ## Installation
 ```
 git clone https://github.com/nucleonautomation/Gluonix-Designer.git
