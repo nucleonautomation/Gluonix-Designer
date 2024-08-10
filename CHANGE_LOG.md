@@ -1,5 +1,8 @@
 # Change Log
 
+## V(2.2)
+- Canvas Refresh function updates all idle tasks.
+
 ## V(2.1)
 - All the items Line, Polyline, Circle, Oval, Rectangle, Polygon, Text & Image are auto resize.
 - Custom On_Resize function for Root, Popup, Frame, Canvas & Scroll
