@@ -13,7 +13,8 @@ from Nucleon.Runner import * ###!REQUIRED ------- Any Script Before This Won't E
 class Slider():
 
     def __init__(self, Bar, Frame):
-        self._Config = ['On_Change', 'Minimum', 'Maximum', 'Increment']
+        self._Config = ['Minimum', 'Maximum', 'Increment']
+        self._Bind = ['On_Change']
         self._Bar = Bar
         self._Frame = Frame
         self._On_Change = False
@@ -40,6 +41,12 @@ class Slider():
                 
     def Config(self, **Input):
         for Each in self._Config:
+            if Each in Input:
+                Value = Input[Each]
+                setattr(self, "_"+Each, Value)
+                
+    def Bind(self, **Input):
+        for Each in self._Bind:
             if Each in Input:
                 Value = Input[Each]
                 setattr(self, "_"+Each, Value)
@@ -76,11 +83,12 @@ class Slider():
         Bar_Progress = (Frame_Left-Bar_Data['Left'])/(Maximum-Minimum)*100
         self._Bar.Set(Bar_Progress)
         self._Frame.Config(Left=Frame_Left)
+        self.On_Change()
         
 def Output():
     print(Slider1.Get())
     
-Slider1 = Slider(Root.Bar, Root.Frame, Output)
+Slider1 = Slider(Root.Bar, Root.Frame)
     
 # -------------------------------------------------------------------------------------------------------------------------------
 # Developer Programming End
