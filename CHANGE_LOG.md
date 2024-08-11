@@ -1,5 +1,8 @@
 # Change Log
 
+## V(2.3)
+- If an internet connection is available at the time of first use, the Software will automatically activate the Pro License. Internet access is required only for this initial activation. Once activated, no further internet connection is needed. Please note that automatic activation may change in the future; however, already activated versions will not require a new license if automatic activation is removed.
+
 ## V(2.2)
 - Canvas Refresh function updates all idle tasks.
 

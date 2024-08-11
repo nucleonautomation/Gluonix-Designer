@@ -1,13 +1,16 @@
 # Gluonix Designer License
 
-Version 2.2, 2024
+Version 2.3, 2024
 
 Definitions
    - "Software" refers to Gluonix Designer, developed by Nucleon Automation.
 
 License Grant
    - Permission is hereby granted, free of charge, to use the Software for the purpose of designing graphical user interfaces in Python applications.
-
+   
+Automatic Pro License Activation
+   - If an internet connection is available at the time of first use, the Software will automatically activate the Pro License. Internet access is required only for this initial activation. Once activated, no further internet connection is needed. Please note that automatic activation may change in the future; however, already activated versions will not require a new license if automatic activation is removed.
+   
 Restrictions
    - 1 Free Version Limitation: Applications designed using the Software using the free version are permitted to run for a maximum of 1 hour after each launch. After this period, the application must be restarted to continue use.
    
