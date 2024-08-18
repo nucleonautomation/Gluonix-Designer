@@ -27,7 +27,7 @@ class Button:
         self._Canvas.Bind(On_Release=lambda E: self.Release())
         Canvas_Data = self._Canvas.Config_Get('Width', 'Height')
         self._Canvas.Label = self._Canvas.Text()
-        self._Canvas.Label.Config(X=Canvas_Data['Width']/2, Y=Canvas_Data['Height']/2, Anchor='center', Color='white', Weight=self._Weight, Size=self._Size)
+        self._Canvas.Label.Config(Left=Canvas_Data['Width']/2, Top=Canvas_Data['Height']/2, Anchor='center', Color='white', Weight=self._Weight, Size=self._Size)
         self.Update()
         
     def Config_Get(self, *Input):
