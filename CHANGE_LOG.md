@@ -3,6 +3,7 @@
 ## V(2.4)
 - Text selection fixed in Select Widget on select.
 - Canvas items arguments names changed
+- Image widget and object can take Pil images directly
 
 ## V(2.3)
 - If an internet connection is available at the time of first use, the Software will automatically activate the Pro License. Internet access is required only for this initial activation. Once activated, no further internet connection is needed. Please note that automatic activation may change in the future; however, already activated versions will not require a new license if automatic activation is removed.
