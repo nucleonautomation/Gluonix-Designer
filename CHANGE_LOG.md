@@ -1,5 +1,8 @@
 # Change Log
 
+## V(2.6)
+- Widget Grab function will return the screenshot of the widget.
+
 ## V(2.5)
 - Properly working Maximize, Restore and Minimize functions for Root and Popup even without widnwos toollbar.
 
