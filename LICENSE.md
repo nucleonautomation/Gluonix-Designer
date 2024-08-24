@@ -1,6 +1,6 @@
 # Gluonix Designer License
 
-Version 3.0, 2024
+Version 3.1, 2024
 
 Definitions
    - "Software" refers to Gluonix Designer, developed by Nucleon Automation.

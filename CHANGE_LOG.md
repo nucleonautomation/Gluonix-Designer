@@ -1,5 +1,8 @@
 # Change Log
 
+## V(3.1)
+- Canvas items in deisgner
+
 ## V(3.0)
 - Designing environment changed. Better widget movements and resizing.
 - Easy to select and add new widgets.
