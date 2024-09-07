@@ -9,12 +9,12 @@
 - Export to Python: Export your designed GUI to a Python script that can be integrated into your Python project.
 
 ## Examples
-### Replica of Kiosk Machine [Kiosk](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/Examples/Kiosk)
+### [Replica of Kiosk Machine](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/Examples/Kiosk)
 
 ![Kiosk Home](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/Examples/Kiosk/Image_01.jpg)
 ![Kiosk Order](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/Examples/Kiosk/Image_02.jpg)
 
-### Replica of Github Desktop [Github](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/Examples/Github)
+### [Replica of Github Desktop](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/Examples/Github)
 
 ![Github Home](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/Examples/Github/Image_01.png)
 ![Github Menu](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/Examples/Github/Image_02.png)
