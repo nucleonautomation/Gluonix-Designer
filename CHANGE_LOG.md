@@ -1,5 +1,8 @@
 # Change Log
 
+## V(3.2)
+- Canvas has new setting Shadow, Controled by Shadow_Size, and Shadow_Color
+
 ## V(3.1)
 - Canvas items in deisgner
 
