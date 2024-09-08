@@ -1,7 +1,11 @@
 # Change Log
 
+## V(3.3)
+- Grid movement can be locked and unloacked.
+- Right click drag rezing bug fix.
+
 ## V(3.2)
-- Canvas has new setting Shadow, Controled by Shadow_Size, and Shadow_Color
+- Canvas has new setting Shadow, Controled by Shadow_Size, and Shadow_Color.
 
 ## V(3.1)
 - Canvas items in deisgner
