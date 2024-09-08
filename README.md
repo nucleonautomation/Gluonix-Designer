@@ -9,6 +9,11 @@
 - Export to Python: Export your designed GUI to a Python script that can be integrated into your Python project.
 
 ## Examples
+
+### [Replica of Covision Quality](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/Examples/Covision)
+
+![Github Home](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/Examples/Covision/Image_01.png)
+
 ### [Replica of Kiosk Machine](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/Examples/Kiosk)
 
 ![Kiosk Home](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/Examples/Kiosk/Image_01.jpg)

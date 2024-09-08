@@ -9,25 +9,29 @@ from Nucleon.Runner import * ###!REQUIRED ------- Any Script Before This Won't E
 # Developer Programming Start
 # -------------------------------------------------------------------------------------------------------------------------------
 
+
 class Button:
-    def __init__(self, Canvas):
+    def __init__(self, Canvas, Label):
         self._Config = ['Background', 'Background_Hover', 'Foreground', 'Foreground_Hover', 'Weight', 'Size', 'Value']
         self._Bind = ['On_Click', 'On_Release']
         self._Canvas = Canvas
+        self._Label = Label
+        self._Label_Data = self._Label.Config_Get('Background', 'Foreground', 'Font_Size', 'Font_Weight', 'Value')
         self._On_Click = False
         self._On_Release = False
-        self._Background, self._Background_Hover = '#FFFFFF', '#FFFFFF'
-        self._Foreground, self._Foreground_Hover = '#000000', '#000000'
-        self._Weight = 'normal'
-        self._Size = 20
-        self._Value = 'CLICK'
+        self._Background, self._Background_Hover = self._Label_Data['Background'], self._Label_Data['Background']
+        self._Foreground, self._Foreground_Hover = self._Label_Data['Foreground'], self._Label_Data['Foreground']
+        self._Weight = self._Label_Data['Font_Weight']
+        self._Size = self._Label_Data['Font_Size']
+        self._Value = self._Label_Data['Value']
         self._Canvas.Bind(On_Hover_In=lambda E: self.Hover_In())
         self._Canvas.Bind(On_Hover_Out=lambda E: self.Hover_Out())
         self._Canvas.Bind(On_Click=lambda E: self.Click())
         self._Canvas.Bind(On_Release=lambda E: self.Release())
-        Canvas_Data = self._Canvas.Config_Get('Width', 'Height')
-        self._Canvas.Label = self._Canvas.Text()
-        self._Canvas.Label.Config(Left=Canvas_Data['Width']/2, Top=Canvas_Data['Height']/2, Anchor='center', Color='white', Weight=self._Weight, Size=self._Size)
+        self._Label.Bind(On_Hover_In=lambda E: self.Hover_In())
+        self._Label.Bind(On_Hover_Out=lambda E: self.Hover_Out())
+        self._Label.Bind(On_Click=lambda E: self.Click())
+        self._Label.Bind(On_Release=lambda E: self.Release())
         self.Update()
         
     def Config_Get(self, *Input):
@@ -53,42 +57,35 @@ class Button:
     def Set(self, Value):
         self._Value = Value
         self._Canvas.Label.Set(self._Value)
-        self._Canvas.Label.Show()
         
     def Update(self):
         self._Canvas.Config(Background=self._Background)
-        self._Canvas.Label.Config(Anchor='center', Color=self._Foreground, Weight=self._Weight, Size=self._Size)
+        self._Canvas.Label.Config(Background=self._Background, Foreground=self._Foreground, Font_Weight=self._Weight, Font_Size=self._Size)
         self._Canvas.Label.Set(self._Value)
-        self._Canvas.Label.Show()
 
     def Click(self):
         self._Canvas.Config(Background=self._Background)
-        self._Canvas.Label.Config(Color=self._Foreground)
-        self._Canvas.Label.Show()
+        self._Canvas.Label.Config(Background=self._Background, Foreground=self._Foreground)
         if self._On_Click:
             self._On_Click()
 
     def Release(self):
         self._Canvas.Config(Background=self._Background_Hover)
-        self._Canvas.Label.Config(Color=self._Foreground_Hover)
-        self._Canvas.Label.Show()
+        self._Canvas.Label.Config(Background=self._Background_Hover, Foreground=self._Foreground)
         if self._On_Release:
             self._On_Release()
 
     def Hover_In(self):
         self._Canvas.Config(Background=self._Background_Hover)
-        self._Canvas.Label.Config(Color=self._Foreground_Hover)
-        self._Canvas.Label.Show()
+        self._Canvas.Label.Config(Background=self._Background_Hover, Foreground=self._Foreground)
 
     def Hover_Out(self):
         self._Canvas.Config(Background=self._Background)
-        self._Canvas.Label.Config(Color=self._Foreground)
-        self._Canvas.Label.Show()
+        self._Canvas.Label.Config(Background=self._Background, Foreground=self._Foreground)
         
-Button1 = Button(Root.Canvas)
+Button1 = Button(Root.Canvas, Root.Canvas.Label)
 Button1.Config(Background='#405cf4', Background_Hover='#191970')
 Button1.Config(Foreground='#FFFFFF', Foreground_Hover='#FFFFFF')
-Button1.Config(Weight='bold', Size=15, Value='CLICK ME')
 Button1.Bind(On_Click = lambda : Button1_Click())
 
 def Button1_Click():
