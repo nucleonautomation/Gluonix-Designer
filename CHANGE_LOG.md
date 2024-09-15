@@ -1,5 +1,9 @@
 # Change Log
 
+## V(3.4)
+- Arc and Pie added to Canvas Items.
+- Canvas Items Thickness update bug fixed.
+
 ## V(3.3)
 - Grid movement can be locked and unloacked.
 - Right click drag rezing bug fix.
