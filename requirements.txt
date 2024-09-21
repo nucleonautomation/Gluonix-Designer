@@ -1,6 +1,6 @@
 # Requirements file
 
+tkinter
 requests
-numpy
 pillow
 pycryptodome
