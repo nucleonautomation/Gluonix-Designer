@@ -1,12 +1,15 @@
 # Change Log
 
+## V(3.5)
+- Linux project runtime support added.
+
 ## V(3.4)
 - Arc and Pie added to Canvas Items.
 - Canvas Items Thickness update bug fixed.
 
 ## V(3.3)
-- Grid movement can be locked and unlocked.
-- Right click drag resizing bug fix.
+- Grid movement can be locked and unloacked.
+- Right click drag rezing bug fix.
 
 ## V(3.2)
 - Canvas has new setting Shadow, Controled by Shadow_Size, and Shadow_Color.
