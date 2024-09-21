@@ -37,6 +37,7 @@ cd Gluonix-Designer
 ```
 pip install -r requirements.txt
 ```
+- You only need a requirements for deployment; the software runs without any additional libraries..
 
 ## License
 - This project is licensed under a custom license. See the [LICENSE](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/LICENSE.md) file for details.
