@@ -1,5 +1,10 @@
 # Change Log
 
+## V(3.6)
+- Font family selection added to Designer for Button, Label, Compound, Entry, Spinner, List, Select and Canvas Text
+- Font family includes 10 fonts acceptable in both windows and linux environment.
+- More font families can be used in programming environment.
+
 ## V(3.5)
 - Linux project runtime support added.
 
