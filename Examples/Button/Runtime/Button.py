@@ -60,28 +60,28 @@ class Button:
         
     def Update(self):
         self._Canvas.Config(Background=self._Background)
-        self._Canvas.Label.Config(Background=self._Background, Foreground=self._Foreground, Font_Weight=self._Weight, Font_Size=self._Size)
-        self._Canvas.Label.Set(self._Value)
+        self._Label.Config(Background=self._Background, Foreground=self._Foreground, Font_Weight=self._Weight, Font_Size=self._Size)
+        self._Label.Set(self._Value)
 
     def Click(self):
         self._Canvas.Config(Background=self._Background)
-        self._Canvas.Label.Config(Background=self._Background, Foreground=self._Foreground)
+        self._Label.Config(Background=self._Background, Foreground=self._Foreground)
         if self._On_Click:
             self._On_Click()
 
     def Release(self):
         self._Canvas.Config(Background=self._Background_Hover)
-        self._Canvas.Label.Config(Background=self._Background_Hover, Foreground=self._Foreground)
+        self._Label.Config(Background=self._Background_Hover, Foreground=self._Foreground_Hover)
         if self._On_Release:
             self._On_Release()
 
     def Hover_In(self):
         self._Canvas.Config(Background=self._Background_Hover)
-        self._Canvas.Label.Config(Background=self._Background_Hover, Foreground=self._Foreground)
+        self._Label.Config(Background=self._Background_Hover, Foreground=self._Foreground_Hover)
 
     def Hover_Out(self):
         self._Canvas.Config(Background=self._Background)
-        self._Canvas.Label.Config(Background=self._Background, Foreground=self._Foreground)
+        self._Label.Config(Background=self._Background, Foreground=self._Foreground)
         
 Button1 = Button(Root.Canvas, Root.Canvas.Label)
 Button1.Config(Background='#405cf4', Background_Hover='#191970')
