@@ -27,6 +27,11 @@
 ## Tutorial
 - See the [VIDEO_TUTORIAL](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/VIDEO_TUTORIAL.md) file for details.
 
+## Modular Repositories
+- We have introduced separate repositories for different Python environments to facilitate easier integration. These smaller repos provide direct libraries without any executables, allowing you to run the software directly in your respective Python environment. This helps in reducing the size and complexity of your installations.
+
+### [Gluonix Designer for Windows (Python 3.11)](https://github.com/nucleonautomation/Gluonix-Designer-Window-311)
+
 ## Installation
 ```
 git clone https://github.com/nucleonautomation/Gluonix-Designer.git
