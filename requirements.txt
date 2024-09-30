@@ -4,3 +4,4 @@ tkinter
 requests
 pillow
 pycryptodome
+sqlite3
