@@ -33,6 +33,9 @@
 - [Gluonix Designer for Windows (Python 3.11)](https://github.com/nucleonautomation/Gluonix-Designer-Window-311)
 - [Gluonix Designer for Windows (Python 3.12)](https://github.com/nucleonautomation/Gluonix-Designer-Window-312)
 
+- [Gluonix Designer for Linux (Python 3.11)](https://github.com/nucleonautomation/Gluonix-Designer-Linux-311)
+- [Gluonix Designer for Linux (Python 3.12)](https://github.com/nucleonautomation/Gluonix-Designer-Linux-312)
+
 ## Installation
 ```
 git clone https://github.com/nucleonautomation/Gluonix-Designer.git
