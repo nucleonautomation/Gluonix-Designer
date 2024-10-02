@@ -15,11 +15,12 @@ class Button:
         self._Config = ['Background', 'Background_Hover', 'Foreground', 'Foreground_Hover', 'Weight', 'Size', 'Value']
         self._Bind = ['On_Click', 'On_Release']
         self._Canvas = Canvas
+        self._Canvas_Data = self._Label.Config_Get('Background')
         self._Label = Label
         self._Label_Data = self._Label.Config_Get('Background', 'Foreground', 'Font_Size', 'Font_Weight', 'Value')
         self._On_Click = False
         self._On_Release = False
-        self._Background, self._Background_Hover = self._Label_Data['Background'], self._Label_Data['Background']
+        self._Background, self._Background_Hover = self._Canvas_Data['Background'], self._Canvas_Data['Background']
         self._Foreground, self._Foreground_Hover = self._Label_Data['Foreground'], self._Label_Data['Foreground']
         self._Weight = self._Label_Data['Font_Weight']
         self._Size = self._Label_Data['Font_Size']
@@ -83,7 +84,7 @@ class Button:
         self._Canvas.Config(Background=self._Background)
         self._Label.Config(Background=self._Background, Foreground=self._Foreground)
         
-Button1 = Button(Root.Canvas, Root.Canvas.Label)
+Button1 = Button(Root.Canvas1, Root.Canvas1.Label1)
 Button1.Config(Background='#405cf4', Background_Hover='#191970')
 Button1.Config(Foreground='#FFFFFF', Foreground_Hover='#FFFFFF')
 Button1.Bind(On_Click = lambda : Button1_Click())
