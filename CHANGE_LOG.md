@@ -1,5 +1,9 @@
 # Change Log
 
+## V(3.7)
+- Focus added to widgets like Entry, Button, Spinner, Select and List.
+- Can be used as Widget.Focus()
+
 ## V(3.6)
 - Font family selection added to Designer for Button, Label, Compound, Entry, Spinner, List, Select and Canvas Text
 - Font family includes 10 fonts acceptable in both windows and linux environment.
