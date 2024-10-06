@@ -1,4 +1,4 @@
-# Gluonix Designer V(3.7)
+# Gluonix Designer V(3.8)
 - Gluonix Designer is a GUI design tool for Python applications that simplifies the process of creating graphical user interfaces using a drag-and-drop approach. This tool is aimed at developers who want to quickly prototype or build Python GUIs without extensive manual coding.
 
 ## Features
@@ -26,15 +26,6 @@
 
 ## Tutorial
 - See the [VIDEO_TUTORIAL](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/VIDEO_TUTORIAL.md) file for details.
-
-## Modular Repositories
-- We have introduced separate repositories for different Python environments to facilitate easier integration. These smaller repos provide direct libraries without any executables, allowing you to run the software directly in your respective Python environment. This helps in reducing the size and complexity of your installations.
-
-- [Gluonix Designer for Windows (Python 3.11)](https://github.com/nucleonautomation/Gluonix-Designer-Window-311)
-- [Gluonix Designer for Windows (Python 3.12)](https://github.com/nucleonautomation/Gluonix-Designer-Window-312)
-
-- [Gluonix Designer for Linux (Python 3.11)](https://github.com/nucleonautomation/Gluonix-Designer-Linux-311)
-- [Gluonix Designer for Linux (Python 3.12)](https://github.com/nucleonautomation/Gluonix-Designer-Linux-312)
 
 ## Installation
 ```

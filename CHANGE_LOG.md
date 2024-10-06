@@ -1,5 +1,8 @@
 # Change Log
 
+## V(3.8)
+- New widget added Roubel with rounded corners and shadow.
+
 ## V(3.7)
 - Focus added to widgets like Entry, Button, Spinner, Select and List.
 - Can be used as Widget.Focus()
