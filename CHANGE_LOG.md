@@ -1,5 +1,10 @@
 # Change Log
 
+## V(3.9)
+- Designer movement and resize performance improvement.
+- Added Position and Size config directly into Widget.Position() and Widget.Size() functions.
+- Backround change in containers has effect on widgets inside with background set to container itself.
+
 ## V(3.8)
 - New widget added Roubel with rounded corners and shadow.
 
