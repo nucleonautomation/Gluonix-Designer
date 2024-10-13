@@ -1,5 +1,9 @@
 # Change Log
 
+## V(4.0)
+- Full GUI/Popup resizing fixed. For larger applications, the rezise directly only applied to the widgets in Show().
+- Hidden widgen will be discluded and on Show() each widget will resize.
+
 ## V(3.9)
 - Designer movement and resize performance improvement.
 - Added Position and Size config directly into Widget.Position() and Widget.Size() functions.
