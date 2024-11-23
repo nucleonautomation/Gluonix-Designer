@@ -1,0 +1,621 @@
+################################################################################################################################
+#Configure_Image
+################################################################################################################################
+import inspect
+import shutil
+import os
+from tkinter import colorchooser
+
+class Configure_Image_Lite:
+    def __init__(self, Global, Configure):
+        try:
+            self.Global = Global
+            self.Configure = Configure
+            self.Widget = []
+            self.ID = False
+            self.Root = False
+            self.Root_ID = False
+            self.Element = False
+            
+            #Frame
+            Fixture = self.Configure.Frame.Locate(100, 95, 0, 5)
+            self.Frame = self.Global['Gluonix'].Scroll(self.Configure.Frame)
+            self.Frame.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Frame.Config(Background='#FFFFFF', Border_Size=0, Display=False)
+            self.Frame.Config(Resize=False, Move=False)
+            self.Frame.Create()
+            self.Configure.Widget.append(self)
+            
+            #Name Label
+            Fixture = self.Frame.Locate(25, 5, 3, 2)
+            self.Name_Label = self.Global['Gluonix'].Label(self.Frame)
+            self.Name_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Name_Label.Config(Foreground='#000000', Value="Name:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Name_Label.Create()
+            
+            #Name Entry
+            Fixture = self.Frame.Locate(60, 5, 28, 2)
+            self.Name_Entry = self.Global['Gluonix'].Entry(self.Frame)
+            self.Name_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Name_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='left', Border_Size=1)
+            self.Name_Entry.Bind(On_Key_Release=lambda E: self.Update_Name())
+            self.Name_Entry.Create()
+            
+            #Background Label
+            Fixture = self.Frame.Locate(25, 5, 3, 9)
+            self.Background_Label = self.Global['Gluonix'].Label(self.Frame)
+            self.Background_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Background_Label.Config(Foreground='#000000', Value="Background:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Background_Label.Create()
+            
+            #Background Color
+            Fixture = self.Frame.Locate(7, 5, 28, 9)
+            self.Background_Color = self.Global['Gluonix'].Label(self.Frame)
+            self.Background_Color.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Background_Color.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='w', Border_Size=1)
+            self.Background_Color.Bind(On_Click=lambda E: self.Select_Color(self.Background_Color))
+            self.Background_Color.Bind(On_Change=lambda : self.Update_Background())
+            self.Background_Color.Create()
+            
+            #Background Check
+            Fixture = self.Frame.Locate(7, 5, 37, 9)
+            self.Background_Check = self.Global['Gluonix'].Check(self.Frame)
+            self.Background_Check.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Background_Check.Config(Border_Size=0)
+            self.Background_Check.Bind(On_Change=lambda : self.Update_Background())
+            self.Background_Check.Create()
+            
+            #Alignment Label
+            Fixture = self.Frame.Locate(25, 5, 3, 16)
+            self.Alignment_Label = self.Global['Gluonix'].Label(self.Frame)
+            self.Alignment_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Alignment_Label.Config(Foreground='#000000', Value="Alignment:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Alignment_Label.Create()
+            
+            #Alignment Select
+            Fixture = self.Frame.Locate(40, 5, 28, 16)
+            self.Alignment_Select = self.Global['Gluonix'].Select(self.Frame)
+            self.Alignment_Select.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Alignment_Select.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Alignment_Select.Add('Percentage')
+            self.Alignment_Select.Add('Pixel')
+            self.Alignment_Select.Bind(On_Change=lambda E: self.Update_Alignment())
+            self.Alignment_Select.Create()
+            
+            #Alignment Lock
+            Fixture = self.Frame.Locate(7, 5, 70, 16)
+            self.Lock = False
+            self.Lock_Image = {True: 'Lock_Closed', False: 'Lock_Open'}
+            self.Alignment_Lock = self.Global['Gluonix'].Image(self.Frame)
+            self.Alignment_Lock.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Alignment_Lock.Config(Border_Size=0)
+            self.Alignment_Lock.Bind(On_Click=lambda E: self.Update_Lock())
+            self.Alignment_Lock.Create()
+            
+            #Width Label
+            Fixture = self.Frame.Locate(25, 5, 3, 23)
+            self.Width_Label = self.Global['Gluonix'].Label(self.Frame)
+            self.Width_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Width_Label.Config(Foreground='#000000', Value="Width:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Width_Label.Create()
+            
+            #Width Entry
+            Fixture = self.Frame.Locate(40, 5, 28, 23)
+            self.Width_Entry = self.Global['Gluonix'].Entry(self.Frame)
+            self.Width_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Width_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Width_Entry.Bind(On_Key_Release=lambda E: self.Update_Width())
+            self.Width_Entry.Create()
+            
+            #Height Label
+            Fixture = self.Frame.Locate(25, 5, 3, 30)
+            self.Height_Label = self.Global['Gluonix'].Label(self.Frame)
+            self.Height_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Height_Label.Config(Foreground='#000000', Value="Height:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Height_Label.Create()
+            
+            #Height Entry
+            Fixture = self.Frame.Locate(40, 5, 28, 30)
+            self.Height_Entry = self.Global['Gluonix'].Entry(self.Frame)
+            self.Height_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Height_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Height_Entry.Bind(On_Key_Release=lambda E: self.Update_Height())
+            self.Height_Entry.Create()
+            
+            #Left Label
+            Fixture = self.Frame.Locate(25, 5, 3, 37)
+            self.Left_Label = self.Global['Gluonix'].Label(self.Frame)
+            self.Left_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Left_Label.Config(Foreground='#000000', Value="Left:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Left_Label.Create()
+            
+            #Left Entry
+            Fixture = self.Frame.Locate(40, 5, 28, 37)
+            self.Left_Entry = self.Global['Gluonix'].Entry(self.Frame)
+            self.Left_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Left_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Left_Entry.Bind(On_Key_Release=lambda E: self.Update_Left())
+            self.Left_Entry.Create()
+            
+            #Top Label
+            Fixture = self.Frame.Locate(25, 5, 3, 44)
+            self.Top_Label = self.Global['Gluonix'].Label(self.Frame)
+            self.Top_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Top_Label.Config(Foreground='#000000', Value="Top:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Top_Label.Create()
+            
+            #Top Entry
+            Fixture = self.Frame.Locate(40, 5, 28, 44)
+            self.Top_Entry = self.Global['Gluonix'].Entry(self.Frame)
+            self.Top_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Top_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Top_Entry.Bind(On_Key_Release=lambda E: self.Update_Top())
+            self.Top_Entry.Create()
+            
+            #Display Label
+            Fixture = self.Frame.Locate(25, 5, 3, 51)
+            self.Display_Label = self.Global['Gluonix'].Label(self.Frame)
+            self.Display_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Display_Label.Config(Foreground='#000000', Value="Display:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Display_Label.Create()
+            
+            #Display Check
+            Fixture = self.Frame.Locate(7, 5, 27.7, 51)
+            self.Display_Check = self.Global['Gluonix'].Check(self.Frame)
+            self.Display_Check.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Display_Check.Config(Border_Size=0)
+            self.Display_Check.Bind(On_Change=lambda : self.Update_Display())
+            self.Display_Check.Create()
+            
+            #Resize Width Label
+            Fixture = self.Frame.Locate(25, 5, 3, 58)
+            self.Resize_Width_Label = self.Global['Gluonix'].Label(self.Frame)
+            self.Resize_Width_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Resize_Width_Label.Config(Foreground='#000000', Value="Resize Width:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Resize_Width_Label.Create()
+            
+            #Resize Width Check
+            Fixture = self.Frame.Locate(7, 5, 27.7, 58)
+            self.Resize_Width_Check = self.Global['Gluonix'].Check(self.Frame)
+            self.Resize_Width_Check.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Resize_Width_Check.Config(Border_Size=0)
+            self.Resize_Width_Check.Bind(On_Change=lambda : self.Update_Resize_Width())
+            self.Resize_Width_Check.Create()
+            
+            #Resize Height Label
+            Fixture = self.Frame.Locate(25, 5, 3, 65)
+            self.Resize_Height_Label = self.Global['Gluonix'].Label(self.Frame)
+            self.Resize_Height_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Resize_Height_Label.Config(Foreground='#000000', Value="Resize Height:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Resize_Height_Label.Create()
+            
+            #Resize Height Check
+            Fixture = self.Frame.Locate(7, 5, 27.7, 65)
+            self.Resize_Height_Check = self.Global['Gluonix'].Check(self.Frame)
+            self.Resize_Height_Check.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Resize_Height_Check.Config(Border_Size=0)
+            self.Resize_Height_Check.Bind(On_Change=lambda : self.Update_Resize_Height())
+            self.Resize_Height_Check.Create()
+            
+            #Move Left Label
+            Fixture = self.Frame.Locate(25, 5, 3, 72)
+            self.Move_Left_Label = self.Global['Gluonix'].Label(self.Frame)
+            self.Move_Left_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Move_Left_Label.Config(Foreground='#000000', Value="Move Left:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Move_Left_Label.Create()
+            
+            #Move Left Check
+            Fixture = self.Frame.Locate(7, 5, 27.7, 72)
+            self.Move_Left_Check = self.Global['Gluonix'].Check(self.Frame)
+            self.Move_Left_Check.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Move_Left_Check.Config(Border_Size=0)
+            self.Move_Left_Check.Bind(On_Change=lambda : self.Update_Move_Left())
+            self.Move_Left_Check.Create()
+            
+            #Move Top Label
+            Fixture = self.Frame.Locate(25, 5, 3, 79)
+            self.Move_Top_Label = self.Global['Gluonix'].Label(self.Frame)
+            self.Move_Top_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Move_Top_Label.Config(Foreground='#000000', Value="Move Top:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Move_Top_Label.Create()
+            
+            #Move Top Check
+            Fixture = self.Frame.Locate(7, 5, 27.7, 79)
+            self.Move_Top_Check = self.Global['Gluonix'].Check(self.Frame)
+            self.Move_Top_Check.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Move_Top_Check.Config(Border_Size=0)
+            self.Move_Top_Check.Bind(On_Change=lambda : self.Update_Move_Top())
+            self.Move_Top_Check.Create()
+            
+            #Interactive Label
+            Fixture = self.Frame.Locate(25, 5, 3, 86)
+            self.Interactive_Label = self.Global['Gluonix'].Label(self.Frame)
+            self.Interactive_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Interactive_Label.Config(Foreground='#000000', Value="Interactive:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Interactive_Label.Create()
+            
+            #Interactive Check
+            Fixture = self.Frame.Locate(7, 5, 27.7, 86)
+            self.Interactive_Check = self.Global['Gluonix'].Check(self.Frame)
+            self.Interactive_Check.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Interactive_Check.Config(Border_Size=0)
+            self.Interactive_Check.Bind(On_Change=lambda : self.Update_Interactive())
+            self.Interactive_Check.Create()
+            
+            #Transparent Label
+            Fixture = self.Frame.Locate(25, 5, 3, 93)
+            self.Transparent_Label = self.Global['Gluonix'].Label(self.Frame)
+            self.Transparent_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Transparent_Label.Config(Foreground='#000000', Value="Transparent:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Transparent_Label.Create()
+            
+            #Transparent Check
+            Fixture = self.Frame.Locate(7, 5, 27.7, 93)
+            self.Transparent_Check = self.Global['Gluonix'].Check(self.Frame)
+            self.Transparent_Check.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Transparent_Check.Config(Border_Size=0)
+            self.Transparent_Check.Bind(On_Change=lambda : self.Update_Transparent())
+            self.Transparent_Check.Create()
+            
+            #Aspect Ratio Label
+            Fixture = self.Frame.Locate(25, 5, 3, 100)
+            self.Aspect_Ratio_Label = self.Global['Gluonix'].Label(self.Frame)
+            self.Aspect_Ratio_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Aspect_Ratio_Label.Config(Foreground='#000000', Value="Aspect Ratio:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Aspect_Ratio_Label.Create()
+            
+            #Aspect Ratio Check
+            Fixture = self.Frame.Locate(7, 5, 27.7, 99)
+            self.Aspect_Ratio_Check = self.Global['Gluonix'].Check(self.Frame)
+            self.Aspect_Ratio_Check.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Aspect_Ratio_Check.Config(Border_Size=0)
+            self.Aspect_Ratio_Check.Bind(On_Change=lambda : self.Update_Aspect_Ratio())
+            self.Aspect_Ratio_Check.Create()
+            
+            #Rotate Label
+            Fixture = self.Frame.Locate(25, 5, 3, 107)
+            self.Rotate_Label = self.Global['Gluonix'].Label(self.Frame)
+            self.Rotate_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Rotate_Label.Config(Foreground='#000000', Value="Rotate:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Rotate_Label.Create()
+            
+            #Rotate Entry
+            Fixture = self.Frame.Locate(40, 5, 28, 107)
+            self.Rotate_Entry = self.Global['Gluonix'].Entry(self.Frame)
+            self.Rotate_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Rotate_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Rotate_Entry.Bind(On_Key_Release=lambda E: self.Update_Rotate())
+            self.Rotate_Entry.Create()
+            
+            #Image Label
+            Fixture = self.Frame.Locate(25, 5, 3, 114)
+            self.Image_Label = self.Global['Gluonix'].Label(self.Frame)
+            self.Image_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Image_Label.Config(Foreground='#000000', Value="Image:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Image_Label.Create()
+            
+            #Image Image
+            Fixture = self.Frame.Locate(60, 30, 28, 114)
+            self.Image_Image = self.Global['Gluonix'].Image(self.Frame)
+            self.Image_Image.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Image_Image.Config(Border_Size=1)
+            self.Image_Image.Bind(On_Click=lambda E: self.Update_Image())
+            self.Image_Image.Create()
+            
+            #Update Scroll
+            self.Frame.Update(self.Image_Image)
+            
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Load(self, ID=False):
+        try:
+            if ID!=self.ID:
+                self.Root = False
+                self.Root_ID = False
+                self.Element = False
+                self.ID = ID
+                Widget_Data = self.Configure.Design.Database.Get(f"SELECT * FROM `Widget` WHERE `ID`='{self.ID}'", Keys=True)
+                if len(Widget_Data)==1:
+                    Widget_Data = Widget_Data[0]
+                    self.Root_ID = Widget_Data['Root']
+                    self.Name_Entry.Config(Border_Color='#000000', Border_Size=1)
+                    self.Width_Entry.Config(Border_Color='#000000', Border_Size=1)
+                    self.Height_Entry.Config(Border_Color='#000000', Border_Size=1)
+                    self.Left_Entry.Config(Border_Color='#000000', Border_Size=1)
+                    self.Top_Entry.Config(Border_Color='#000000', Border_Size=1)
+                    self.Name_Label.Set(Widget_Data['Type'])
+                    self.Name_Entry.Set(Widget_Data['Name'])
+                    if Widget_Data['Background']=='False':
+                        self.Background_Check.Set(False)
+                    else:
+                        self.Background_Check.Set(True)
+                        self.Background_Color.Config(Background=Widget_Data['Background'])
+                    self.Alignment_Select.Set(Widget_Data['Alignment'])
+                    self.Lock = bool(Widget_Data['Lock'])
+                    self.Alignment_Lock.Set(self.Global['Image'](self.Lock_Image[self.Lock]))
+                    self.Width_Entry.Set(Widget_Data['Width'])
+                    self.Height_Entry.Set(Widget_Data['Height'])
+                    self.Left_Entry.Set(Widget_Data['Left'])
+                    self.Top_Entry.Set(Widget_Data['Top'])
+                    self.Display_Check.Set(bool(Widget_Data['Display']))
+                    self.Resize_Width_Check.Set(bool(Widget_Data['Resize_Width']))
+                    self.Resize_Height_Check.Set(bool(Widget_Data['Resize_Height']))
+                    self.Move_Left_Check.Set(bool(Widget_Data['Move_Left']))
+                    self.Move_Top_Check.Set(bool(Widget_Data['Move_Top']))
+                    self.Interactive_Check.Set(bool(Widget_Data['Interactive']))
+                    self.Aspect_Ratio_Check.Set(bool(Widget_Data['Aspect_Ratio']))
+                    self.Transparent_Check.Set(bool(Widget_Data['Transparent']))
+                    self.Rotate_Entry.Set(Widget_Data['Rotate'])
+                    self.Image_Image.Set(f"{self.Configure.Design.Project_Path}/Data/File/{self.ID}")
+                    self.Configure.Hide_All()
+                    self.Configure.Current = self
+                    self.Frame.Show()
+                    Temp_Root = Widget_Data['Root']
+                    Root = Temp_Root
+                    while Temp_Root!='Root':
+                        Widget_Data = self.Configure.Design.Database.Get(f"SELECT * FROM `Frame` WHERE `ID`='{Temp_Root}'", Keys=True)
+                        if len(Widget_Data)==1:
+                            Widget_Data = Widget_Data[0]
+                            Temp_Root = Widget_Data['Root']
+                            Root = Temp_Root+'.'+Root
+                        else:
+                            break
+                    Root_Split = Root.split('.')
+                    Current = ''
+                    for Each in Root_Split:
+                        if Current:
+                            Current = Current+'.'+Each
+                        else:
+                            Current = Each
+                        if Current!='Root':
+                            Temp_Root = self.Global['Custom'].Get_Attr_Class(self.Configure.Design, Current)
+                            Temp_Root.Show()
+                    self.Root = self.Global['Custom'].Get_Attr_Class(self.Configure.Design, Root)
+                    self.Element = getattr(self.Root, self.ID)
+                    self.Element.Show()
+                else:
+                    self.Global['Message'].Show('Error', 'Project Files Corrupted\nReopen Project')
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+        self.Global['Loading'].Hide()
+            
+    def Movement_Update(self):
+        try:
+            if self.ID:
+                Widget_Data = self.Configure.Design.Database.Get(f"SELECT * FROM `Widget` WHERE `ID`='{self.ID}'", Keys=True)
+                Widget_Data = Widget_Data[0]
+                self.Width_Entry.Set(Widget_Data['Width'])
+                self.Height_Entry.Set(Widget_Data['Height'])
+                self.Left_Entry.Set(Widget_Data['Left'])
+                self.Top_Entry.Set(Widget_Data['Top'])
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Select_Color(self, Element):
+        try:
+            Color = colorchooser.askcolor(color=Element.Config_Get('Background')['Background'], title ="Choose Background Color")[1]
+            if Color is not None:
+                Element.Config(Background=Color)
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Update_Name(self):
+        try:
+            Name = self.Name_Entry.Get()
+            TempName = self.Configure.Design.Database.Get(f"SELECT * FROM `Widget` WHERE (`ID`!='{self.ID}' AND `Root`=='{self.Root_ID}' AND `Name`='{Name}')")
+            if self.Global['Custom'].Valid_Variable(Name) and len(TempName)==0:
+                self.Configure.Design.Database.Post(f"UPDATE `Widget` SET `Name`='{Name}' WHERE `ID`='{self.ID}'")
+                self.Configure.Design.Element.Tree.Edit(Name=Name)
+                self.Name_Entry.Config(Border_Color='#000000', Border_Size=1)
+            else:
+                self.Name_Entry.Config(Border_Color='red', Border_Size=2)
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Update_Background(self):
+        try:
+            if self.Background_Check.Get():
+                Background = self.Background_Color.Config_Get('Background')['Background']
+                self.Configure.Design.Database.Post(f"UPDATE `Widget` SET `Background`='{Background}' WHERE `ID`='{self.ID}'")
+                if self.Element:
+                    self.Element.Config(Background=Background)
+            else:
+                self.Configure.Design.Database.Post(f"UPDATE `Widget` SET `Background`='False' WHERE `ID`='{self.ID}'")
+                if self.Element:
+                    self.Element.Config(Background=False)
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Update_Alignment(self):
+        try:
+            Alignment = self.Alignment_Select.Get()
+            self.Configure.Design.Database.Post(f"UPDATE `Widget` SET `Alignment`='{Alignment}' WHERE `ID`='{self.ID}'")
+            if self.Element:
+                Width = float(self.Width_Entry.Get())
+                Height = float(self.Height_Entry.Get())
+                Left = float(self.Left_Entry.Get())
+                Top = float(self.Top_Entry.Get())
+                if Alignment=='Percentage':
+                    Fixture = self.Root.Locate(Width, Height, Left, Top)
+                else:
+                    Fixture = [Width, Height, Left, Top]
+                self.Element.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Update_Lock(self):
+        try:
+            self.Lock = not self.Lock
+            self.Alignment_Lock.Set(self.Global['Image'](self.Lock_Image[self.Lock]))
+            self.Configure.Design.Database.Post(f"UPDATE `Widget` SET `Lock`='{int(self.Lock)}' WHERE `ID`='{self.ID}'")
+            if self.Element:
+                self.Element.Lock = self.Lock
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Update_Width(self):
+        try:
+            Width = self.Width_Entry.Get()
+            if self.Global['Custom'].Is_Float(Width):
+                Width = float(Width)
+                self.Configure.Design.Database.Post(f"UPDATE `Widget` SET `Width`='{Width}' WHERE `ID`='{self.ID}'")
+                self.Width_Entry.Config(Border_Color='#000000', Border_Size=1)
+                if self.Element:
+                    if self.Alignment_Select.Get()=='Percentage':
+                        Fixture = self.Root.Locate(Width, 0, 0, 0)
+                    else:
+                        Fixture = [Width, 0, 0, 0]
+                    self.Element.Config(Width=Fixture[0])
+            else:
+                self.Width_Entry.Config(Border_Color='red', Border_Size=2)
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Update_Height(self):
+        try:
+            Height = self.Height_Entry.Get()
+            if self.Global['Custom'].Is_Float(Height):
+                Height = float(Height)
+                self.Configure.Design.Database.Post(f"UPDATE `Widget` SET `Height`='{Height}' WHERE `ID`='{self.ID}'")
+                self.Height_Entry.Config(Border_Color='#000000', Border_Size=1)
+                if self.Element:
+                    if self.Alignment_Select.Get()=='Percentage':
+                        Fixture = self.Root.Locate(0, Height, 0, 0)
+                    else:
+                        Fixture = [0, Height, 0, 0]
+                    self.Element.Config(Height=Fixture[1])
+            else:
+                self.Height_Entry.Config(Border_Color='red', Border_Size=2)
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Update_Left(self):
+        try:
+            Left = self.Left_Entry.Get()
+            if self.Global['Custom'].Is_Float(Left):
+                Left = float(Left)
+                self.Configure.Design.Database.Post(f"UPDATE `Widget` SET `Left`='{Left}' WHERE `ID`='{self.ID}'")
+                self.Left_Entry.Config(Border_Color='#000000', Border_Size=1)
+                if self.Element:
+                    if self.Alignment_Select.Get()=='Percentage':
+                        Fixture = self.Root.Locate(0, 0, Left, 0)
+                    else:
+                        Fixture = [0, 0, Left, 0]
+                    self.Element.Config(Left=Fixture[2])
+            else:
+                self.Left_Entry.Config(Border_Color='red', Border_Size=2)
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Update_Top(self):
+        try:
+            Top = self.Top_Entry.Get()
+            if self.Global['Custom'].Is_Float(Top):
+                Top = float(Top)
+                self.Configure.Design.Database.Post(f"UPDATE `Widget` SET `Top`='{Top}' WHERE `ID`='{self.ID}'")
+                self.Top_Entry.Config(Border_Color='#000000', Border_Size=1)
+                if self.Element:
+                    if self.Alignment_Select.Get()=='Percentage':
+                        Fixture = self.Root.Locate(0, 0, 0, Top)
+                    else:
+                        Fixture = [0, 0, 0, Top]
+                    self.Element.Config(Top=Fixture[3])
+            else:
+                self.Top_Entry.Config(Border_Color='red', Border_Size=2)
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Update_Display(self):
+        try:
+            Display = self.Display_Check.Get()
+            self.Configure.Design.Database.Post(f"UPDATE `Widget` SET `Display`='{int(Display)}' WHERE `ID`='{self.ID}'")
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Update_Resize_Width(self):
+        try:
+            Resize_Width = self.Resize_Width_Check.Get()
+            self.Configure.Design.Database.Post(f"UPDATE `Widget` SET `Resize_Width`='{int(Resize_Width)}' WHERE `ID`='{self.ID}'")
+            if self.Element:
+                self.Element.Config(Resize_Width=Resize_Width)
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Update_Resize_Height(self):
+        try:
+            Resize_Height = self.Resize_Height_Check.Get()
+            self.Configure.Design.Database.Post(f"UPDATE `Widget` SET `Resize_Height`='{int(Resize_Height)}' WHERE `ID`='{self.ID}'")
+            if self.Element:
+                self.Element.Config(Resize_Height=Resize_Height)
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Update_Move_Left(self):
+        try:
+            Move_Left = self.Move_Left_Check.Get()
+            self.Configure.Design.Database.Post(f"UPDATE `Widget` SET `Move_Left`='{int(Move_Left)}' WHERE `ID`='{self.ID}'")
+            if self.Element:
+                self.Element.Config(Move_Left=Move_Left)
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Update_Move_Top(self):
+        try:
+            Move_Top = self.Move_Top_Check.Get()
+            self.Configure.Design.Database.Post(f"UPDATE `Widget` SET `Move_Top`='{int(Move_Top)}' WHERE `ID`='{self.ID}'")
+            if self.Element:
+                self.Element.Config(Move_Top=Move_Top)
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Update_Interactive(self):
+        try:
+            Interactive = self.Interactive_Check.Get()
+            self.Configure.Design.Database.Post(f"UPDATE `Widget` SET `Interactive`='{int(Interactive)}' WHERE `ID`='{self.ID}'")
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Update_Transparent(self):
+        try:
+            Transparent = self.Transparent_Check.Get()
+            self.Configure.Design.Database.Post(f"UPDATE `Widget` SET `Transparent`='{int(Transparent)}' WHERE `ID`='{self.ID}'")
+            if self.Element:
+                self.Element.Config(Transparent=Transparent)
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Update_Aspect_Ratio(self):
+        try:
+            Aspect_Ratio = self.Aspect_Ratio_Check.Get()
+            self.Configure.Design.Database.Post(f"UPDATE `Widget` SET `Aspect_Ratio`='{int(Aspect_Ratio)}' WHERE `ID`='{self.ID}'")
+            if self.Element:
+                self.Element.Config(Aspect_Ratio=Aspect_Ratio)
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Update_Rotate(self):
+        try:
+            Rotate = self.Rotate_Entry.Get()
+            if self.Global['Custom'].Is_Float(Rotate):
+                Rotate = float(Rotate)
+                self.Configure.Design.Database.Post(f"UPDATE `Widget` SET `Rotate`='{Rotate}' WHERE `ID`='{self.ID}'")
+                self.Rotate_Entry.Config(Border_Color='#000000', Border_Size=1)
+                if self.Element:
+                    self.Element.Config(Rotate=Rotate)
+            else:
+                self.Rotate_Entry.Config(Border_Color='red', Border_Size=2)
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Update_Image(self):
+        try:
+            Icon_File_Path = self.Global['GUI'].File(Initial=os.path.join(os.path.expanduser('~'), 'Documents'), Title='Select Image', Default='.png', Type=[["PNG (*.png)", "*.png"], ["JPG (*.jpg)", "*.jpg"], ["JPEG (*.jpeg)", "*.jpeg"]])
+            if Icon_File_Path:
+                if os.path.exists(f"{self.Configure.Design.Project_Path}/Data/File/{self.ID}"):
+                    os.remove(f"{self.Configure.Design.Project_Path}/Data/File/{self.ID}")
+                shutil.copy(Icon_File_Path, f"{self.Configure.Design.Project_Path}/Data/File/{self.ID}")
+                self.Image_Image.Refresh()
+                self.Element.Refresh()
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))

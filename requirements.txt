@@ -1,0 +1,6 @@
+# Requirements file
+
+tkinter
+requests
+pillow
+sqlite3
