@@ -1105,8 +1105,8 @@ class Image_Zoom:
                         NewLeft = OldLeft-(ScaleX*(ZoomCenterX-OldLeft)/self._Last_Zoom_Width)
                         NewTop = OldTop-(ScaleY*(ZoomCenterY-OldTop)/self._Last_Zoom_Height)
                     else:
-                        NewLeft = OldLeft-(ScaleX*(ZoomCenterX-OldLeft))
-                        NewTop = OldTop-(ScaleY*(ZoomCenterY-OldTop))
+                        NewLeft = OldLeft-(ScaleX*(ZoomCenterX-OldLeft)/self._Image_Width)
+                        NewTop = OldTop-(ScaleY*(ZoomCenterY-OldTop)/self._Image_Height)
                     self._Frame._Frame.Temp_Image = Image
                     self._Frame._Frame.itemconfig(self._Image_Window, image=Image['Image'])
                     self._Frame._Frame.coords(self._Image_Window, NewLeft, NewTop)
