@@ -1101,9 +1101,13 @@ class Image_Zoom:
                     Image = self.Convert(self._Zoom_Width, self._Zoom_Height)
                     OldLeft = self._Frame._Frame.coords(self._Image_Window)[0]
                     OldTop = self._Frame._Frame.coords(self._Image_Window)[1]
-                    NewLeft = OldLeft-(ScaleX*(ZoomCenterX-OldLeft)/self._Last_Zoom_Width)
-                    NewTop = OldTop-(ScaleY*(ZoomCenterY-OldTop)/self._Last_Zoom_Height)
-                    self._Temp_Image = Image
+                    if self._Last_Zoom_Width and self._Last_Zoom_Height:
+                        NewLeft = OldLeft-(ScaleX*(ZoomCenterX-OldLeft)/self._Last_Zoom_Width)
+                        NewTop = OldTop-(ScaleY*(ZoomCenterY-OldTop)/self._Last_Zoom_Height)
+                    else:
+                        NewLeft = OldLeft-(ScaleX*(ZoomCenterX-OldLeft))
+                        NewTop = OldTop-(ScaleY*(ZoomCenterY-OldTop))
+                    self._Frame._Frame.Temp_Image = Image
                     self._Frame._Frame.itemconfig(self._Image_Window, image=Image['Image'])
                     self._Frame._Frame.coords(self._Image_Window, NewLeft, NewTop)
         except Exception as E:
