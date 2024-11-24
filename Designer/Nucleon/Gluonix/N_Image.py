@@ -842,6 +842,7 @@ class Image_Zoom:
     def Display(self):
         try:
             self._Frame.Show()
+            self._Frame._Frame.tag_raise(self._Image_Window)
             self._Display = True
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Display -> {E}")
