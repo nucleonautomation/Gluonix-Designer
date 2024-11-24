@@ -1085,7 +1085,7 @@ class Image_Zoom:
             
     def Zoom(self, Event):
         try:
-            if self._Image_Window:
+            if self._Image_Window and self._Image_Width and self._Image_Height:
                 ZoomIncrement = Event.delta
                 ZoomCenterX = self._Frame._Frame.canvasx(Event.x)
                 ZoomCenterY = self._Frame._Frame.canvasy(Event.y)
