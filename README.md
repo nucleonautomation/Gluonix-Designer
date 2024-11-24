@@ -25,7 +25,7 @@
 ![Github Menu](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/Examples/Github/Image_02.png)
 
 ## Tutorial
-- See the [VIDEO_TUTORIAL](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/VIDEO_TUTORIAL.md) file for details.
+- See the [TUTORIAL](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/TUTORIAL.md) file for details.
 
 ## Installation
 ```
@@ -37,10 +37,9 @@ cd Gluonix-Designer
 ```
 pip install -r requirements.txt
 ```
-- You only need requirements to run deployed projects, the software runs without any additional libraries.
 
 ## License
 - This project is licensed under BSD 4-Clause License. See the [LICENSE](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/LICENSE.md) file for details.
 
 ## Change Log
-- See the [CHANGE_LOG](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/CHANGE_LOG.md) file for details.
+- See the [LOG](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/LOG.md) file for details.
