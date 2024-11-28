@@ -281,7 +281,7 @@ class Radio:
             
     def Relocate(self, Direct=False):
         try:
-            return False
+            self.Display()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Relocate -> {E}")
             
