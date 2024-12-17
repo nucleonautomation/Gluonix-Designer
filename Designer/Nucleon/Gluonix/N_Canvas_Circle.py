@@ -20,6 +20,8 @@ class Canvas_Circle:
         self._Widget = self._Canvas._Frame.create_oval(self._X1, self._Y1, self._X2, self._Y2, outline=self._Outline, width=self._Thickness, fill=self._Fill)
         self._Canvas._Widget.append(self)
         self._Resizable = self._Canvas._Resizable
+        self._On_Show = False
+        self._On_Hide = False
 
     def Copy(self, Main=False):
         try:
@@ -36,6 +38,8 @@ class Canvas_Circle:
         try:
             self._Canvas._Frame.itemconfigure(self._Widget, state='hidden')
             self._Display = False
+            if self._On_Hide:
+                self._On_Hide()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type}-> Hide -> {E}")
             
@@ -46,6 +50,8 @@ class Canvas_Circle:
                 self.Resize()
             else:
                 self.Display()
+            if self._On_Show:
+                self._On_Show()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Show -> {E}")
 
@@ -68,6 +74,10 @@ class Canvas_Circle:
         
     def Bind(self, **Input):
         try:
+            if 'On_Show' in Input:
+                self._On_Show = Input['On_Show']
+            if 'On_Hide' in Input:
+                self._On_Hide = Input['On_Hide']
             Event_Bind_Canvas(self._Canvas._Frame, self._Widget, **Input)
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Bind -> {E}")

@@ -33,6 +33,8 @@ class Check:
                 self._Background_Main = True
                 self._Check = False
                 self._On_Change = False
+                self._On_Show = False
+                self._On_Hide = False
             except Exception as E:
                 self._GUI.Error(f"{self._Type} -> Init -> {E}")
         else:
@@ -71,6 +73,8 @@ class Check:
         try:
             self._Frame.Hide()
             self._Display = False
+            if self._On_Hide:
+                self._On_Hide()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Hide -> {E}")
             
@@ -78,6 +82,8 @@ class Check:
         try:
             self._Display = True
             self.Resize()
+            if self._On_Show:
+                self._On_Show()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Show -> {E}")
             
@@ -125,6 +131,10 @@ class Check:
             
     def Bind(self, **Input):
         try:
+            if 'On_Show' in Input:
+                self._On_Show = Input['On_Show']
+            if 'On_Hide' in Input:
+                self._On_Hide = Input['On_Hide']
             if 'On_Change' in Input:
                 self._On_Change = Input['On_Change']
             self._Frame.Bind(**Input)

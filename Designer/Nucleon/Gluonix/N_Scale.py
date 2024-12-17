@@ -33,6 +33,8 @@ class Scale:
                 self._Maximum = 100
                 self._Orient = 'Horizontal'
                 self._Resizable = self._Main._Resizable
+                self._On_Show = False
+                self._On_Hide = False
             except Exception as E:
                 self._GUI.Error(f"{self._Type} -> Init -> {E}")
         else:
@@ -72,6 +74,8 @@ class Scale:
         try:
             self._Frame.Hide()
             self._Display = False
+            if self._On_Hide:
+                self._On_Hide()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Hide -> {E}")
             
@@ -82,6 +86,8 @@ class Scale:
                 self.Resize()
             else:
                 self.Display()
+            if self._On_Show:
+                self._On_Show()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Show -> {E}")
             
@@ -125,6 +131,10 @@ class Scale:
             
     def Bind(self, **Input):
         try:
+            if 'On_Show' in Input:
+                self._On_Show = Input['On_Show']
+            if 'On_Hide' in Input:
+                self._On_Hide = Input['On_Hide']
             if "On_Change" in Input:
                 self._Widget.config(command=Input["On_Change"])
             Event_Bind(self._Widget, **Input)

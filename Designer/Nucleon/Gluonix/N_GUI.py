@@ -52,6 +52,8 @@ class GUI():
             self._On_Resize = False
             self._Restore_Width = False
             self._Restore_Height = False
+            self._On_Show = False
+            self._On_Hide = False
             if os.name == 'nt':
                 self._Window = True
             else:
@@ -153,12 +155,16 @@ class GUI():
     def Hide(self):
         try:
             self._Frame.withdraw()
+            if self._On_Hide:
+                self._On_Hide()
         except Exception as E:
             self.Error(f"{self._Type} -> Hide -> {E}")
             
     def Show(self):
         try:
             self._Frame.deiconify()
+            if self._On_Show:
+                self._On_Show()
         except Exception as E:
             self.Error(f"{self._Type} -> Show -> {E}")
     
@@ -251,6 +257,10 @@ class GUI():
             
     def Bind(self, **Input):
         try:
+            if 'On_Show' in Input:
+                self._On_Show = Input['On_Show']
+            if 'On_Hide' in Input:
+                self._On_Hide = Input['On_Hide']
             if "On_Resize" in Input:
                 self._On_Resize = Input["On_Resize"]
             if 'On_Close' in Input:

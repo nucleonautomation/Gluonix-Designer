@@ -18,6 +18,8 @@ class Canvas_Rectangle2:
         self._Widget = self.Rectangle()
         self._Canvas._Widget.append(self)
         self._Resizable = self._Canvas._Resizable
+        self._On_Show = False
+        self._On_Hide = False
 
     def Copy(self, Main=False):
         try:
@@ -34,6 +36,8 @@ class Canvas_Rectangle2:
         try:
             self._Canvas._Frame.itemconfigure(self._Widget, state='hidden')
             self._Display = False
+            if self._On_Hide:
+                self._On_Hide()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type}-> Hide -> {E}")
             
@@ -44,6 +48,8 @@ class Canvas_Rectangle2:
                 self.Resize()
             else:
                 self.Display()
+            if self._On_Show:
+                self._On_Show()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Show -> {E}")
 
@@ -66,6 +72,10 @@ class Canvas_Rectangle2:
         
     def Bind(self, **Input):
         try:
+            if 'On_Show' in Input:
+                self._On_Show = Input['On_Show']
+            if 'On_Hide' in Input:
+                self._On_Hide = Input['On_Hide']
             Event_Bind_Canvas(self._Canvas._Frame, self._Widget, **Input)
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Bind -> {E}")

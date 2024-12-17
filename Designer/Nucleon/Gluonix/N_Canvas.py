@@ -54,6 +54,8 @@ class Canvas:
                 self._Background_Main = True
                 self._On_Resize = False
                 self._Resizable = self._Main._Resizable
+                self._On_Show = False
+                self._On_Hide = False
             except Exception as E:
                 self._GUI.Error(f"{self._Type} -> Init -> {E}")
         else:
@@ -112,6 +114,8 @@ class Canvas:
         try:
             self._Frame.place_forget()
             self._Display = False
+            if self._On_Hide:
+                self._On_Hide()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Hide -> {E}")
             
@@ -122,6 +126,8 @@ class Canvas:
                 self.Resize()
             else:
                 self.Display()
+            if self._On_Show:
+                self._On_Show()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Show -> {E}")
             
@@ -156,6 +162,10 @@ class Canvas:
             
     def Bind(self, **Input):
         try:
+            if 'On_Show' in Input:
+                self._On_Show = Input['On_Show']
+            if 'On_Hide' in Input:
+                self._On_Hide = Input['On_Hide']
             if "On_Resize" in Input:
                 self._On_Resize = Input["On_Resize"]
             Event_Bind(self._Frame, **Input)

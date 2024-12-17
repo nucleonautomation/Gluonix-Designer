@@ -1,5 +1,8 @@
 # Change Log
 
+## V(1.3)
+- Bind functions for On_Show and On_Hide
+
 ## V(1.2)
 - Fixed Show() for Check, Radio & Switch
 

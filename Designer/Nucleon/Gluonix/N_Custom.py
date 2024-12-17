@@ -67,8 +67,8 @@ def Event_Bind(Widget, **Input):
         Widget.bind("<KeyPress>", Input["On_Key"])
     if "On_Key_Release" in Input:
         Widget.bind("<KeyRelease>", Input["On_Key_Release"])
-    if "On_Focus_Out" in Input:
-        Widget.bind("<FocusIn>", Input["On_Focus_Out"])
+    if "On_Focus_In" in Input:
+        Widget.bind("<FocusIn>", Input["On_Focus_In"])
     if "On_Focus_Out" in Input:
         Widget.bind("<FocusOut>", Input["On_Focus_Out"])
     if "On_Map" in Input:

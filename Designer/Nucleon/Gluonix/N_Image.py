@@ -47,6 +47,8 @@ class Image:
                 self._Aspect_Ratio = True
                 self._Convert_Type = 'P'
                 self._Resizable = self._Main._Resizable
+                self._On_Show = False
+                self._On_Hide = False
             except Exception as E:
                 self._GUI.Error(f"{self._Type} -> Init -> {E}")
         else:
@@ -86,6 +88,8 @@ class Image:
         try:
             self._Frame.Hide()
             self._Display = False
+            if self._On_Hide:
+                self._On_Hide()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Hide -> {E}")
             
@@ -96,6 +100,8 @@ class Image:
                 self.Resize()
             else:
                 self.Display()
+            if self._On_Show:
+                self._On_Show()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Show -> {E}")
             
@@ -145,6 +151,10 @@ class Image:
             
     def Bind(self, **Input):
         try:
+            if 'On_Show' in Input:
+                self._On_Show = Input['On_Show']
+            if 'On_Hide' in Input:
+                self._On_Hide = Input['On_Hide']
             Event_Bind(self._Widget, **Input)
             self._Frame.Bind(**Input)
         except Exception as E:
@@ -419,6 +429,8 @@ class Image_Lite:
                 self._Aspect_Ratio = True
                 self._Convert_Type = 'P'
                 self._Resizable = self._Main._Resizable
+                self._On_Show = False
+                self._On_Hide = False
             except Exception as E:
                 self._GUI.Error(f"{self._Type} -> Init -> {E}")
         else:
@@ -457,6 +469,8 @@ class Image_Lite:
         try:
             self._Widget.place_forget()
             self._Display = False
+            if self._On_Hide:
+                self._On_Hide()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Hide -> {E}")
             
@@ -467,6 +481,8 @@ class Image_Lite:
                 self.Resize()
             else:
                 self.Display()
+            if self._On_Show:
+                self._On_Show()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Show -> {E}")
             
@@ -516,6 +532,10 @@ class Image_Lite:
             
     def Bind(self, **Input):
         try:
+            if 'On_Show' in Input:
+                self._On_Show = Input['On_Show']
+            if 'On_Hide' in Input:
+                self._On_Hide = Input['On_Hide']
             Event_Bind(self._Widget, **Input)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Bind -> {E}")
@@ -788,6 +808,8 @@ class Image_Zoom:
                 self._Angle = 0
                 self._Transparent = True
                 self._Resizable = self._Main._Resizable
+                self._On_Show = False
+                self._On_Hide = False
             except Exception as E:
                 self._GUI.Error(f"{self._Type} -> Init -> {E}")
         else:
@@ -826,6 +848,8 @@ class Image_Zoom:
         try:
             self._Frame.Hide()
             self._Display = False
+            if self._On_Hide:
+                self._On_Hide()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Hide -> {E}")
             
@@ -836,6 +860,8 @@ class Image_Zoom:
                 self.Resize()
             else:
                 self.Display()
+            if self._On_Show:
+                self._On_Show()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Show -> {E}")
             
@@ -880,6 +906,10 @@ class Image_Zoom:
             
     def Bind(self, **Input):
         try:
+            if 'On_Show' in Input:
+                self._On_Show = Input['On_Show']
+            if 'On_Hide' in Input:
+                self._On_Hide = Input['On_Hide']
             self._Frame.Bind(**Input)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Bind -> {E}")

@@ -22,6 +22,8 @@ class Canvas_Text:
         self._Widget = self._Canvas._Frame.create_text(0, 0, text=self._Value, fill=self._Color, font=(self._Font, self._Size, self._Weight), anchor=self._Anchor, width=self._Width, justify=self._Justify)
         self._Canvas._Widget.append(self)
         self._Resizable = self._Canvas._Resizable
+        self._On_Show = False
+        self._On_Hide = False
 
     def Copy(self, Main=False):
         try:
@@ -38,6 +40,8 @@ class Canvas_Text:
         try:
             self._Canvas._Frame.itemconfigure(self._Widget, state='hidden')
             self._Display = False
+            if self._On_Hide:
+                self._On_Hide()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type}-> Hide -> {E}")
             
@@ -48,6 +52,8 @@ class Canvas_Text:
                 self.Resize()
             else:
                 self.Display()
+            if self._On_Show:
+                self._On_Show()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Show -> {E}")
 
@@ -77,6 +83,10 @@ class Canvas_Text:
         
     def Bind(self, **Input):
         try:
+            if 'On_Show' in Input:
+                self._On_Show = Input['On_Show']
+            if 'On_Hide' in Input:
+                self._On_Hide = Input['On_Hide']
             Event_Bind_Canvas(self._Canvas._Frame, self._Widget, **Input)
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Bind -> {E}")

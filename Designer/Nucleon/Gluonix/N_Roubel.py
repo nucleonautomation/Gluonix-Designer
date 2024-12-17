@@ -37,6 +37,8 @@ class Roubel:
                 self._Widget = self._Frame._Frame.create_text(0, 0, text=self._Value, fill=self._Foreground, font=(self._Font_Family, self._Font_Size, self._Font_Weight), anchor='center', width=0, justify='center')
                 self._On_Change = False
                 self._Resizable = self._Main._Resizable
+                self._On_Show = False
+                self._On_Hide = False
             except Exception as E:
                 self._GUI.Error(f"{self._Type} -> Init -> {E}")
         else:
@@ -76,6 +78,8 @@ class Roubel:
         try:
             self._Frame.Hide()
             self._Display = False
+            if self._On_Hide:
+                self._On_Hide()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Hide -> {E}")
             
@@ -86,6 +90,8 @@ class Roubel:
                 self.Resize()
             else:
                 self.Display()
+            if self._On_Show:
+                self._On_Show()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Show -> {E}")
             
@@ -121,6 +127,10 @@ class Roubel:
             
     def Bind(self, **Input):
         try:
+            if 'On_Show' in Input:
+                self._On_Show = Input['On_Show']
+            if 'On_Hide' in Input:
+                self._On_Hide = Input['On_Hide']
             if 'On_Change' in Input:
                 self._On_Change = Input['On_Change']
             self._Frame.Bind(**Input)

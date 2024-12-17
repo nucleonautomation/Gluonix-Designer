@@ -14,7 +14,7 @@ class Overview:
             self.Widget = []
             self.Project_Path = False
             self.Runtime_Path = False
-            TempDatabase = self.Global['Gluonix'].SQL(f'./Data/NGD.dll')
+            self.TempDatabase = False
             
             Fixture = self.Panel.Frame.Locate(100, 100, 0, 0)
             self.Frame = self.Global['Gluonix'].Frame(self.Panel.Frame)
@@ -540,64 +540,67 @@ class Overview:
             
     def Update(self, Partial=False):
         try:
-            TempDatabase = self.Global['Gluonix'].SQL(f'{self.Project_Path}/Data/NGD.dll')
-            if not Partial:
-                self.Project_Data = {}
-                Project_Data_Temp = TempDatabase.Get("SELECT * FROM `Variable`", Keys=True)
-                for Each in Project_Data_Temp:
-                    self.Project_Data[Each['ID']] = Each['Data']
-                Display_Data_Temp = TempDatabase.Get("SELECT * FROM `Display`", Keys=True)
-                self.Display_Select.Clear()
-                for Each in Display_Data_Temp:
-                    self.Display_Select.Add(Each['ID'])
-                self.Display_Select.Set('Root')
-                self.Error_Log_Check.Set(bool(int(self.Project_Data['Error_Log'])))
-                self.Version_Entry.Set(self.Project_Data['Version'])
-                self.Revision_Entry.Set(self.Project_Data['Revision'])
-                self.Icon_Image.Set(f"{self.Project_Path}/Data/File/{self.Project_Data['Icon']}")
-            self.Display_ID = self.Display_Select.Get()
-            self.Display_Select.Sort()
-            Display_Data_Temp = TempDatabase.Get(f"SELECT * FROM `Display` WHERE `ID`='{self.Display_ID}'", Keys=True)
-            self.Display_Data = Display_Data_Temp[0]
-            self.Title_Entry.Set(self.Display_Data['Title'])
-            self.Background_Color.Config(Background=self.Display_Data['Background'])
-            self.Width_Entry.Set(self.Display_Data['Width'])
-            self.Height_Entry.Set(self.Display_Data['Height'])
-            self.Left_Entry.Set(self.Display_Data['Left'])
-            self.Top_Entry.Set(self.Display_Data['Top'])
-            self.Full_Screen_Check.Set(bool(int(self.Display_Data['Full_Screen'])))
-            self.Resizable_Check.Set(bool(int(self.Display_Data['Resizable'])))
-            self.Persistent_Check.Set(bool(int(self.Display_Data['Persistent'])))
-            self.Menu_Check.Set(bool(int(self.Display_Data['Menu'])))
-            self.Toolbar_Check.Set(bool(int(self.Display_Data['Toolbar'])))
-            self.Topmost_Check.Set(bool(int(self.Display_Data['Topmost'])))
-            if self.Display_ID=='Root':
-                self.Error_Log_Label.Show()
-                self.Error_Log_Check.Show()
-                self.Topmost_Label.Hide()
-                self.Topmost_Check.Hide()
-                self.Version_Label.Show()
-                self.Version_Entry.Show()
-                self.Revision_Label.Show()
-                self.Revision_Entry.Show()
-                self.Icon_Label.Show()
-                self.Icon_Image.Show()
-                self.Icon_Browser.Show()
+            if os.path.exists(f'{self.Project_Path}/Data/NGD.dll'):
+                TempDatabase = self.Global['Gluonix'].SQL(f'{self.Project_Path}/Data/NGD.dll')
+                if not Partial:
+                    self.Project_Data = {}
+                    Project_Data_Temp = TempDatabase.Get("SELECT * FROM `Variable`", Keys=True)
+                    for Each in Project_Data_Temp:
+                        self.Project_Data[Each['ID']] = Each['Data']
+                    Display_Data_Temp = TempDatabase.Get("SELECT * FROM `Display`", Keys=True)
+                    self.Display_Select.Clear()
+                    for Each in Display_Data_Temp:
+                        self.Display_Select.Add(Each['ID'])
+                    self.Display_Select.Set('Root')
+                    self.Error_Log_Check.Set(bool(int(self.Project_Data['Error_Log'])))
+                    self.Version_Entry.Set(self.Project_Data['Version'])
+                    self.Revision_Entry.Set(self.Project_Data['Revision'])
+                    self.Icon_Image.Set(f"{self.Project_Path}/Data/File/{self.Project_Data['Icon']}")
+                self.Display_ID = self.Display_Select.Get()
+                self.Display_Select.Sort()
+                Display_Data_Temp = TempDatabase.Get(f"SELECT * FROM `Display` WHERE `ID`='{self.Display_ID}'", Keys=True)
+                self.Display_Data = Display_Data_Temp[0]
+                self.Title_Entry.Set(self.Display_Data['Title'])
+                self.Background_Color.Config(Background=self.Display_Data['Background'])
+                self.Width_Entry.Set(self.Display_Data['Width'])
+                self.Height_Entry.Set(self.Display_Data['Height'])
+                self.Left_Entry.Set(self.Display_Data['Left'])
+                self.Top_Entry.Set(self.Display_Data['Top'])
+                self.Full_Screen_Check.Set(bool(int(self.Display_Data['Full_Screen'])))
+                self.Resizable_Check.Set(bool(int(self.Display_Data['Resizable'])))
+                self.Persistent_Check.Set(bool(int(self.Display_Data['Persistent'])))
+                self.Menu_Check.Set(bool(int(self.Display_Data['Menu'])))
+                self.Toolbar_Check.Set(bool(int(self.Display_Data['Toolbar'])))
+                self.Topmost_Check.Set(bool(int(self.Display_Data['Topmost'])))
+                if self.Display_ID=='Root':
+                    self.Error_Log_Label.Show()
+                    self.Error_Log_Check.Show()
+                    self.Topmost_Label.Hide()
+                    self.Topmost_Check.Hide()
+                    self.Version_Label.Show()
+                    self.Version_Entry.Show()
+                    self.Revision_Label.Show()
+                    self.Revision_Entry.Show()
+                    self.Icon_Label.Show()
+                    self.Icon_Image.Show()
+                    self.Icon_Browser.Show()
+                else:
+                    self.Topmost_Label.Show()
+                    self.Topmost_Check.Show()
+                    self.Error_Log_Label.Hide()
+                    self.Error_Log_Check.Hide()
+                    self.Version_Label.Hide()
+                    self.Version_Entry.Hide()
+                    self.Revision_Label.Hide()
+                    self.Revision_Entry.Hide()
+                    self.Icon_Label.Hide()
+                    self.Icon_Image.Hide()
+                    self.Icon_Browser.Hide()
+                self.Delete_Hide()
+                self.Frame.Show()
+                TempDatabase.Close()
             else:
-                self.Topmost_Label.Show()
-                self.Topmost_Check.Show()
-                self.Error_Log_Label.Hide()
-                self.Error_Log_Check.Hide()
-                self.Version_Label.Hide()
-                self.Version_Entry.Hide()
-                self.Revision_Label.Hide()
-                self.Revision_Entry.Hide()
-                self.Icon_Label.Hide()
-                self.Icon_Image.Hide()
-                self.Icon_Browser.Hide()
-            self.Delete_Hide()
-            self.Frame.Show()
-            TempDatabase.Close()
+                self.Global['Message'].Show('Error', 'Project files not found')
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             
