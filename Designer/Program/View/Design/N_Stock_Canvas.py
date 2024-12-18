@@ -57,7 +57,7 @@ class Stock_Canvas:
                 self.Stock.Design.Element.Tree.Expand(Root)
                 ID_Tree = getattr(self.Stock.Design.Element, ID)
                 self.Stock.Design.Element.Tree.Select(ID_Tree)
-                self.Stock.Design.Database.Post(f"INSERT INTO `Frame` (`ID`, `Name`, `Type`, `Level`, `Root`) VALUES ('{ID}', '{Name}', '{self.Type}', '{Level}', '{Root_ID}')")
+                self.Stock.Design.Database.Post(f"INSERT INTO `Frame` (`ID`, `Name`, `Type`, `Level`, `Root`, `Alignment`) VALUES ('{ID}', '{Name}', '{self.Type}', '{Level}', '{Root_ID}', '{self.Stock.Design.Alignment}')")
                 self.Create(ID)
                 self.Stock.Design.Configure.Hide_All()
                 Configure = getattr(self.Stock.Design.Configure, f'Configure_{self.Type}')

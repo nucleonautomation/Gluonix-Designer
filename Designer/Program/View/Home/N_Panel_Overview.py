@@ -96,19 +96,35 @@ class Overview:
             self.Title_Entry.Create()
             
                 #Background Label
-            Fixture = self.Frame.Locate(15, 5, 53, 16)
+            Fixture = self.Frame.Locate(15, 5, 47, 16)
             self.Background_Label = self.Global['Gluonix'].Label(self.Frame)
             self.Background_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Background_Label.Config(Foreground='black', Value="Background:", Font_Size=12, Font_Weight='normal', Align='w', Border_Size=0)
             self.Background_Label.Create()
             
                 #Background Color
-            Fixture = self.Frame.Locate(4, 5, 67, 16)
+            Fixture = self.Frame.Locate(4, 5, 61, 16)
             self.Background_Color = self.Global['Gluonix'].Label(self.Frame)
             self.Background_Color.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Background_Color.Config(Background='white', Foreground='black', Font_Size=10, Font_Weight='normal', Align='w', Border_Size=1)
             self.Background_Color.Bind(On_Click=lambda E: self.Select_Color())
             self.Background_Color.Create()
+            
+                #Alignment Label
+            Fixture = self.Frame.Locate(12, 5, 70, 16)
+            self.Alignment_Label = self.Global['Gluonix'].Label(self.Frame)
+            self.Alignment_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Alignment_Label.Config(Foreground='black', Value="Alignment:", Font_Size=12, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Alignment_Label.Create()
+            
+                #Alignment Select
+            Fixture = self.Frame.Locate(12, 5, 82, 16)
+            self.Alignment_Select = self.Global['Gluonix'].Select(self.Frame)
+            self.Alignment_Select.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Alignment_Select.Config(Background='white', Foreground='black', Font_Size=11, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Alignment_Select.Create()
+            self.Alignment_Select.Add('Percentage')
+            self.Alignment_Select.Add('Pixel')
             
                 #Width Label
             Fixture = self.Frame.Locate(7, 5, 3, 25)
@@ -395,6 +411,7 @@ class Overview:
                     self.Project_Data['NGD'] = self.Global['Variable_Data']['Version']+'.'+self.Global['Variable_Data']['Revision']
                     self.Display_Data['Title'] = Project_Name
                     self.Display_Data['Background'] = self.Background_Color.Config_Get('Background')['Background']
+                    self.Display_Data['Alignment'] = self.Alignment_Select.Get()
                     self.Display_Data['Width'] = self.Width_Entry.Get()
                     self.Display_Data['Height'] = self.Height_Entry.Get()
                     self.Display_Data['Left'] = self.Left_Entry.Get()
@@ -410,6 +427,7 @@ class Overview:
                         TempDatabase.Post(f"UPDATE `Variable` SET `DATA`='{Value}' WHERE `ID`='{Key}'")
                     TempDatabase.Post(f"UPDATE `Display` SET `Title`='{self.Display_Data['Title']}' WHERE `ID`='{self.Display_ID}'")
                     TempDatabase.Post(f"UPDATE `Display` SET `Background`='{self.Display_Data['Background']}' WHERE `ID`='{self.Display_ID}'")
+                    TempDatabase.Post(f"UPDATE `Display` SET `Alignment`='{self.Display_Data['Alignment']}' WHERE `ID`='{self.Display_ID}'")
                     TempDatabase.Post(f"UPDATE `Display` SET `Width`='{self.Display_Data['Width']}' WHERE `ID`='{self.Display_ID}'")
                     TempDatabase.Post(f"UPDATE `Display` SET `Height`='{self.Display_Data['Height']}' WHERE `ID`='{self.Display_ID}'")
                     TempDatabase.Post(f"UPDATE `Display` SET `Left`='{self.Display_Data['Left']}' WHERE `ID`='{self.Display_ID}'")
@@ -562,6 +580,7 @@ class Overview:
                 self.Display_Data = Display_Data_Temp[0]
                 self.Title_Entry.Set(self.Display_Data['Title'])
                 self.Background_Color.Config(Background=self.Display_Data['Background'])
+                self.Alignment_Select.Set(self.Display_Data['Alignment'])
                 self.Width_Entry.Set(self.Display_Data['Width'])
                 self.Height_Entry.Set(self.Display_Data['Height'])
                 self.Left_Entry.Set(self.Display_Data['Left'])

@@ -19,6 +19,7 @@ class Design:
             self.Project_Path = False
             self.Project_Data = False
             self.Display_ID = False
+            self.Alignment = 'Pixel'
             
             #Frame
             Fixture = self.Main.Frame.Locate(100, 100, 0, 0)
@@ -73,6 +74,7 @@ class Design:
                     Display_Data_Temp = self.Database.Get(f"SELECT * FROM `Display` WHERE `ID`='{self.Display_ID}'", Keys=True)
                     self.Display_Data = Display_Data_Temp[0]
                     self.Label.Set(self.Display_Data['Title'])
+                    self.Alignment = self.Display_Data['Alignment']
                     setattr(self, self.Display_ID, self.Global['Gluonix'].Popup(self.Global['GUI']))
                     Temp_Root = getattr(self, self.Display_ID)
                     Temp_Root.Config(Width=int(self.Display_Data['Width']), Height=int(self.Display_Data['Height']), Left=int(self.Display_Data['Left']), Top=int(self.Display_Data['Top']))

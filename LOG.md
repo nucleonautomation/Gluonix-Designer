@@ -1,10 +1,13 @@
 # Change Log
 
+## V(1.4)
+- Global Option To Choose Pixel Or Percentage Alignment For Display In Project Overview
+
 ## V(1.3)
-- Bind functions for On_Show and On_Hide
+- Bind Functions For On_Show And On_Hide
 
 ## V(1.2)
-- Fixed Show() for Check, Radio & Switch
+- Fixed Show() For Check, Radio & Switch
 
 ## V(1.1) - Extra
 - Fixed Interactive Image For Display & Zoom Error
