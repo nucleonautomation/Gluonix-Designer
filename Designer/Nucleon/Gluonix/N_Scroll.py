@@ -237,10 +237,8 @@ class Scroll:
             if Top is not None:
                 self._Top = Top
             if Left is not None or Top is not None:
-                self.Relocate()
-            Left = self._Frame_Canvas.winfo_x()
-            Top = self._Frame_Canvas.winfo_y()
-            return [Left, Top]
+                self.Resize()
+            return self._Frame_Canvas.Position(Left, Top)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Position -> {E}")
             
@@ -252,7 +250,7 @@ class Scroll:
                 self._Height = Height
             if Width or Height:
                 self.Resize()
-            return [self._Frame_Canvas.winfo_width(), self._Frame_Canvas.winfo_height()]
+            return self._Frame_Canvas.Size(Width, Height)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Size -> {E}")
         
@@ -320,6 +318,7 @@ class Scroll:
         try:
             try:
                 Widget.Resize()
+                self._Last = Widget
             except Exception:
                 self.Nothing = False
             if self._Width_Frame < (Widget._Left_Current+Widget._Width_Current):
