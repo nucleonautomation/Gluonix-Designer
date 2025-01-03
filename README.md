@@ -18,20 +18,11 @@
 
 ![Github Home](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/Screenshots/Image_02.png)
 
-### Design Canvas
-
-![Github Home](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/Screenshots/Image_03.png)
-
 ## Examples
 
 ### [Replica of Covision Quality](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/Examples/Covision)
 
 ![Github Home](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/Examples/Covision/Image_01.png)
-
-### [Replica of Kiosk Machine](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/Examples/Kiosk)
-
-![Kiosk Home](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/Examples/Kiosk/Image_01.jpg)
-![Kiosk Order](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/Examples/Kiosk/Image_02.jpg)
 
 ### [Replica of Github Desktop](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/Examples/Github)
 
