@@ -351,7 +351,7 @@ class Overview:
             self.Design_Button.Config(Background='#FAD7A0', Foreground='black', Value='Design', Font_Size=9, Font_Weight='normal', Border_Size=1, Border_Color='#935116')
             self.Design_Button.Bind(On_Hover_In=lambda E: self.Design_Button.Config(Background='#F39C12'))
             self.Design_Button.Bind(On_Hover_Out=lambda E: self.Design_Button.Config(Background='#FAD7A0'))
-            self.Design_Button.Bind(On_Click=lambda E: self.Save(Launch=True))
+            self.Design_Button.Bind(On_Click=lambda E: self.Save(Launch=True, Direct=True))
             self.Design_Button.Create()
             
                 #Save Button
@@ -449,7 +449,7 @@ class Overview:
                         self.Panel.Home.Main.Design.Project_Data = self.Project_Data
                         self.Panel.Home.Main.Design.Display_ID = self.Display_ID
                         self.Panel.Home.Frame.Hide()
-                        self.Panel.Home.Main.Design.Update()
+                        self.Panel.Home.Main.Design.Update(Loading=False)
                     if not Direct:
                         self.Global['Loading'].Hide()
                         self.Global['Message'].Show('Success', 'Save Successfull')
