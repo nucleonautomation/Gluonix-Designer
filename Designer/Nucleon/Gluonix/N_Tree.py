@@ -104,7 +104,7 @@ class Tree:
     def Display(self):
         try:
             self._Frame.Show()
-            self._Widget.place(x=0, y=0, width=self._Width_Current-(self._Border_Size*2), height=self._Height_Current-(self._Border_Size*2))
+            self._Widget.place(x=0, y=0, width=self._Width_Current-(self._Border_Size*2), height=self._Height_Current-(self._Border_Size*2)-20)
             self._Display = True
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Display -> {E}")
