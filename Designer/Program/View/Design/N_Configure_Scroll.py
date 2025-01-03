@@ -376,7 +376,6 @@ class Configure_Scroll:
     def Update_Frame(self):
         try:
             if self.Element:
-                self.Element.Shrink()
                 self.Element.UpdateAll()
                 self.Global['Message'].Show('Success', 'Scroll Updated!')
         except Exception as E:
