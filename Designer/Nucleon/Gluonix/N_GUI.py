@@ -26,8 +26,8 @@ class GUI():
 
     def __init__(self, *args, **kwargs):
         if not hasattr(self, '_Initialized'):
-            self._Config = ['Error_Display', 'Error_Log', 'Resize_Delay', 'Title', 'Icon', 'Background', 'Persistent', 'Resizable', 'Full_Screen', 'Toolbar', 'Menu_Enable', 'Width', 'Height', 'Left', 'Top']
-            self._Config_Get = ['Error_Display', 'Error_Log', 'Resize_Delay', 'Title', 'Icon', 'Background', 'Persistent', 'Resizable', 'Full_Screen', 'Toolbar', 'Menu_Enable', 'Width', 'Height', 'Left', 'Top', 'Full_Screen', 'Screen_Width', 'Screen_Height']
+            self._Config = ['Error_Display', 'Error_Log', 'Resize_Delay', 'Title', 'Icon', 'Background', 'Persistent', 'Resizable', 'Full_Screen', 'Toolbar', 'Menu_Enable', 'Width', 'Height', 'Left', 'Top', 'Alignment']
+            self._Config_Get = ['Error_Display', 'Error_Log', 'Resize_Delay', 'Title', 'Icon', 'Background', 'Persistent', 'Resizable', 'Full_Screen', 'Toolbar', 'Menu_Enable', 'Width', 'Height', 'Left', 'Top', 'Alignment', 'Full_Screen', 'Screen_Width', 'Screen_Height']
             self._Initialized = False
             self._Error_Display = False
             self._Error_Log = False
@@ -42,6 +42,7 @@ class GUI():
             self._Title = "Nucleon Gluonix"
             self._Icon = ""
             self._Background = "#F0F0F0"
+            self._Alignment = 'Pixel'
             self._Persistent = False
             self._Toolbar = True
             self._Full_Screen = False
@@ -417,6 +418,11 @@ class GUI():
                     self._Frame.overrideredirect(True)
                 else:
                     self._Frame.bind("<Configure>", self.Event)
+                    if self._Alignment == 'Percentage':
+                        self._Width = int(self._Frame.winfo_screenwidth() * (self._Width/100))
+                        self._Height = int(self._Frame.winfo_screenheight() * (self._Height/100))
+                        self._Left = int(self._Frame.winfo_screenwidth() * (self._Left/100))
+                        self._Top = int(self._Frame.winfo_screenheight() * (self._Top/100))
                     self._Frame.geometry(f"{int(self._Width)}x{int(self._Height)}+{int(self._Left)}+{int(self._Top)}")
                     self._Frame.resizable(self._Resizable, self._Resizable)
                     self._Frame.attributes('-fullscreen', False)

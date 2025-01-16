@@ -79,7 +79,7 @@ class Design:
                     Temp_Root = getattr(self, self.Display_ID)
                     Temp_Root.Config(Width=int(self.Display_Data['Width']), Height=int(self.Display_Data['Height']), Left=int(self.Display_Data['Left']), Top=int(self.Display_Data['Top']))
                     Temp_Root.Config(Title=self.Display_Data['Title'], Background=self.Display_Data['Background'], Icon=f"{self.Project_Path}/Data/File/{self.Project_Data['Icon']}", Resizable=bool(int(self.Display_Data['Resizable'])))
-                    Temp_Root.Config(Persistent=True, Full_Screen=bool(int(self.Display_Data['Full_Screen'])), Minimize=True, Toolbar=True, Menu_Enable=bool(int(self.Display_Data['Menu'])))
+                    Temp_Root.Config(Persistent=True, Full_Screen=bool(int(self.Display_Data['Full_Screen'])), Minimize=True, Toolbar=bool(int(self.Display_Data['Toolbar'])), Alignment=self.Display_Data['Alignment'], Menu_Enable=bool(int(self.Display_Data['Menu'])))
                     Temp_Root.Create()
                     if bool(int(self.Display_Data['Menu'])):
                         Temp_Root.Add_Menu(Name='File')

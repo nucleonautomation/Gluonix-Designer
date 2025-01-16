@@ -1,5 +1,8 @@
 # Change Log
 
+## V(1.6)
+- Display Alignment To Percentage Will Require Left, Top, Width, & Height as Percent Vlaue For Non-Full_Screen Window
+
 ## V(1.5)
 - Fixed Tree Hight Issues Caused By Horizontal Scrollbar
 - Fixed Scroll Movement & Size In Designer

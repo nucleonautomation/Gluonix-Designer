@@ -17,8 +17,8 @@ class Popup():
         if self._GUI is not None:
             self._Type = "Popup"
             try:
-                self._Config = ['Error_Display', 'Resize_Delay', 'Title', 'Icon', 'Background', 'Topmost', 'Persistent', 'Resizable', 'Full_Screen', 'Toolbar', 'Menu_Enable', 'Width', 'Height', 'Left', 'Top', 'Minimize']
-                self._Config_Get = ['Error_Display', 'Resize_Delay', 'Title', 'Icon', 'Background', 'Topmost','Persistent', 'Resizable', 'Full_Screen', 'Toolbar', 'Menu_Enable', 'Width', 'Height', 'Left', 'Top', 'Full_Screen', 'Screen_Width', 'Screen_Height', 'Minimize']
+                self._Config = ['Error_Display', 'Resize_Delay', 'Title', 'Icon', 'Background', 'Topmost', 'Persistent', 'Resizable', 'Full_Screen', 'Toolbar', 'Menu_Enable', 'Width', 'Height', 'Left', 'Top', 'Alignment', 'Minimize']
+                self._Config_Get = ['Error_Display', 'Resize_Delay', 'Title', 'Icon', 'Background', 'Topmost','Persistent', 'Resizable', 'Full_Screen', 'Toolbar', 'Menu_Enable', 'Width', 'Height', 'Left', 'Top', 'Alignment', 'Full_Screen', 'Screen_Width', 'Screen_Height', 'Minimize']
                 self._Initialized = False
                 self._Error_Display = True
                 self._Error = []
@@ -34,6 +34,7 @@ class Popup():
                 self._Title = "Nucleon Gluonix"
                 self._Icon = ""
                 self._Background = "#F0F0F0"
+                self._Alignment = 'Pixel'
                 self._Topmost = False
                 self._Persistent = False
                 self._Toolbar = True
@@ -352,6 +353,11 @@ class Popup():
                     self._Frame.overrideredirect(True)
                 else:
                     self._Frame.bind("<Configure>", self.Event)
+                    if self._Alignment == 'Percentage':
+                        self._Width = int(self._Frame.winfo_screenwidth() * (self._Width/100))
+                        self._Height = int(self._Frame.winfo_screenheight() * (self._Height/100))
+                        self._Left = int(self._Frame.winfo_screenwidth() * (self._Left/100))
+                        self._Top = int(self._Frame.winfo_screenheight() * (self._Top/100))
                     self._Frame.geometry(f"{int(self._Width)}x{int(self._Height)}+{int(self._Left)}+{int(self._Top)}")
                     self._Frame.resizable(self._Resizable, self._Resizable)
                     self._Frame.attributes('-fullscreen', False)
