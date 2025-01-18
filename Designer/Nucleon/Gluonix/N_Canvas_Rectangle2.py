@@ -5,14 +5,17 @@ from .N_Custom import Event_Bind_Canvas
 class Canvas_Rectangle2:
     def __init__(self, Main):
         self._Canvas = Main
-        self._Config = ['Outline', 'Fill', 'Width', 'Height', 'Left', 'Top', 'Angle', 'Thickness', 'Resize']
+        self._Config = ['Name', 'Outline', 'Fill', 'Width', 'Height', 'Left', 'Top', 'Angle', 'Thickness', 'Resize', 'Translucent']
         self._Display = True
         self._Resize = True
+        self._Name = False
+        self._Last_Name = False
         self._Type = 'Canvas_Rectangle2'
         self._Outline = '#000000'
         self._Fill = '#000000'
         self._Thickness = 1
         self._Angle = 0
+        self._Translucent = False
         self._Width, self._Height, self._Left, self._Top = 1, 1, 1, 1
         self._Width_Current, self._Height_Current, self._Left_Current, self._Top_Current = 1, 1, 1, 1
         self._Widget = self.Rectangle()
@@ -157,7 +160,8 @@ class Canvas_Rectangle2:
             C_X = sum(X for X, Y in Corners) / len(Corners)
             C_Y = sum(Y for X, Y in Corners) / len(Corners)
             Rotated_Corners = [self.Rotate(X, Y, C_X, C_Y, Angle_Rad) for X, Y in Corners]
-            return self._Canvas._Frame.create_polygon(Rotated_Corners, outline=self._Outline, width=self._Thickness, fill=self._Fill)
+            Stripple = 'gray12' if self._Translucent else ''
+            return self._Canvas._Frame.create_polygon(Rotated_Corners, outline=self._Outline, width=self._Thickness, fill=self._Fill, stipple=Stripple)
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Rectangle -> {E}")
             
@@ -165,6 +169,13 @@ class Canvas_Rectangle2:
         try:
             self._Canvas._Frame.delete(self._Widget)
             self._Widget = self.Rectangle()
+            if self._Name!=self._Last_Name:
+                if self._Last_Name:
+                    if self._Last_Name in self._Canvas.__dict__:
+                        del self._Canvas.__dict__[self._Last_Name]
+                if self._Name:
+                    self._Canvas.__dict__[self._Name] = self
+                self._Last_Name = self._Name
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Create -> {E}")
 

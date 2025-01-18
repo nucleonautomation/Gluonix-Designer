@@ -5,13 +5,16 @@ from .N_Custom import Event_Bind_Canvas
 class Canvas_Circle:
     def __init__(self, Main):
         self._Canvas = Main
-        self._Config = ['Outline', 'Fill', 'Left', 'Top', 'Radius', 'Thickness', 'Resize']
+        self._Config = ['Name', 'Outline', 'Fill', 'Left', 'Top', 'Radius', 'Thickness', 'Resize', 'Translucent']
         self._Display = True
         self._Resize = True
+        self._Name = False
+        self._Last_Name = False
         self._Type = 'Canvas_Circle'
         self._Outline = '#000000'
         self._Fill = '#000000'
         self._Thickness = 1
+        self._Translucent = False
         self._Left, self._Top, self._Radius = 0, 0, 0
         self._X1 = abs(self._Left - self._Radius)
         self._Y1 = abs(self._Top - self._Radius)
@@ -138,8 +141,16 @@ class Canvas_Circle:
         
     def Create(self):
         try:
-            self._Canvas._Frame.itemconfig(self._Widget, outline=self._Outline, width=self._Thickness, fill=self._Fill)
+            Stripple = 'gray12' if self._Translucent else ''
+            self._Canvas._Frame.itemconfig(self._Widget, outline=self._Outline, width=self._Thickness, fill=self._Fill, stipple=Stripple)
             self._Canvas._Frame.coords(self._Widget, self._X1, self._Y1, self._X2, self._Y2)
+            if self._Name!=self._Last_Name:
+                if self._Last_Name:
+                    if self._Last_Name in self._Canvas.__dict__:
+                        del self._Canvas.__dict__[self._Last_Name]
+                if self._Name:
+                    self._Canvas.__dict__[self._Name] = self
+                self._Last_Name = self._Name
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Create -> {E}")
 

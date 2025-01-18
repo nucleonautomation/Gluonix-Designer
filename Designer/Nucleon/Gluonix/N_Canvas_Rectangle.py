@@ -5,13 +5,16 @@ from .N_Custom import Event_Bind_Canvas
 class Canvas_Rectangle:
     def __init__(self, Main):
         self._Canvas = Main
-        self._Config = ['Outline', 'Fill', 'Width', 'Height', 'Left', 'Top', 'Thickness', 'Resize']
+        self._Config = ['Name', 'Outline', 'Fill', 'Width', 'Height', 'Left', 'Top', 'Thickness', 'Resize', 'Translucent']
         self._Display = True
         self._Resize = True
+        self._Name = False
+        self._Last_Name = False
         self._Type = 'Canvas_Rectangle'
         self._Outline = '#000000'
         self._Fill = '#000000'
         self._Thickness = 1
+        self._Translucent = False
         self._Width, self._Height, self._Left, self._Top = 0, 0, 0, 0
         self._Widget = self._Canvas._Frame.create_rectangle(0, 0, 0, 0, outline=self._Outline, width=self._Thickness, fill=self._Fill)
         self._Canvas._Widget.append(self)
@@ -134,8 +137,16 @@ class Canvas_Rectangle:
         
     def Create(self):
         try:
-            self._Canvas._Frame.itemconfig(self._Widget, outline=self._Outline, width=self._Thickness, fill=self._Fill)
+            Stripple = 'gray12' if self._Translucent else ''
+            self._Canvas._Frame.itemconfig(self._Widget, outline=self._Outline, width=self._Thickness, fill=self._Fill, stipple=Stripple)
             self._Canvas._Frame.coords(self._Widget, self._X1_Current, self._Y1_Current, self._X2_Current, self._Y2_Current)
+            if self._Name!=self._Last_Name:
+                if self._Last_Name:
+                    if self._Last_Name in self._Canvas.__dict__:
+                        del self._Canvas.__dict__[self._Last_Name]
+                if self._Name:
+                    self._Canvas.__dict__[self._Name] = self
+                self._Last_Name = self._Name
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Create -> {E}")
 

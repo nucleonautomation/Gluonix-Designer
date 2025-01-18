@@ -5,9 +5,11 @@ from .N_Custom import Event_Bind_Canvas
 class Canvas_Line:
     def __init__(self, Main):
         self._Canvas = Main
-        self._Config = ['Outline', 'Width', 'Height', 'Left', 'Top', 'Thickness', 'Resize']
+        self._Config = ['Name', 'Outline', 'Width', 'Height', 'Left', 'Top', 'Thickness', 'Resize']
         self._Display = True
         self._Resize = True
+        self._Name = False
+        self._Last_Name = False
         self._Type = 'Canvas_Line'
         self._Outline = '#000000'
         self._Thickness = 1
@@ -135,6 +137,13 @@ class Canvas_Line:
         try:
             self._Canvas._Frame.itemconfig(self._Widget, fill=self._Outline, width=self._Thickness)
             self._Canvas._Frame.coords(self._Widget, self._X1_Current, self._Y1_Current, self._X2_Current, self._Y2_Current)
+            if self._Name!=self._Last_Name:
+                if self._Last_Name:
+                    if self._Last_Name in self._Canvas.__dict__:
+                        del self._Canvas.__dict__[self._Last_Name]
+                if self._Name:
+                    self._Canvas.__dict__[self._Name] = self
+                self._Last_Name = self._Name
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Create -> {E}")
 

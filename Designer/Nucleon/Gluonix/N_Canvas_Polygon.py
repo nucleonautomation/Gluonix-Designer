@@ -5,15 +5,18 @@ from .N_Custom import Event_Bind_Canvas
 class Canvas_Polygon:
     def __init__(self, Main):
         self._Canvas = Main
-        self._Config = ['Outline', 'Fill', 'Thickness', 'Resize']
+        self._Config = ['Name', 'Outline', 'Fill', 'Thickness', 'Resize', 'Translucent']
         self._Display = True
         self._Resize = True
+        self._Name = False
+        self._Last_Name = False
         self._Type = 'Canvas_Polygon'
         self._Points = []
         self._Points_Current = []
         self._Outline = '#000000'
         self._Fill = '#000000'
         self._Thickness = 1
+        self._Translucent = False
         Points = [0, 0, 0, 0]
         self._Widget = self._Canvas._Frame.create_polygon(Points, outline=self._Outline, width=self._Thickness, fill=self._Fill)
         self._Canvas._Widget.append(self)
@@ -153,12 +156,20 @@ class Canvas_Polygon:
 
     def Create(self):
         try:
-            self._Canvas._Frame.itemconfig(self._Widget, outline=self._Outline, width=self._Thickness, fill=self._Fill)
+            Stripple = 'gray12' if self._Translucent else ''
+            self._Canvas._Frame.itemconfig(self._Widget, outline=self._Outline, width=self._Thickness, fill=self._Fill, stipple=Stripple)
             if len(self._Points)>1:
                 Points = [Item for Pair in self._Points_Current for Item in Pair]
             else:
                 Points = [0, 0, 0, 0]
             self._Canvas._Frame.coords(self._Widget, Points)
+            if self._Name!=self._Last_Name:
+                if self._Last_Name:
+                    if self._Last_Name in self._Canvas.__dict__:
+                        del self._Canvas.__dict__[self._Last_Name]
+                if self._Name:
+                    self._Canvas.__dict__[self._Name] = self
+                self._Last_Name = self._Name
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Create -> {E}")
 

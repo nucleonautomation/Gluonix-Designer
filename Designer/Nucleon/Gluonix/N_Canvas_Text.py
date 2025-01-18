@@ -5,9 +5,11 @@ from .N_Custom import Event_Bind_Canvas
 class Canvas_Text:
     def __init__(self, Main):
         self._Canvas = Main
-        self._Config = ['Left', 'Top', 'Width', 'Height', 'Color', 'Size', 'Value', 'Weight', 'Font', 'Resize', 'Anchor', 'Resize_Font']
+        self._Config = ['Name', 'Left', 'Top', 'Width', 'Height', 'Color', 'Size', 'Value', 'Weight', 'Font', 'Resize', 'Anchor', 'Resize_Font']
         self._Display = True
         self._Resize = True
+        self._Name = False
+        self._Last_Name = False
         self._Resize_Font = True
         self._Type = 'Canvas_Text'
         self._Left, self._Top, self._Width = 0, 0, 0
@@ -149,6 +151,13 @@ class Canvas_Text:
         try:
             self._Canvas._Frame.itemconfig(self._Widget, text=self._Value, fill=self._Color, font=(self._Font, self._Size_Current, self._Weight), anchor=self._Anchor, width=self._Width_Current, justify=self._Justify)
             self._Canvas._Frame.coords(self._Widget, self._X_Current, self._Y_Current)
+            if self._Name!=self._Last_Name:
+                if self._Last_Name:
+                    if self._Last_Name in self._Canvas.__dict__:
+                        del self._Canvas.__dict__[self._Last_Name]
+                if self._Name:
+                    self._Canvas.__dict__[self._Name] = self
+                self._Last_Name = self._Name
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Create -> {E}")
 

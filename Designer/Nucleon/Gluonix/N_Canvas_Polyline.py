@@ -5,9 +5,11 @@ from .N_Custom import Event_Bind_Canvas
 class Canvas_Polyline:
     def __init__(self, Main):
         self._Canvas = Main
-        self._Config = ['Outline', 'Thickness', 'Resize']
+        self._Config = ['Name', 'Outline', 'Thickness', 'Resize']
         self._Display = True
         self._Resize = True
+        self._Name = False
+        self._Last_Name = False
         self._Type = 'Canvas_Polyline'
         self._Points = []
         self._Points_Current = []
@@ -158,6 +160,13 @@ class Canvas_Polyline:
             else:
                 Points = [0, 0, 0, 0]
             self._Canvas._Frame.coords(self._Widget, Points)
+            if self._Name!=self._Last_Name:
+                if self._Last_Name:
+                    if self._Last_Name in self._Canvas.__dict__:
+                        del self._Canvas.__dict__[self._Last_Name]
+                if self._Name:
+                    self._Canvas.__dict__[self._Name] = self
+                self._Last_Name = self._Name
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Create -> {E}")
 
