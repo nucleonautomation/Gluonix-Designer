@@ -246,9 +246,10 @@ class Image:
                 self._Main._Widget.append(self)
                 self._Initialized = True
             self._Widget.config(background=self._Background)
-            if self._Path!=self._Path_Memory:
-                self._Path_Memory = self._Path
-                self.Open()
+            if not self._Array:
+                if self._Path!=self._Path_Memory:
+                    self._Path_Memory = self._Path
+                    self.Open()
             self.Relocate()
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
@@ -622,9 +623,10 @@ class Image_Lite:
                 self._Main._Widget.append(self)
                 self._Initialized = True
             self._Widget.config(background=self._Background)
-            if self._Path!=self._Path_Memory:
-                self._Path_Memory = self._Path
-                self.Open()
+            if not self._Array:
+                if self._Path!=self._Path_Memory:
+                    self._Path_Memory = self._Path
+                    self.Open()
             self.Relocate()
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
@@ -1000,9 +1002,10 @@ class Image_Zoom:
                     self.Hide()
                 self._Main._Widget.append(self)
                 self._Initialized = True
-            if self._Path!=self._Path_Memory:
-                self._Path_Memory = self._Path
-                self.Open()
+            if not self._Array:
+                if self._Path!=self._Path_Memory:
+                    self._Path_Memory = self._Path
+                    self.Open()
             self.Relocate()
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
