@@ -246,10 +246,20 @@ class Image:
                 self._Main._Widget.append(self)
                 self._Initialized = True
             self._Widget.config(background=self._Background)
-            if not self._Array:
-                if self._Path!=self._Path_Memory:
+            if isinstance(self._Path, str) and isinstance(self._Path_Memory, str):
+                if self._Path != self._Path_Memory:
                     self._Path_Memory = self._Path
                     self.Open()
+            elif isinstance(self._Path, list) and isinstance(self._Path_Memory, list):
+                if not np.array_equal(self._Path, self._Path_Memory):
+                    self._Path_Memory = self._Path
+                    self.Open()
+            elif type(self._Path) != type(self._Path_Memory):
+                self._Path_Memory = self._Path
+                self.Open()
+            elif self._Path != self._Path_Memory:
+                self._Path_Memory = self._Path
+                self.Open()
             self.Relocate()
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
@@ -623,10 +633,20 @@ class Image_Lite:
                 self._Main._Widget.append(self)
                 self._Initialized = True
             self._Widget.config(background=self._Background)
-            if not self._Array:
-                if self._Path!=self._Path_Memory:
+            if isinstance(self._Path, str) and isinstance(self._Path_Memory, str):
+                if self._Path != self._Path_Memory:
                     self._Path_Memory = self._Path
                     self.Open()
+            elif isinstance(self._Path, list) and isinstance(self._Path_Memory, list):
+                if not np.array_equal(self._Path, self._Path_Memory):
+                    self._Path_Memory = self._Path
+                    self.Open()
+            elif type(self._Path) != type(self._Path_Memory):
+                self._Path_Memory = self._Path
+                self.Open()
+            elif self._Path != self._Path_Memory:
+                self._Path_Memory = self._Path
+                self.Open()
             self.Relocate()
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
@@ -1002,10 +1022,20 @@ class Image_Zoom:
                     self.Hide()
                 self._Main._Widget.append(self)
                 self._Initialized = True
-            if not self._Array:
-                if self._Path!=self._Path_Memory:
+            if isinstance(self._Path, str) and isinstance(self._Path_Memory, str):
+                if self._Path != self._Path_Memory:
                     self._Path_Memory = self._Path
                     self.Open()
+            elif isinstance(self._Path, list) and isinstance(self._Path_Memory, list):
+                if not np.array_equal(self._Path, self._Path_Memory):
+                    self._Path_Memory = self._Path
+                    self.Open()
+            elif type(self._Path) != type(self._Path_Memory):
+                self._Path_Memory = self._Path
+                self.Open()
+            elif self._Path != self._Path_Memory:
+                self._Path_Memory = self._Path
+                self.Open()
             self.Relocate()
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
