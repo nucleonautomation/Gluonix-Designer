@@ -257,9 +257,6 @@ class Image:
             elif type(self._Path) != type(self._Path_Memory):
                 self._Path_Memory = self._Path
                 self.Open()
-            elif self._Path != self._Path_Memory:
-                self._Path_Memory = self._Path
-                self.Open()
             self.Relocate()
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
@@ -642,9 +639,6 @@ class Image_Lite:
                     self._Path_Memory = self._Path
                     self.Open()
             elif type(self._Path) != type(self._Path_Memory):
-                self._Path_Memory = self._Path
-                self.Open()
-            elif self._Path != self._Path_Memory:
                 self._Path_Memory = self._Path
                 self.Open()
             self.Relocate()
@@ -1031,9 +1025,6 @@ class Image_Zoom:
                     self._Path_Memory = self._Path
                     self.Open()
             elif type(self._Path) != type(self._Path_Memory):
-                self._Path_Memory = self._Path
-                self.Open()
-            elif self._Path != self._Path_Memory:
                 self._Path_Memory = self._Path
                 self.Open()
             self.Relocate()
