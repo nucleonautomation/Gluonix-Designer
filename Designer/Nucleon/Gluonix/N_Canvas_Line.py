@@ -20,13 +20,15 @@ class Canvas_Line:
         self._On_Show = False
         self._On_Hide = False
 
-    def Copy(self, Main=False):
+    def Copy(self, Name=False, Main=False):
         try:
             if not Main:
                 Main = self._Canvas
             Instance = type(self)(Main)
             for Key in self._Config:
                 setattr(Instance, "_"+Key, getattr(self, "_"+Key))
+            setattr(Instance, "_Name", Name)
+            Instance.Create()
             return Instance
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Copy -> {E}")

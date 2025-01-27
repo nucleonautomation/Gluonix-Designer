@@ -74,8 +74,7 @@ class Canvas:
             Instance = type(self)(Main)
             for Key in self._Config:
                 setattr(Instance, "_"+Key, getattr(self, "_"+Key))
-            if Name:
-                setattr(Instance, "_Name", Name)
+            setattr(Instance, "_Name", Name)
             Instance.Create()
             for Each in self._Widget:
                 Each.Copy(Main=Instance)

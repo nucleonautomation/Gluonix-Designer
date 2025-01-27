@@ -1,5 +1,8 @@
 # Change Log
 
+## V(1.8)
+- Fixed: Naming While Coping A Widget. New Object Will Have Be Independent Object With Differnet Name.
+
 ## V(1.7)
 - Translucent Config For Canvas Item Rectangle, Rectangle2, Circle, Oval, Arc, Pie, & Polygon
 - Fixed: Canvas Items Accessible Using Names
