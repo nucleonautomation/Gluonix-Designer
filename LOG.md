@@ -1,5 +1,9 @@
 # Change Log
 
+## V(2.0)
+- Tree Add Function Takes Image Path To Append An Image Before Text
+- Initial Function Added To Image So It Can Be Reset To Intial Image Assigned At Design Time
+
 ## V(1.8)
 - Fixed: Naming While Coping A Widget. New Object Will Have Be Independent Object With Differnet Name.
 

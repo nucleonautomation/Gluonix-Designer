@@ -30,6 +30,8 @@ class Bar:
                 self._Progress = 0
                 self._Zero = 'Left'
                 self._Resizable = self._Main._Resizable
+                self._On_Show = False
+                self._On_Hide = False
             except Exception as E:
                 self._GUI.Error(f"{self._Type} -> Init -> {E}")
         else:

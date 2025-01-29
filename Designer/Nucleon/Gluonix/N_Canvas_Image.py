@@ -9,7 +9,7 @@ from .N_Custom import Event_Bind_Canvas
 class Canvas_Image:
     def __init__(self, Main):
         self._Canvas = Main
-        self._Config = ['Width', 'Height', 'Left', 'Top', 'Anchor', 'Url', 'Array', 'Pil', 'Photo', 'Resize', 'Rotate', 'Path', 'Transparent']
+        self._Config = ['Width', 'Height', 'Left', 'Top', 'Anchor', 'Url', 'Array', 'Pil', 'Photo', 'Resize', 'Rotate', 'Path', 'Path_Initial', 'Transparent']
         self._Display = True
         self._Resize = True
         self._Name = False
@@ -20,6 +20,7 @@ class Canvas_Image:
         self._Image_Garbage = False
         self._Path = False
         self._Path_Memory = False
+        self._Path_Initial = False
         self._Url = False
         self._Array = False
         self._Pil = False
@@ -93,6 +94,13 @@ class Canvas_Image:
             self.Load()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Set -> {E}")
+            
+    def Initial(self):
+        try:
+            if self._Path_Initial:
+                self.Set(self._Path_Initial)
+        except Exception as E:
+            self._Canvas._GUI.Error(f"{self._Type} -> Initial -> {E}")
             
     def Refresh(self):
         try:
@@ -185,6 +193,8 @@ class Canvas_Image:
             else:
                 if self._Path and os.path.exists(self._Path):
                     self._Image = PIL_Image.open(self._Path)
+                    if not self._Path_Initial:
+                        self._Path_Initial = self._Path
             if self._Image and not self._Photo:
                 self._Image_Width, self._Image_Height = self._Image.size
         except Exception as E:

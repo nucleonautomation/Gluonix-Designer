@@ -25,7 +25,7 @@ class Stock_Canvas_Line:
             self.Label.Bind(On_Hover_Out=lambda E: self.Label.Config(Border_Color='#adadad', Background='#FFFFFF'))
             self.Label.Bind(On_Click=lambda E: self.On_Click())
             self.Label.Create()
-            self.Label.Set(Path=self.Global['Image']('Line'), Value=' Line')
+            self.Label.Set(Path=self.Global['Image'](self.Type), Value=' Line')
             self.Stock.Widget.append(self.Label)
             
         except Exception as E:
@@ -53,7 +53,8 @@ class Stock_Canvas_Line:
                 ID = Random_Letter+self.Global['Custom'].MD5(Root_ID+Name+str(time.time()*1000000))
                 Level = Root_Level+1
                 Root = getattr(self.Stock.Design.Element, Root_ID)
-                setattr(self.Stock.Design.Element, ID, self.Stock.Design.Element.Tree.Add(Name=Name, Parent=Root, Value=[ID, self.Type, Level]))
+                Image = self.Global['Image'](self.Type)
+                setattr(self.Stock.Design.Element, ID, self.Stock.Design.Element.Tree.Add(Name=f' {Name}', Parent=Root, Value=[ID, self.Type, Level], Path=Image))
                 self.Stock.Design.Element.Tree.Expand(Root)
                 ID_Tree = getattr(self.Stock.Design.Element, ID)
                 self.Stock.Design.Element.Tree.Select(ID_Tree)

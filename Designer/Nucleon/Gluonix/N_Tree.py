@@ -1,5 +1,7 @@
 # IMPORT LIBRARIES
 import os
+import math
+from PIL import Image as PIL_Image, ImageTk as PIL_ImageTk
 import tkinter as TK
 from .N_GUI import GUI
 from .N_Frame import Frame
@@ -18,6 +20,7 @@ class Tree:
                 self._Last_Name = False
                 self._Tag = []
                 self._Item = []
+                self._Image = {}
                 self._Resize_Font, self._Resize, self._Resize_Width, self._Resize_Height, self._Move, self._Move_Left, self._Move_Top = False, True, True, True, True, True, True
                 self._Popup = False
                 self._Display = True
@@ -201,15 +204,27 @@ class Tree:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Edit -> {E}")
             
-    def Add(self, Name, Parent='', Index='end', Tag='Default', Value=[], ID=False):
+    def Add(self, Name, Parent='', Index='end', Tag='Default', Value=[], ID=None, Path=None):
         try:
             if Index!='end':
                 if not isinstance(Index, int):
                     Index = int(self.Index(Index))
-            if ID:
-                Item = self._Widget.insert(Parent, Index, iid=ID, text=Name, values=Value, tags=Tag)
-            else:
-                Item = self._Widget.insert(Parent, Index, text=Name, values=Value, tags=Tag)
+            Insert_Args = {'parent': Parent, 'index': Index, 'text': f' {Name}', 'values': Value, 'tags': Tag}
+            if ID is not None:
+                Insert_Args['iid'] = ID
+            if Path is not None and os.path.exists(Path):
+                if Path not in self._Image:
+                    Image_Pil = PIL_Image.open(Path)
+                    Height = math.ceil(self._Font_Size * 1.5)
+                    Aspect_Ratio = Image_Pil.width / Image_Pil.height
+                    Width = int(Height * Aspect_Ratio)
+                    Image_Pil = Image_Pil.resize((Width, Height), PIL_Image.NEAREST)
+                    Image = PIL_ImageTk.PhotoImage(Image_Pil)
+                    self._Image[Path] = Image
+                else:
+                    Image = self._Image[Path]
+                Insert_Args['image'] = Image
+            Item = self._Widget.insert(**Insert_Args)
             self._Item.append(Item)
             self.Adjust_Width(Name, Item)
             return Item

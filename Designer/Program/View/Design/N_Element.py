@@ -125,19 +125,22 @@ class Element:
                 Stock = getattr(self.Design.Stock, f"Stock_{Widget['Type']}")
                 Stock.Create(Widget['ID'])
                 Root = getattr(self, Widget['Root'])
-                setattr(self, Widget['ID'], self.Tree.Add(Name=Widget['Name'], Parent=Root, Value=[Widget['ID'], Widget['Type'], 0]))
+                Image = self.Global['Image'](Widget['Type'])
+                setattr(self, Widget['ID'], self.Tree.Add(Name=Widget['Name'], Parent=Root, Value=[Widget['ID'], Widget['Type'], 0], Path=Image))
             Widgets = self.Design.Database.Get(f"SELECT * FROM `Item` WHERE `Root`='{Parent}'", Keys=True)
             for Widget in Widgets:
                 Stock = getattr(self.Design.Stock, f"Stock_{Widget['Type']}")
                 Stock.Create(Widget['ID'])
                 Root = getattr(self, Widget['Root'])
-                setattr(self, Widget['ID'], self.Tree.Add(Name=Widget['Name'], Parent=Root, Value=[Widget['ID'], Widget['Type'], 0]))
+                Image = self.Global['Image'](Widget['Type'])
+                setattr(self, Widget['ID'], self.Tree.Add(Name=Widget['Name'], Parent=Root, Value=[Widget['ID'], Widget['Type'], 0], Path=Image))
             Widgets = self.Design.Database.Get(f"SELECT * FROM `Frame` WHERE `Root`='{Parent}'", Keys=True)
             for Widget in Widgets:
                 Stock = getattr(self.Design.Stock, f"Stock_{Widget['Type']}")
                 Stock.Create(Widget['ID'])
                 Root = getattr(self, Widget['Root'])
-                setattr(self, Widget['ID'], self.Tree.Add(Name=Widget['Name'], Parent=Root, Value=[Widget['ID'], Widget['Type'], Widget['Level']]))
+                Image = self.Global['Image'](Widget['Type'])
+                setattr(self, Widget['ID'], self.Tree.Add(Name=Widget['Name'], Parent=Root, Value=[Widget['ID'], Widget['Type'], Widget['Level']], Path=Image))
                 self.Load_Child(Widget['ID'])
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
@@ -479,7 +482,8 @@ class Element:
                 Level = 0
                 if Type=='Frame':
                     Level = Widget['Level']
-                setattr(self, Widget['ID'], self.Tree.Add(Name=Widget['Name'], Parent=Root, Value=[Widget['ID'], Widget['Type'], Level]))
+                Image = self.Global['Image'](Widget['Type'])
+                setattr(self, Widget['ID'], self.Tree.Add(Name=Widget['Name'], Parent=Root, Value=[Widget['ID'], Widget['Type'], Level], Path=Image))
                 for Each in self.Tree.Child(ID):
                     self.Paste_All(Each, getattr(self, Widget['ID']))
         except Exception as E:

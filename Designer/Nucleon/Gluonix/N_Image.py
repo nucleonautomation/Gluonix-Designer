@@ -19,7 +19,7 @@ class Image:
         if self._GUI is not None:
             self._Type = "Image"
             try:
-                self._Config = ['Name', 'Background', 'Foreground', 'Border_Color', 'Border_Size', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Path', 'Url', 'Array', 'Pil', 'Rotate', 'Transparent', 'Aspect_Ratio', 'Convert_Type', 'Tolerance']
+                self._Config = ['Name', 'Background', 'Foreground', 'Border_Color', 'Border_Size', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Path', 'Path_Initial', 'Url', 'Array', 'Pil', 'Rotate', 'Transparent', 'Aspect_Ratio', 'Convert_Type', 'Tolerance']
                 self._Initialized = False
                 self._Name = False
                 self._Last_Name = False
@@ -38,6 +38,7 @@ class Image:
                 self._Image = False
                 self._Path = False
                 self._Path_Memory = False
+                self._Path_Initial = False
                 self._Url = False
                 self._Array = False
                 self._Pil = False
@@ -126,6 +127,13 @@ class Image:
             self.Relocate()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Set -> {E}")
+            
+    def Initial(self):
+        try:
+            if self._Path_Initial:
+                self.Set(self._Path_Initial)
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Initial -> {E}")
             
     def Reset(self):
         try:
@@ -295,6 +303,8 @@ class Image:
             else:
                 if self._Path and os.path.exists(self._Path):
                     self._Image = PIL_Image.open(self._Path)
+                    if not self._Path_Initial:
+                        self._Path_Initial = self._Path
                 else:
                     self._Image = False
                     self._Widget.configure(image = None)
@@ -411,7 +421,7 @@ class Image_Lite:
         if self._GUI is not None:
             self._Type = "Image_Lite"
             try:
-                self._Config = ['Name', 'Background', 'Foreground', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Path', 'Url', 'Array', 'Pil', 'Rotate', 'Transparent', 'Aspect_Ratio', 'Convert_Type', 'Tolerance']
+                self._Config = ['Name', 'Background', 'Foreground', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Path', 'Path_Initial', 'Url', 'Array', 'Pil', 'Rotate', 'Transparent', 'Aspect_Ratio', 'Convert_Type', 'Tolerance']
                 self._Initialized = False
                 self._Name = False
                 self._Last_Name = False
@@ -427,6 +437,7 @@ class Image_Lite:
                 self._Image = False
                 self._Path = False
                 self._Path_Memory = False
+                self._Path_Initial = False
                 self._Url = False
                 self._Array = False
                 self._Pil = False
@@ -514,6 +525,13 @@ class Image_Lite:
             self.Relocate()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Set -> {E}")
+            
+    def Initial(self):
+        try:
+            if self._Path_Initial:
+                self.Set(self._Path_Initial)
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Initial -> {E}")
             
     def Reset(self):
         try:
@@ -678,6 +696,8 @@ class Image_Lite:
             else:
                 if self._Path and os.path.exists(self._Path):
                     self._Image = PIL_Image.open(self._Path)
+                    if not self._Path_Initial:
+                        self._Path_Initial = self._Path
                 else:
                     self._Image = False
                     self._Widget.configure(image = None)
@@ -794,7 +814,7 @@ class Image_Zoom:
         if self._GUI is not None:
             self._Type = "Image_Zoom"
             try:
-                self._Config = ['Name', 'Background', 'Border_Color', 'Border_Size', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Path', 'Url', 'Array', 'Pil', 'Rotate', 'Transparent']
+                self._Config = ['Name', 'Background', 'Border_Color', 'Border_Size', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Path', 'Path_Initial', 'Url', 'Array', 'Pil', 'Rotate', 'Transparent']
                 self._Initialized = False
                 self._Name = False
                 self._Last_Name = False
@@ -815,6 +835,7 @@ class Image_Zoom:
                 self._Image_Window = False
                 self._Path = False
                 self._Path_Memory = False
+                self._Path_Initial = False
                 self._Url = False
                 self._Array = False
                 self._Pil = False
@@ -903,6 +924,13 @@ class Image_Zoom:
                 self.Load_Current()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Set -> {E}")
+            
+    def Initial(self):
+        try:
+            if self._Path_Initial:
+                self.Set(self._Path_Initial)
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Initial -> {E}")
             
     def Refresh(self):
         try:
@@ -1052,6 +1080,8 @@ class Image_Zoom:
             else:
                 if self._Path and os.path.exists(self._Path):
                     self._Image = PIL_Image.open(self._Path)
+                    if not self._Path_Initial:
+                        self._Path_Initial = self._Path
                 else:
                     self._Image = False
             if self._Image:
