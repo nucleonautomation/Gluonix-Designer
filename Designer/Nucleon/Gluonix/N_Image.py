@@ -131,7 +131,10 @@ class Image:
     def Initial(self):
         try:
             if self._Path_Initial:
+                Load_Setup = [self._Array, self._Url, self._Pil]
+                self._Array, self._Url, self._Pil = False, False, False
                 self.Set(self._Path_Initial)
+                self._Array, self._Url, self._Pil = Load_Setup
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Initial -> {E}")
             
@@ -529,7 +532,10 @@ class Image_Lite:
     def Initial(self):
         try:
             if self._Path_Initial:
+                Load_Setup = [self._Array, self._Url, self._Pil]
+                self._Array, self._Url, self._Pil = False, False, False
                 self.Set(self._Path_Initial)
+                self._Array, self._Url, self._Pil = Load_Setup
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Initial -> {E}")
             
@@ -928,7 +934,10 @@ class Image_Zoom:
     def Initial(self):
         try:
             if self._Path_Initial:
+                Load_Setup = [self._Array, self._Url, self._Pil]
+                self._Array, self._Url, self._Pil = False, False, False
                 self.Set(self._Path_Initial)
+                self._Array, self._Url, self._Pil = Load_Setup
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Initial -> {E}")
             

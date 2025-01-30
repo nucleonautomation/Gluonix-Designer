@@ -98,7 +98,10 @@ class Canvas_Image:
     def Initial(self):
         try:
             if self._Path_Initial:
+                Load_Setup = [self._Array, self._Url, self._Pil, self._Photo]
+                self._Array, self._Url, self._Pil, self._Photo = False, False, False, False
                 self.Set(self._Path_Initial)
+                self._Array, self._Url, self._Pil, self._Photo = Load_Setup
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Initial -> {E}")
             
