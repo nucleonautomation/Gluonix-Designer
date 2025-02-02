@@ -1,5 +1,9 @@
 # Change Log
 
+## V(2.1)
+- Deplyment To Runtime Changed To Single Nucleon Folder Instead Of Nucleon & Data Separate Folders
+- Design Environment Updates
+
 ## V(2.0)
 - Tree Add Function Takes Image Path To Append An Image Before Text
 - Initial Function Added To Image So It Can Be Reset To Intial Image Assigned At Design Time

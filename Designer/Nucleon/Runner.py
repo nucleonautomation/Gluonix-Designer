@@ -22,7 +22,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 # -------------------------------------------------------------------------------------------------------------------------------
 # Global Variables
 # -------------------------------------------------------------------------------------------------------------------------------
-Database = Gluonix.SQL("./Data/NGD.dll")
+Database = Gluonix.SQL("./Nucleon/Data/NGD.dll")
 Error_List = []
 Log_Folder = "./Log"
 Log_File = "Gluonix_Error.log"
@@ -81,7 +81,7 @@ def Load(Global):
             Temp_Root = Global[Display['ID']]
             Temp_Root.Config(Error_Log=Error_Log)
             Temp_Root.Config(Width=int(Display['Width']), Height=int(Display['Height']), Left=int(Display['Left']), Top=int(Display['Top']))
-            Temp_Root.Config(Title=Display['Title'], Background=Display['Background'], Icon=f"./Data/File/{Variable_Data['Icon']}", Resizable=bool(int(Display['Resizable'])))
+            Temp_Root.Config(Title=Display['Title'], Background=Display['Background'], Icon=f"./Nucleon/Data/File/{Variable_Data['Icon']}", Resizable=bool(int(Display['Resizable'])))
             Temp_Root.Config(Persistent=bool(int(Display['Persistent'])), Full_Screen=bool(int(Display['Full_Screen'])), Toolbar=bool(int(Display['Toolbar'])), Alignment=Display['Alignment'], Menu_Enable=bool(int(Display['Menu'])))
             Temp_Root.Create()
             Temp_Root.Hide()
@@ -118,7 +118,7 @@ def Load_Child(Parent, Root, Global):
             Temp_Widget.Config(Resize_Width=bool(Widget['Resize_Width']), Resize_Height=bool(Widget['Resize_Height']))
             Temp_Widget.Config(Move_Left=bool(Widget['Move_Left']), Move_Top=bool(Widget['Move_Top']))
             Temp_Widget.Config(Progress=Widget['Progress'], Zero=Widget['Zero'], Increment=Widget['Increment'], Mimimum=Widget['Minimum'], Maximum=Widget['Maximum'])
-            Temp_Widget.Config(Path=f"./Data/File/{Widget['ID']}")
+            Temp_Widget.Config(Path=f"./Nucleon/Data/File/{Widget['ID']}")
             Temp_Widget.Config(Url=bool(Widget['Url']), Transparent=bool(Widget['Transparent']), Rotate=Widget['Rotate'], Compound=Widget['Compound'], Aspect_Ratio=bool(Widget['Aspect_Ratio']))
             Temp_Widget.Config(Secure=Widget['Secure'])
             Temp_Widget.Config(Orient=Widget['Orient'], Ridge=Widget['Ridge'], Height_List=Widget['Height_List'])
@@ -136,7 +136,7 @@ def Load_Child(Parent, Root, Global):
             Temp_Item.Config(Justify=Item['Justify'], Anchor=Item['Anchor'])
             Temp_Item.Config(Resize=bool(Item['Resize']), Move=bool(Item['Move']))
             Temp_Item.Config(Url=bool(Item['Url']), Array=bool(Item['Array']), Pil=bool(Item['Pil']), Transparent=bool(Item['Transparent']), Rotate=Item['Rotate'], Aspect_Ratio=bool(Item['Aspect_Ratio']))
-            Temp_Item.Config(Path=f"./Data/File/{Item['ID']}")
+            Temp_Item.Config(Path=f"./Nucleon/Data/File/{Item['ID']}")
             Temp_Item.Create()
         Frames = Database.Get(f"SELECT * FROM `Frame` WHERE `Root`='{Parent}'", Keys=True)
         for Frame in Frames:
@@ -174,7 +174,7 @@ def Create_Popup(Display):
             Display = Display[0]
             Temp_Popup = Gluonix.Popup(Global['Root'])
             Temp_Popup.Config(Width=int(Display['Width']), Height=int(Display['Height']), Left=int(Display['Left']), Top=int(Display['Top']))
-            Temp_Popup.Config(Title=Display['Title'], Background=Display['Background'], Icon=f"./Data/File/{Variable_Data['Icon']}", Resizable=bool(int(Display['Resizable'])))
+            Temp_Popup.Config(Title=Display['Title'], Background=Display['Background'], Icon=f"./Nucleon/Data/File/{Variable_Data['Icon']}", Resizable=bool(int(Display['Resizable'])))
             Temp_Popup.Config(Persistent=bool(int(Display['Persistent'])), Full_Screen=bool(int(Display['Full_Screen'])), Toolbar=bool(int(Display['Toolbar'])), Alignment=Display['Alignment'], Topmost=bool(int(Display['Topmost'])), Menu_Enable=bool(int(Display['Menu'])))
             Temp_Popup.Create()
             Load_Child(Display['ID'], Temp_Popup, Global)

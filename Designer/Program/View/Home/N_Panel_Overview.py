@@ -482,9 +482,7 @@ class Overview:
                     if os.path.exists(f'{self.Runtime_Path}/Nucleon'):
                         shutil.rmtree(f'{self.Runtime_Path}/Nucleon')
                     shutil.copytree(f'./Nucleon', f'{self.Runtime_Path}/Nucleon')
-                    if os.path.exists(f'{self.Runtime_Path}/Data'):
-                        shutil.rmtree(f'{self.Runtime_Path}/Data')
-                    shutil.copytree(f'{self.Project_Path}/Data', f'{self.Runtime_Path}/Data')
+                    shutil.copytree(f'{self.Project_Path}/Data', f'{self.Runtime_Path}/Nucleon/Data')
                     Temp_Name = self.Title_Entry.Get()
                     if not os.path.exists(f'{self.Runtime_Path}/{Temp_Name}.py'):
                         shutil.copy('Program/Base/GUI.py', f'{self.Runtime_Path}/{Temp_Name}.py')
