@@ -625,8 +625,8 @@ class Image_Lite:
         try:
             Width = self._Width*(Width/100)
             Height = self._Height*(Height/100)
-            Left = self._Width*(Left/100)-self._Border_Size
-            Top = self._Height*(Top/100)-self._Border_Size
+            Left = self._Width*(Left/100)
+            Top = self._Height*(Top/100)
             return [Width, Height, Left, Top]
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Locate -> {E}")

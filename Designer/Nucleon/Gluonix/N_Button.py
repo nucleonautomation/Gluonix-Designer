@@ -12,7 +12,7 @@ class Button:
         if self._GUI is not None:
             self._Type = "Button"
             try:
-                self._Config = ['Name', 'Background', 'Foreground', 'Border_Color', 'Border_Size', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Font_Size', 'Font_Weight', 'Font_Family','Value', 'Ridge', 'Disable']
+                self._Config = ['Name', 'Background', 'Foreground', 'Border_Color', 'Border_Size', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Font_Size', 'Font_Weight', 'Font_Family', 'Value', 'Ridge', 'Disable', 'Disable_Foreground', 'Active_Background', 'Active_Foreground']
                 self._Initialized = False
                 self._Name = False
                 self._Last_Name = False
@@ -28,6 +28,9 @@ class Button:
                 self._Background = self._Main._Background
                 self._Background_Main = True
                 self._Foreground = '#000000'
+                self._Disable_Foreground = self._Foreground
+                self._Active_Foreground = self._Background
+                self._Active_Background = self._Foreground
                 self._Font_Size = 12
                 self._Font_Weight = 'normal'
                 self._Font_Family = 'Helvetica'
@@ -233,6 +236,7 @@ class Button:
             self.Font()
             self._Font = TK.font.Font(family=self._Font_Family, size=self._Font_Size_Current, weight=self._Font_Weight)
             self._Widget.config(background=self._Background, foreground=self._Foreground, font=self._Font, text=self._Value, wraplength=self._Width_Current-(self._Border_Size*2), state=State, relief=Relief)
+            self._Widget.config(disabledforeground=self._Disable_Foreground, activebackground=self._Active_Background, activeforeground=self._Active_Foreground)
             self.Resize()
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
@@ -315,7 +319,7 @@ class Button_Lite:
         if self._GUI is not None:
             self._Type = "Button_Lite"
             try:
-                self._Config = ['Name', 'Background', 'Foreground', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Font_Size', 'Font_Weight', 'Font_Family','Value', 'Ridge', 'Disable']
+                self._Config = ['Name', 'Background', 'Foreground', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Font_Size', 'Font_Weight', 'Font_Family', 'Value', 'Ridge', 'Disable', 'Disable_Foreground', 'Active_Background', 'Active_Foreground']
                 self._Initialized = False
                 self._Name = False
                 self._Last_Name = False
@@ -327,6 +331,9 @@ class Button_Lite:
                 self._Background = self._Main._Background
                 self._Background_Main = True
                 self._Foreground = '#000000'
+                self._Disable_Foreground = self._Foreground
+                self._Active_Foreground = self._Background
+                self._Active_Background = self._Foreground
                 self._Font_Size = 12
                 self._Font_Weight = 'normal'
                 self._Font_Family = 'Helvetica'
@@ -496,8 +503,8 @@ class Button_Lite:
         try:
             Width = self._Width*(Width/100)
             Height = self._Height*(Height/100)
-            Left = self._Width*(Left/100)-self._Border_Size
-            Top = self._Height*(Top/100)-self._Border_Size
+            Left = self._Width*(Left/100)
+            Top = self._Height*(Top/100)
             return [Width, Height, Left, Top]
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Locate -> {E}")
@@ -533,6 +540,7 @@ class Button_Lite:
             self.Font()
             self._Font = TK.font.Font(family=self._Font_Family, size=self._Font_Size_Current, weight=self._Font_Weight)
             self._Widget.config(background=self._Background, foreground=self._Foreground, font=self._Font, text=self._Value, wraplength=self._Width_Current, state=State, relief=Relief)
+            self._Widget.config(disabledforeground=self._Disable_Foreground, activebackground=self._Active_Background, activeforeground=self._Active_Foreground)
             self.Resize()
             if self._Name!=self._Last_Name:
                 if self._Last_Name:

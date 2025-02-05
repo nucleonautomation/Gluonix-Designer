@@ -1,5 +1,8 @@
 # Change Log
 
+## V(2.2)
+- List, Entry & Button Widget Configs Updates
+
 ## V(2.1)
 - Deplyment To Runtime Changed To Single Nucleon Folder Instead Of Nucleon & Data Separate Folders
 - Design Environment Updates

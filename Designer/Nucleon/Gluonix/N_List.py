@@ -12,7 +12,7 @@ class List:
         if self._GUI is not None:
             self._Type = "List"
             try:
-                self._Config = ['Name', 'Background', 'Foreground', 'Border_Color', 'Border_Size', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Font_Size', 'Font_Weight', 'Font_Family','Disable']
+                self._Config = ['Name', 'Background', 'Foreground', 'Border_Color', 'Border_Size', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Font_Size', 'Font_Weight', 'Font_Family', 'Disable', 'Scrollbar', 'Vertical', 'Select_Foreground', 'Select_Background', 'Multiple']
                 self._Initialized = False
                 self._Name = False
                 self._Last_Name = False
@@ -24,15 +24,21 @@ class List:
                 self._Main = Main
                 self._Frame = Frame(self._Main)
                 self._Widget = TK.Listbox(self._Frame._Frame)
+                self._Scrollbar_Vertical = TK.Scrollbar(self._Frame._Frame)
                 self._Border_Color = '#000000'
                 self._Border_Size = 0
                 self._Background = self._Main._Background
                 self._Background_Main = True
+                self._Scrollbar = 25
+                self._Vertical = False
                 self._Foreground = '#000000'
+                self._Select_Foreground = '#000000'
+                self._Select_Background = '#FFFFFF'
                 self._Font_Size = 12
                 self._Font_Weight = 'normal'
                 self._Font_Family = 'Helvetica'
                 self._Disable = False
+                self._Multiple = False
                 self._Resizable = self._Main._Resizable
                 self._On_Show = False
                 self._On_Hide = False
@@ -64,6 +70,7 @@ class List:
         try:
             self._Main._Widget.remove(self)
             self._Widget.destroy()
+            self._Scrollbar_Vertical.destroy()
             self._Frame.Delete()
             if self:
                 del self
@@ -111,22 +118,40 @@ class List:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Grab -> {E}")
             
+    def Top(self):
+        try:
+            self._Widget.yview_moveto(0)
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Top -> {E}")
+            
     def Get(self):
         try:
-            if len(self._Widget.curselection())>0:
+            if len(self._Widget.curselection())==1:
                 return self._Values[self._Widget.curselection()[0]]
+            else:
+                Result = []
+                for Each in self._Widget.curselection():
+                    Result.append(self._Values[Each])
+                return Result
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Get -> {E}")
             
     def Set(self, Value):
         try:
-            self._Widget.selection_clear(0, TK.END)
+            if not self._Multiple:
+                self._Widget.selection_clear(0, TK.END)
             if isinstance(Value, int):
                 self._Widget.selection_set(Value)
             else:
                 self._Widget.selection_set(self._Values.index(Value))
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Set -> {E}")
+            
+    def Reset(self):
+        try:
+            self._Widget.selection_clear(0, TK.END)
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Reset -> {E}")
             
     def Add(self, Value):
         try:
@@ -264,9 +289,17 @@ class List:
                 State = "disabled"
             else:
                 State = "normal"
+            self._Scrollbar_Vertical.config(orient="vertical", command=self._Widget.yview, width=self._Scrollbar)
             self.Font()
             self._Font = TK.font.Font(family=self._Font_Family, size=self._Font_Size_Current, weight=self._Font_Weight)
-            self._Widget.config(background=self._Background, foreground=self._Foreground, font=self._Font, state=State, bd=0)
+            Select_Mode = TK.BROWSE
+            if self._Multiple:
+                Select_Mode = TK.MULTIPLE
+            self._Widget.config(background=self._Background, foreground=self._Foreground, font=self._Font, state=State, bd=0, activestyle='dotbox')
+            self._Widget.config(selectbackground=self._Select_Background, selectforeground=self._Select_Foreground, selectmode=Select_Mode)
+            if self._Vertical:
+                self._Scrollbar_Vertical.place(relx=1, rely=0, relheight=1, anchor="ne")
+                self._Widget.configure(yscrollcommand=self._Scrollbar_Vertical.set)
             self.Resize()
             if self._Name!=self._Last_Name:
                 if self._Last_Name:

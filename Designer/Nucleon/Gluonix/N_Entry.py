@@ -12,7 +12,7 @@ class Entry:
         if self._GUI is not None:
             self._Type = "Entry"
             try:
-                self._Config = ['Name', 'Background', 'Foreground', 'Border_Color', 'Border_Size', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Font_Size', 'Font_Weight', 'Font_Family','Align', 'Disable', 'Secure']
+                self._Config = ['Name', 'Background', 'Foreground', 'Border_Color', 'Border_Size', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Font_Size', 'Font_Weight', 'Font_Family','Align', 'Disable', 'Secure', 'Disable_Background', 'Disable_Foreground', 'Select_Background', 'Select_Foreground']
                 self._Initialized = False
                 self._Widget = []
                 self._Name = False
@@ -28,6 +28,10 @@ class Entry:
                 self._Background = self._Main._Background
                 self._Background_Main = True
                 self._Foreground = '#000000'
+                self._Disable_Foreground = self._Foreground
+                self._Disable_Background = '#d0d3d4'
+                self._Select_Foreground = self._Background
+                self._Select_Background = self._Foreground
                 self._Font_Size = 12
                 self._Font_Weight = 'normal'
                 self._Font_Family = 'Helvetica'
@@ -244,6 +248,7 @@ class Entry:
             self.Font()
             self._Font = TK.font.Font(family=self._Font_Family, size=self._Font_Size_Current, weight=self._Font_Weight)
             self._Widget.config(background=self._Background, foreground=self._Foreground, font=self._Font, state=State, show=Show, justify=self._Align, bd=0, highlightthickness=0, relief=TK.FLAT)
+            self._Widget.config(disabledbackground=self._Disable_Background, disabledforeground=self._Disable_Foreground, selectbackground=self._Select_Background, selectforeground=self._Select_Foreground)
             self.Resize()
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
