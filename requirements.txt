@@ -1,6 +1,10 @@
 # Requirements file
 
-tkinter
-requests
-pillow
-sqlite3
+pillow>=6.0.0
+requests>=2.22.0
+
+# tkinter is part of the standard library, no need to include it here
+# tkinter>=8.6
+
+# sqlite3 is also included in the standard library
+# sqlite3>=3.14.2
