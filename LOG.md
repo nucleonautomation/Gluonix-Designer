@@ -1,5 +1,8 @@
 # Change Log
 
+## V(2.3)
+- Relative Paths Fixed, Designer & Deployed Projects Can be Started From Any Directory Using Relative Or Absolute Path
+
 ## V(2.2)
 - List, Entry & Button Widget Configs Updates
 
@@ -12,7 +15,7 @@
 - Initial Function Added To Image So It Can Be Reset To Intial Image Assigned At Design Time
 
 ## V(1.8)
-- Fixed: Naming While Coping A Widget. New Object Will Have Be Independent Object With Differnet Name.
+- Fixed: Naming While Coping A Widget. New Object Will Have Be Independent Object With Differnet Name
 
 ## V(1.7)
 - Translucent Config For Canvas Item Rectangle, Rectangle2, Circle, Oval, Arc, Pie, & Polygon

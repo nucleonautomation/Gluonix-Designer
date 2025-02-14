@@ -30,7 +30,6 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 # -------------------------------------------------------------------------------------------------------------------------------
 # Global Variables
 # -------------------------------------------------------------------------------------------------------------------------------
-Database = Gluonix.SQL("./Data/NGD.dll")
 Title = "Gluonix Designer - Nucleon Automation"
 Error_List = []
 Error_Display = True
@@ -46,15 +45,7 @@ Top = 50
 Background = "#F0F0F0"
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# Database Variables
-# -------------------------------------------------------------------------------------------------------------------------------
-Variable_Data = {}
-Variable_Data_Temp = Database.Get("SELECT * FROM `Variable`", Keys=True)
-for Each in Variable_Data_Temp:
-        Variable_Data[Each['ID']] = Each['Data']
-
-# -------------------------------------------------------------------------------------------------------------------------------
-# Global Functions
+# Error Log
 # -------------------------------------------------------------------------------------------------------------------------------
 def Error(E):
     global Error_List, Error_Display
@@ -78,7 +69,71 @@ def Error(E):
         with open(Log_Path, "w") as File:
             File.write(Line.rstrip("\r\n") + "\n")
             File.writelines(File_Content)
+            
+# -------------------------------------------------------------------------------------------------------------------------------
+# Relative Path
+# -------------------------------------------------------------------------------------------------------------------------------
 
+def Image(Name, Ext="png"):
+    try:
+        Base_Dir = os.path.dirname(os.path.abspath(__file__))
+        Suffix = r"\Program\Main"
+        if Base_Dir.endswith(Suffix):
+            Base_Dir = Base_Dir[:-len(Suffix)]
+        Path = os.path.join(Base_Dir, "Data", "Image", f"{Name}.{Ext}")
+        if os.path.exists(Path):
+            return Path
+        else:
+            return os.path.join(Base_Dir, "Data", "Image", "Black.png")
+    except Exception as E:
+        Error("Image -> " + str(E))
+
+
+def Data(Name):
+    try:
+        Base_Dir = os.path.dirname(os.path.abspath(__file__))
+        Suffix = r"\Program\Main"
+        if Base_Dir.endswith(Suffix):
+            Base_Dir = Base_Dir[:-len(Suffix)]
+        Path = os.path.join(Base_Dir, "Data", f"{Name}")
+        if os.path.exists(Path):
+            return Path
+        else:
+            return ""
+    except Exception as E:
+        Error("Data -> " + str(E))
+
+
+def Relative_Path(Name):
+    try:
+        Base_Dir = os.path.dirname(os.path.abspath(__file__))
+        Suffix = r"\Program\Main"
+        if Base_Dir.endswith(Suffix):
+            Base_Dir = Base_Dir[:-len(Suffix)]
+        Path = os.path.join(Base_Dir, f"{Name}")
+        if os.path.exists(Path):
+            return Path
+        else:
+            return ""
+    except Exception as E:
+        Error("Data -> " + str(E))
+
+# -------------------------------------------------------------------------------------------------------------------------------
+# Database
+# -------------------------------------------------------------------------------------------------------------------------------
+Database = Gluonix.SQL(Data('NGD.dll'))
+
+# -------------------------------------------------------------------------------------------------------------------------------
+# Database Variables
+# -------------------------------------------------------------------------------------------------------------------------------
+Variable_Data = {}
+Variable_Data_Temp = Database.Get("SELECT * FROM `Variable`", Keys=True)
+for Each in Variable_Data_Temp:
+        Variable_Data[Each['ID']] = Each['Data']
+
+# -------------------------------------------------------------------------------------------------------------------------------
+# Global Functions
+# -------------------------------------------------------------------------------------------------------------------------------
 
 def Error_Clear():
     try:
@@ -86,28 +141,6 @@ def Error_Clear():
         Error_List = []
     except Exception as E:
         Error("Error_Clear -> " + str(E))
-
-
-def Image(Name, Ext="png"):
-    try:
-        Path = f"./Data/Image/{Name}.{Ext}"
-        if os.path.exists(Path):
-            return Path
-        else:
-            return "./Data/Image/Black.png"
-    except Exception as E:
-        Error("Image -> " + str(E))
-
-
-def Data(Name):
-    try:
-        Path = f"./Data/{Name}"
-        if os.path.exists(Path):
-            return Path
-        else:
-            return ""
-    except Exception as E:
-        Error("Data -> " + str(E))
 
 
 def Hide(Widget=[]):

@@ -481,11 +481,11 @@ class Overview:
                 if self.Save(Loading=False, Direct=True):
                     if os.path.exists(f'{self.Runtime_Path}/Nucleon'):
                         shutil.rmtree(f'{self.Runtime_Path}/Nucleon')
-                    shutil.copytree(f'./Nucleon', f'{self.Runtime_Path}/Nucleon')
+                    shutil.copytree(self.Global['Relative_Path']('Nucleon'), f'{self.Runtime_Path}/Nucleon')
                     shutil.copytree(f'{self.Project_Path}/Data', f'{self.Runtime_Path}/Nucleon/Data')
                     Temp_Name = self.Title_Entry.Get()
                     if not os.path.exists(f'{self.Runtime_Path}/{Temp_Name}.py'):
-                        shutil.copy('Program/Base/GUI.py', f'{self.Runtime_Path}/{Temp_Name}.py')
+                        shutil.copy(self.Global['Relative_Path']('Program/Base/GUI.py'), f'{self.Runtime_Path}/{Temp_Name}.py')
                     self.Global['Message'].Show('Success', 'Project Deployed')
                     os.startfile(self.Runtime_Path)
                 self.Global['Loading'].Hide()

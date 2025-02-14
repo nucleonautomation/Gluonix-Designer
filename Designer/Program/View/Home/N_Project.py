@@ -66,7 +66,7 @@ class Project:
             
                 #Version
                     #Current
-            TempDatabase = self.Global['Gluonix'].SQL(f'./Data/NGD.dll')
+            TempDatabase = self.Global['Gluonix'].SQL(self.Global['Data']('NGD.dll'))
             TempVersion = TempDatabase.Get("SELECT `Data` FROM `Variable` WHERE `ID`='Version'")[0][0]
             TempRevision = TempDatabase.Get("SELECT `Data` FROM `Variable` WHERE `ID`='Revision'")[0][0]
             TempDatabase.Close()
@@ -94,7 +94,7 @@ class Project:
             Project_File_Path = self.Global['GUI'].File(Initial=os.path.join(os.path.expanduser('~'), 'Documents'), Title='Select Project', Default='.ng', Type=[["Nucleon Gluonix (*.ng)", "*.ng"]])
             if Project_File_Path:
                 Project_Path = os.path.dirname(Project_File_Path)
-                self.Update_Database(f'{Project_Path}/Data/NGD.dll', './Data/PNGD.dll')
+                self.Update_Database(f'{Project_Path}/Data/NGD.dll', self.Global['Data']('PNGD.dll'))
                 self.Home.Panel.Overview.Project_Path = Project_Path
                 self.Home.Panel.Overview.Update()
                 self.Global['Message'].Hide()
