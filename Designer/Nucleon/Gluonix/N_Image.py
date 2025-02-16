@@ -261,7 +261,7 @@ class Image:
                     self._Path_Memory = self._Path
                     self.Open()
             elif isinstance(self._Path, list) and isinstance(self._Path_Memory, list):
-                if not np.array_equal(self._Path, self._Path_Memory):
+                if not all(a == b for a, b in zip(self._Path, self._Path_Memory)):
                     self._Path_Memory = self._Path
                     self.Open()
             elif type(self._Path) != type(self._Path_Memory):
@@ -657,7 +657,7 @@ class Image_Lite:
                     self._Path_Memory = self._Path
                     self.Open()
             elif isinstance(self._Path, list) and isinstance(self._Path_Memory, list):
-                if not np.array_equal(self._Path, self._Path_Memory):
+                if not all(a == b for a, b in zip(self._Path, self._Path_Memory)):
                     self._Path_Memory = self._Path
                     self.Open()
             elif type(self._Path) != type(self._Path_Memory):
@@ -1055,7 +1055,7 @@ class Image_Zoom:
                     self._Path_Memory = self._Path
                     self.Open()
             elif isinstance(self._Path, list) and isinstance(self._Path_Memory, list):
-                if not np.array_equal(self._Path, self._Path_Memory):
+                if not all(a == b for a, b in zip(self._Path, self._Path_Memory)):
                     self._Path_Memory = self._Path
                     self.Open()
             elif type(self._Path) != type(self._Path_Memory):
