@@ -31,6 +31,8 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 # Global Variables
 # -------------------------------------------------------------------------------------------------------------------------------
 Title = "Gluonix Designer - Nucleon Automation"
+Version = 2
+Revision = 4
 Error_List = []
 Error_Display = True
 Error_Log = True
@@ -119,19 +121,6 @@ def Relative_Path(Name):
         Error("Data -> " + str(E))
 
 # -------------------------------------------------------------------------------------------------------------------------------
-# Database
-# -------------------------------------------------------------------------------------------------------------------------------
-Database = Gluonix.SQL(Data('NGD.dll'))
-
-# -------------------------------------------------------------------------------------------------------------------------------
-# Database Variables
-# -------------------------------------------------------------------------------------------------------------------------------
-Variable_Data = {}
-Variable_Data_Temp = Database.Get("SELECT * FROM `Variable`", Keys=True)
-for Each in Variable_Data_Temp:
-        Variable_Data[Each['ID']] = Each['Data']
-
-# -------------------------------------------------------------------------------------------------------------------------------
 # Global Functions
 # -------------------------------------------------------------------------------------------------------------------------------
 
@@ -162,10 +151,7 @@ def StartUp():
         
 def On_Close():
     try:
-        global Database
-        if Main.Design.Database:
-            Main.Design.Database.Close()
-        Database.Close()
+        pass
     except Exception as E:
         Error("On_Close -> " + str(E))
     

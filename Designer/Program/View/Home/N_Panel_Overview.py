@@ -408,7 +408,7 @@ class Overview:
                     self.Project_Data['Error_Log'] = str(int(self.Error_Log_Check.Get()))
                     self.Project_Data['Version'] = self.Version_Entry.Get()
                     self.Project_Data['Revision'] = self.Revision_Entry.Get()
-                    self.Project_Data['NGD'] = self.Global['Variable_Data']['Version']+'.'+self.Global['Variable_Data']['Revision']
+                    self.Project_Data['NGD'] = f"{self.Global['Version']}.{self.Global['Revision']}"
                     self.Display_Data['Title'] = Project_Name
                     self.Display_Data['Background'] = self.Background_Color.Config_Get('Background')['Background']
                     self.Display_Data['Alignment'] = self.Alignment_Select.Get()

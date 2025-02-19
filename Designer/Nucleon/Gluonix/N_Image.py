@@ -19,7 +19,7 @@ class Image:
         if self._GUI is not None:
             self._Type = "Image"
             try:
-                self._Config = ['Name', 'Background', 'Foreground', 'Border_Color', 'Border_Size', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Path', 'Path_Initial', 'Url', 'Array', 'Pil', 'Rotate', 'Transparent', 'Aspect_Ratio', 'Convert_Type', 'Tolerance']
+                self._Config = ['Name', 'Background', 'Foreground', 'Border_Color', 'Border_Size', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Path', 'Path_Initial', 'Url', 'Array', 'Pil', 'Rotate', 'Transparent', 'Aspect_Ratio', 'Convert_Type', 'Tolerance', 'Hover_Background', 'Hover_Foreground', 'Hover_Border_Color']
                 self._Initialized = False
                 self._Name = False
                 self._Last_Name = False
@@ -34,6 +34,12 @@ class Image:
                 self._Background = self._Main._Background
                 self._Background_Main = True
                 self._Foreground = False
+                self._Hover_Background = False
+                self._Hover_Foreground = False
+                self._Hover_Border_Color = False
+                self._Last_Background = False
+                self._Last_Foreground = False
+                self._Last_Border_Color = False
                 self._Tolerance = 10
                 self._Image = False
                 self._Path = False
@@ -50,6 +56,8 @@ class Image:
                 self._Resizable = self._Main._Resizable
                 self._On_Show = False
                 self._On_Hide = False
+                self._On_Hover_In = False
+                self._On_Hover_Out = False
             except Exception as E:
                 self._GUI.Error(f"{self._Type} -> Init -> {E}")
         else:
@@ -165,10 +173,51 @@ class Image:
                 self._On_Show = Input['On_Show']
             if 'On_Hide' in Input:
                 self._On_Hide = Input['On_Hide']
-            Event_Bind(self._Widget, **Input)
+            if 'On_Hover_In' in Input:
+                self._On_Hover_In = Input['On_Hover_In']
             self._Frame.Bind(**Input)
+            Input['On_Hover_In'] = lambda E: self.On_Hover_In(E)
+            if 'On_Hover_Out' in Input:
+                self._On_Hover_Out = Input['On_Hover_Out']
+            Input['On_Hover_Out'] = lambda E: self.On_Hover_Out(E)
+            Event_Bind(self._Widget, **Input)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Bind -> {E}")
+            
+    def On_Hover_In(self, E):
+        try:
+            Config = {}
+            if self._Hover_Background:
+                self._Last_Background = self._Background
+                Config['Background'] = self._Hover_Background
+            if self._Hover_Foreground:
+                self._Last_Foreground = self._Foreground
+                Config['Foreground'] = self._Hover_Foreground
+            if self._Hover_Border_Color:
+                self._Last_Border_Color = self._Border_Color
+                Config['Border_Color'] = self._Hover_Border_Color
+            if len(Config)>0:
+                self.Config(**Config)
+            if self._On_Hover_In:
+                self._On_Hover_In(E)
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> On_Hover_In -> {E}")
+            
+    def On_Hover_Out(self, E):
+        try:
+            Config = {}
+            if self._Hover_Background and self._Last_Background:
+                Config['Background'] = self._Last_Background
+            if self._Hover_Foreground and self._Last_Foreground:
+                Config['Foreground'] = self._Last_Foreground
+            if self._Hover_Border_Color and self._Last_Border_Color:
+                Config['Border_Color'] = self._Last_Border_Color
+            if len(Config)>0:
+                self.Config(**Config)
+            if self._On_Hover_Out:
+                self._On_Hover_Out(E)
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> On_Hover_Out -> {E}")
             
     def Config_Get(self, *Input):
         try:
@@ -251,6 +300,7 @@ class Image:
                 self._Frame.Config(Width=self._Width_Current, Height=self._Height_Current, Left=self._Left_Current, Top=self._Top_Current)
                 self._Frame.Config(Background=self._Background, Border_Size=self._Border_Size, Border_Color=self._Border_Color)
                 self._Frame.Create()
+                Event_Bind(self._Widget, On_Hover_In=lambda E: self.On_Hover_In(E), On_Hover_Out=lambda E: self.On_Hover_Out(E))
                 if not self._Display:
                     self.Hide()
                 self._Main._Widget.append(self)
@@ -424,7 +474,7 @@ class Image_Lite:
         if self._GUI is not None:
             self._Type = "Image_Lite"
             try:
-                self._Config = ['Name', 'Background', 'Foreground', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Path', 'Path_Initial', 'Url', 'Array', 'Pil', 'Rotate', 'Transparent', 'Aspect_Ratio', 'Convert_Type', 'Tolerance']
+                self._Config = ['Name', 'Background', 'Foreground', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Path', 'Path_Initial', 'Url', 'Array', 'Pil', 'Rotate', 'Transparent', 'Aspect_Ratio', 'Convert_Type', 'Tolerance', 'Hover_Background', 'Hover_Foreground']
                 self._Initialized = False
                 self._Name = False
                 self._Last_Name = False
@@ -436,6 +486,10 @@ class Image_Lite:
                 self._Background = self._Main._Background
                 self._Background_Main = True
                 self._Foreground = False
+                self._Hover_Background = False
+                self._Hover_Foreground = False
+                self._Last_Background = False
+                self._Last_Foreground = False
                 self._Tolerance = 10
                 self._Image = False
                 self._Path = False
@@ -452,6 +506,8 @@ class Image_Lite:
                 self._Resizable = self._Main._Resizable
                 self._On_Show = False
                 self._On_Hide = False
+                self._On_Hover_In = False
+                self._On_Hover_Out = False
             except Exception as E:
                 self._GUI.Error(f"{self._Type} -> Init -> {E}")
         else:
@@ -566,9 +622,45 @@ class Image_Lite:
                 self._On_Show = Input['On_Show']
             if 'On_Hide' in Input:
                 self._On_Hide = Input['On_Hide']
+            if 'On_Hover_In' in Input:
+                self._On_Hover_In = Input['On_Hover_In']
+            Input['On_Hover_In'] = lambda E: self.On_Hover_In(E)
+            if 'On_Hover_Out' in Input:
+                self._On_Hover_Out = Input['On_Hover_Out']
+            Input['On_Hover_Out'] = lambda E: self.On_Hover_Out(E)
             Event_Bind(self._Widget, **Input)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Bind -> {E}")
+            
+    def On_Hover_In(self, E):
+        try:
+            Config = {}
+            if self._Hover_Background:
+                self._Last_Background = self._Background
+                Config['Background'] = self._Hover_Background
+            if self._Hover_Foreground:
+                self._Last_Foreground = self._Foreground
+                Config['Foreground'] = self._Hover_Foreground
+            if len(Config)>0:
+                self.Config(**Config)
+            if self._On_Hover_In:
+                self._On_Hover_In(E)
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> On_Hover_In -> {E}")
+            
+    def On_Hover_Out(self, E):
+        try:
+            Config = {}
+            if self._Hover_Background and self._Last_Background:
+                Config['Background'] = self._Last_Background
+            if self._Hover_Foreground and self._Last_Foreground:
+                Config['Foreground'] = self._Last_Foreground
+            if len(Config)>0:
+                self.Config(**Config)
+            if self._On_Hover_Out:
+                self._On_Hover_Out(E)
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> On_Hover_Out -> {E}")
             
     def Config_Get(self, *Input):
         try:
@@ -650,6 +742,7 @@ class Image_Lite:
                 if not self._Display:
                     self.Hide()
                 self._Main._Widget.append(self)
+                Event_Bind(self._Widget, On_Hover_In=lambda E: self.On_Hover_In(E), On_Hover_Out=lambda E: self.On_Hover_Out(E))
                 self._Initialized = True
             self._Widget.config(background=self._Background)
             if isinstance(self._Path, str) and isinstance(self._Path_Memory, str):
@@ -820,7 +913,7 @@ class Image_Zoom:
         if self._GUI is not None:
             self._Type = "Image_Zoom"
             try:
-                self._Config = ['Name', 'Background', 'Border_Color', 'Border_Size', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Path', 'Path_Initial', 'Url', 'Array', 'Pil', 'Rotate', 'Transparent']
+                self._Config = ['Name', 'Background', 'Border_Color', 'Border_Size', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Path', 'Path_Initial', 'Url', 'Array', 'Pil', 'Rotate', 'Transparent', 'Hover_Background', 'Hover_Foreground', 'Hover_Border_Color']
                 self._Initialized = False
                 self._Name = False
                 self._Last_Name = False
@@ -837,6 +930,10 @@ class Image_Zoom:
                 self._Border_Size = 0
                 self._Background = self._Main._Background
                 self._Background_Main = True
+                self._Hover_Background = False
+                self._Hover_Border_Color = False
+                self._Last_Background = False
+                self._Last_Border_Color = False
                 self._Image = False
                 self._Image_Window = False
                 self._Path = False
@@ -851,6 +948,8 @@ class Image_Zoom:
                 self._Resizable = self._Main._Resizable
                 self._On_Show = False
                 self._On_Hide = False
+                self._On_Hover_In = False
+                self._On_Hover_Out = False
             except Exception as E:
                 self._GUI.Error(f"{self._Type} -> Init -> {E}")
         else:
@@ -960,9 +1059,45 @@ class Image_Zoom:
                 self._On_Show = Input['On_Show']
             if 'On_Hide' in Input:
                 self._On_Hide = Input['On_Hide']
+            if 'On_Hover_In' in Input:
+                self._On_Hover_In = Input['On_Hover_In']
+            Input['On_Hover_In'] = lambda E: self.On_Hover_In(E)
+            if 'On_Hover_Out' in Input:
+                self._On_Hover_Out = Input['On_Hover_Out']
+            Input['On_Hover_Out'] = lambda E: self.On_Hover_Out(E)
             self._Frame.Bind(**Input)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Bind -> {E}")
+            
+    def On_Hover_In(self, E):
+        try:
+            Config = {}
+            if self._Hover_Background:
+                self._Last_Background = self._Background
+                Config['Background'] = self._Hover_Background
+            if self._Hover_Border_Color:
+                self._Last_Border_Color = self._Border_Color
+                Config['Border_Color'] = self._Hover_Border_Color
+            if len(Config)>0:
+                self.Config(**Config)
+            if self._On_Hover_In:
+                self._On_Hover_In(E)
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> On_Hover_In -> {E}")
+            
+    def On_Hover_Out(self, E):
+        try:
+            Config = {}
+            if self._Hover_Background and self._Last_Background:
+                Config['Background'] = self._Last_Background
+            if self._Hover_Border_Color and self._Last_Border_Color:
+                Config['Border_Color'] = self._Last_Border_Color
+            if len(Config)>0:
+                self.Config(**Config)
+            if self._On_Hover_Out:
+                self._On_Hover_Out(E)
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> On_Hover_Out -> {E}")
             
     def Config_Get(self, *Input):
         try:
@@ -1046,6 +1181,7 @@ class Image_Zoom:
                 self._Frame.Config(Width=self._Width_Current, Height=self._Height_Current, Left=self._Left_Current, Top=self._Top_Current)
                 self._Frame.Config(Background=self._Background, Border_Size=self._Border_Size, Border_Color=self._Border_Color)
                 self._Frame.Create()
+                self._Frame.Bind(On_Hover_In=lambda E: self.On_Hover_In(E), On_Hover_Out=lambda E: self.On_Hover_Out(E))
                 if not self._Display:
                     self.Hide()
                 self._Main._Widget.append(self)

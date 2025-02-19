@@ -10,7 +10,7 @@ class Separator:
         if self._GUI is not None:
             self._Type = "Separator"
             try:
-                self._Config = ['Name', 'Background', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Orient']
+                self._Config = ['Name', 'Background', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Orient', 'Hover_Background']
                 self._Initialized = False
                 self._Name = False
                 self._Last_Name = False
@@ -22,6 +22,8 @@ class Separator:
                 self._Frame = Frame(self._Main)
                 self._Background = self._Main._Background
                 self._Background_Main = True
+                self._Hover_Background = False
+                self._Last_Background = False
                 self._Orient = 'Vertical'
                 self._Frame_Input = [False, False]
                 self._Drag = False
@@ -29,6 +31,8 @@ class Separator:
                 self._Resizable = self._Main._Resizable
                 self._On_Show = False
                 self._On_Hide = False
+                self._On_Hover_In = False
+                self._On_Hover_Out = False
             except Exception as E:
                 self._GUI.Error(f"{self._Type} -> Init -> {E}")
         else:
@@ -119,9 +123,46 @@ class Separator:
                 self._On_Show = Input['On_Show']
             if 'On_Hide' in Input:
                 self._On_Hide = Input['On_Hide']
+            if 'On_Hover_In' in Input:
+                self._On_Hover_In = Input['On_Hover_In']
+            Input['On_Hover_In'] = lambda E: self.On_Hover_In(E)
+            if 'On_Hover_Out' in Input:
+                self._On_Hover_Out = Input['On_Hover_Out']
+            Input['On_Hover_Out'] = lambda E: self.On_Hover_Out(E)
             self._Frame.Bind(**Input)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Bind -> {E}")
+            
+    def On_Hover_In(self, E):
+        try:
+            Config = {}
+            if self._Hover_Background:
+                self._Last_Background = self._Background
+                Config['Background'] = self._Hover_Background
+            if len(Config)>0:
+                self.Config(**Config)
+            if self._On_Hover_In:
+                self._On_Hover_In(E)
+            if self._Orient=='Vertical':
+                self._GUI._Frame.config(cursor='sb_h_double_arrow')
+            if self._Orient=='Horizontal':
+                self._GUI._Frame.config(cursor='sb_v_double_arrow')
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> On_Hover_In -> {E}")
+            
+    def On_Hover_Out(self, E):
+        try:
+            Config = {}
+            if self._Hover_Background and self._Last_Background:
+                Config['Background'] = self._Last_Background
+            if len(Config)>0:
+                self.Config(**Config)
+            if self._On_Hover_Out:
+                self._On_Hover_Out(E)
+            if not self._Drag:
+                self._GUI._Frame.config(cursor="")
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> On_Hover_Out -> {E}")
             
     def Config_Get(self, *Input):
         try:
@@ -204,7 +245,7 @@ class Separator:
                 self._Frame.Config(Width=self._Width_Current, Height=self._Height_Current, Left=self._Left_Current, Top=self._Top_Current)
                 self._Frame.Config(Background=self._Background, Border_Size=0, Border_Color='#000000')
                 self._Frame.Bind(On_Click=self.Drag_Start, On_Drag=self.Drag, On_Release=self.Drag_End)
-                self._Frame.Bind(On_Hover_In=self.Hover_In, On_Hover_Out=self.Hover_Out)
+                self._Frame.Bind(On_Hover_In=lambda E: self.On_Hover_In(E), On_Hover_Out=lambda E: self.On_Hover_Out(E))
                 self._Frame.Create()
                 if not self._Display:
                     self.Hide()
@@ -220,22 +261,6 @@ class Separator:
                 self._Last_Name = self._Name
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Create -> {E}")
-            
-    def Hover_In(self, E):
-        try:
-            if self._Orient=='Vertical':
-                self._GUI._Frame.config(cursor='sb_h_double_arrow')
-            if self._Orient=='Horizontal':
-                self._GUI._Frame.config(cursor='sb_v_double_arrow')
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Hover_In -> {E}")
-
-    def Hover_Out(self, E):
-        try:
-            if not self._Drag:
-                self._GUI._Frame.config(cursor="")
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Hover_Out -> {E}")
 
     def Drag_Start(self, E):
         try:
