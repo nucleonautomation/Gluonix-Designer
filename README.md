@@ -36,7 +36,7 @@
 - See the [TUTORIAL](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/TUTORIAL.md) file for details.
 
 ## Help
-- See the [TUTORIAL](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/Help.pdf) file for details.
+- See the [HELP](https://github.com/nucleonautomation/Gluonix-Designer/blob/main/Help.pdf) file for details.
 
 ## Installation
 ```
