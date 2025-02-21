@@ -11,6 +11,7 @@ from Nucleon import Gluonix
 # Default Libraries
 import os
 import time
+import atexit
 import datetime
 import warnings
 
@@ -218,6 +219,15 @@ def Create_Popup(Display):
     except Exception as E:
         Error("Create_Popup -> "+str(E))
         
+def Cleanup():
+    try:
+        global Database
+        Database.Close()
+    except Exception as E:
+        Error("Close -> "+str(E))
+        
+atexit.register(Cleanup)
+
 # -------------------------------------------------------------------------------------------------------------------------------
 # GUI
 # -------------------------------------------------------------------------------------------------------------------------------
