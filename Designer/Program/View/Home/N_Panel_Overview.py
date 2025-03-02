@@ -3,6 +3,7 @@
 ################################################################################################################################
 import os
 import shutil
+import subprocess
 import inspect
 from tkinter import colorchooser
 
@@ -423,8 +424,6 @@ class Overview:
                     self.Display_Data['Toolbar'] = str(int(self.Toolbar_Check.Get()))
                     self.Display_Data['Topmost'] = str(int(self.Topmost_Check.Get()))
                     TempDatabase = self.Global['Gluonix'].SQL(f'{self.Project_Path}/Data/NGD.dll')
-                    for Key, Value in self.Project_Data.items():
-                        TempDatabase.Post(f"UPDATE `Variable` SET `DATA`='{Value}' WHERE `ID`='{Key}'")
                     TempDatabase.Post(f"UPDATE `Display` SET `Title`='{self.Display_Data['Title']}' WHERE `ID`='{self.Display_ID}'")
                     TempDatabase.Post(f"UPDATE `Display` SET `Background`='{self.Display_Data['Background']}' WHERE `ID`='{self.Display_ID}'")
                     TempDatabase.Post(f"UPDATE `Display` SET `Alignment`='{self.Display_Data['Alignment']}' WHERE `ID`='{self.Display_ID}'")
@@ -487,7 +486,10 @@ class Overview:
                     if not os.path.exists(f'{self.Runtime_Path}/{Temp_Name}.py'):
                         shutil.copy(self.Global['Relative_Path']('Program/Base/GUI.py'), f'{self.Runtime_Path}/{Temp_Name}.py')
                     self.Global['Message'].Show('Success', 'Project Deployed')
-                    os.startfile(self.Runtime_Path)
+                    if self.Global['GUI']._Window:
+                        os.startfile(self.Runtime_Path)
+                    else:
+                        subprocess.run(["xdg-open", self.Runtime_Path])
                 self.Global['Loading'].Hide()
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))

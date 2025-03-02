@@ -1,5 +1,8 @@
 # Change Log
 
+## V(2.5)
+- Relative Paths Fixed For Linux. Tested Design & Deployment On Ubuntu Linux
+
 ## V(2.4)
 - All Widgets Can Use Hover Colors Depending Upon Config List For Background, Foreground, Border_Color & Shadow_Color
 - E.G.: Hover_Background='#FF0000'

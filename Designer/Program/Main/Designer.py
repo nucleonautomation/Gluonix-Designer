@@ -32,7 +32,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 # -------------------------------------------------------------------------------------------------------------------------------
 Title = "Gluonix Designer - Nucleon Automation"
 Version = 2
-Revision = 4
+Revision = 5
 Error_List = []
 Error_Display = True
 Error_Log = True
@@ -82,6 +82,9 @@ def Image(Name, Ext="png"):
         Suffix = r"\Program\Main"
         if Base_Dir.endswith(Suffix):
             Base_Dir = Base_Dir[:-len(Suffix)]
+        Suffix = r"/Program/Main"
+        if Base_Dir.endswith(Suffix):
+            Base_Dir = Base_Dir[:-len(Suffix)]
         Path = os.path.join(Base_Dir, "Data", "Image", f"{Name}.{Ext}")
         if os.path.exists(Path):
             return Path
@@ -97,6 +100,9 @@ def Data(Name):
         Suffix = r"\Program\Main"
         if Base_Dir.endswith(Suffix):
             Base_Dir = Base_Dir[:-len(Suffix)]
+        Suffix = r"/Program/Main"
+        if Base_Dir.endswith(Suffix):
+            Base_Dir = Base_Dir[:-len(Suffix)]
         Path = os.path.join(Base_Dir, "Data", f"{Name}")
         if os.path.exists(Path):
             return Path
@@ -110,6 +116,9 @@ def Relative_Path(Name):
     try:
         Base_Dir = os.path.dirname(os.path.abspath(__file__))
         Suffix = r"\Program\Main"
+        if Base_Dir.endswith(Suffix):
+            Base_Dir = Base_Dir[:-len(Suffix)]
+        Suffix = r"/Program/Main"
         if Base_Dir.endswith(Suffix):
             Base_Dir = Base_Dir[:-len(Suffix)]
         Path = os.path.join(Base_Dir, f"{Name}")
