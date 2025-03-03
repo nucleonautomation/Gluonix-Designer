@@ -1,5 +1,8 @@
 # Change Log
 
+## V(2.6)
+- Project on Pypi. "pip install GluonixDesigner"
+
 ## V(2.5)
 - Relative Paths Fixed For Linux. Tested Design & Deployment On Ubuntu Linux
 
