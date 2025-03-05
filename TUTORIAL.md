@@ -6,4 +6,6 @@
 
 ## [Tutorial 03 - Programming Your GUI](https://www.youtube.com/watch?v=7nszf2clZ_o)
 
-## [Tutorial 04 - Roubel](https://www.youtube.com/watch?v=LtgiMcONCpk)
+## [Tutorial 04 - Pypi PIP Installation & Startup](https://www.youtube.com/watch?v=Erm6_6QivL0)
+
+## [Tutorial 05 - Roubel](https://www.youtube.com/watch?v=LtgiMcONCpk)
