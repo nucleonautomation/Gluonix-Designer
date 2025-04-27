@@ -1,5 +1,9 @@
 # Change Log
 
+## V(2.7)
+- Widget Copy Fixed. All Widgets Retain Their Names.
+- Transparent Image Conversion Changed To RGBA
+
 ## V(2.6)
 - Project on Pypi. "pip install GluonixDesigner"
 

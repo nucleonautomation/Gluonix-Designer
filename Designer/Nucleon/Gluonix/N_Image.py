@@ -52,7 +52,7 @@ class Image:
                 self._Angle = 0
                 self._Transparent = True
                 self._Aspect_Ratio = True
-                self._Convert_Type = 'P'
+                self._Convert_Type = 'RGBA'
                 self._Resizable = self._Main._Resizable
                 self._On_Show = False
                 self._On_Hide = False
@@ -502,7 +502,7 @@ class Image_Lite:
                 self._Angle = 0
                 self._Transparent = True
                 self._Aspect_Ratio = True
-                self._Convert_Type = 'P'
+                self._Convert_Type = 'RGBA'
                 self._Resizable = self._Main._Resizable
                 self._On_Show = False
                 self._On_Hide = False

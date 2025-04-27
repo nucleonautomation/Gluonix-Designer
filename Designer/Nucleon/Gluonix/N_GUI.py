@@ -55,11 +55,10 @@ class GUI():
             self._Restore_Height = False
             self._On_Show = False
             self._On_Hide = False
+            self._Window = False
             if os.name == 'nt':
                 self._Window = True
-            else:
-                self._Window = False
-
+                    
     def __str__(self):
         return "Nucleon_Glunoix["+self._Title+"]"
 

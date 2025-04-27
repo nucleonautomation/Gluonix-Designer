@@ -3,7 +3,6 @@
 ################################################################################################################################
 import os
 import shutil
-import subprocess
 import inspect
 from tkinter import colorchooser
 
@@ -488,8 +487,6 @@ class Overview:
                     self.Global['Message'].Show('Success', 'Project Deployed')
                     if self.Global['GUI']._Window:
                         os.startfile(self.Runtime_Path)
-                    else:
-                        subprocess.run(["xdg-open", self.Runtime_Path])
                 self.Global['Loading'].Hide()
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))

@@ -207,7 +207,7 @@ class Canvas_Image:
         try:
             Temp_Image = self._Image.rotate(self._Rotate+self._Angle, PIL_Image.NEAREST, expand=0)
             if self._Transparent:
-                Temp_Image_Convert = Temp_Image.convert('P')
+                Temp_Image_Convert = Temp_Image.convert('RGBA')
             else:
                 Temp_Image_Convert = Temp_Image.convert("HSV")
             Width, Height = Temp_Image.size
