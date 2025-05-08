@@ -32,7 +32,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 # -------------------------------------------------------------------------------------------------------------------------------
 Title = "Gluonix Designer - Nucleon Automation"
 Version = 2
-Revision = 7
+Revision = 8
 Error_List = []
 Error_Display = True
 Error_Log = True

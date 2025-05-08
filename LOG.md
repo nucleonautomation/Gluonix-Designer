@@ -1,5 +1,9 @@
 # Change Log
 
+## V(2.8)
+- Full APP Resize Adjustment Option When Changing Display Size In Pixels.
+- Widgets Can Be Added To Container Even Other Widget Is Selected. Adds To Parent Container
+
 ## V(2.7)
 - Widget Copy Fixed. All Widgets Retain Their Names.
 - Transparent Image Conversion Changed To RGBA

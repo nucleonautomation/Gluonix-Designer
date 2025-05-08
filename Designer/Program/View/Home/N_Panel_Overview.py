@@ -2,6 +2,7 @@
 #Menu
 ################################################################################################################################
 import os
+import math
 import shutil
 import inspect
 from tkinter import colorchooser
@@ -15,6 +16,9 @@ class Overview:
             self.Project_Path = False
             self.Runtime_Path = False
             self.TempDatabase = False
+            self.Launch = False
+            self.Direct = False
+            self.Resize = False
             
             Fixture = self.Panel.Frame.Locate(100, 100, 0, 0)
             self.Frame = self.Global['Gluonix'].Frame(self.Panel.Frame)
@@ -351,7 +355,7 @@ class Overview:
             self.Design_Button.Config(Background='#FAD7A0', Foreground='black', Value='Design', Font_Size=9, Font_Weight='normal', Border_Size=1, Border_Color='#935116')
             self.Design_Button.Bind(On_Hover_In=lambda E: self.Design_Button.Config(Background='#F39C12'))
             self.Design_Button.Bind(On_Hover_Out=lambda E: self.Design_Button.Config(Background='#FAD7A0'))
-            self.Design_Button.Bind(On_Click=lambda E: self.Save(Launch=True, Direct=True))
+            self.Design_Button.Bind(On_Click=lambda E: self.Save_Check(Launch=True, Direct=True))
             self.Design_Button.Create()
             
                 #Save Button
@@ -361,17 +365,52 @@ class Overview:
             self.Save_Button.Config(Background='#ABEBC6', Foreground='black', Value='Save', Font_Size=9, Font_Weight='normal', Border_Size=1, Border_Color='#1D8348')
             self.Save_Button.Bind(On_Hover_In=lambda E: self.Save_Button.Config(Background='#2ECC71'))
             self.Save_Button.Bind(On_Hover_Out=lambda E: self.Save_Button.Config(Background='#ABEBC6'))
-            self.Save_Button.Bind(On_Click=lambda E: self.Save())
+            self.Save_Button.Bind(On_Click=lambda E: self.Save_Check())
             self.Save_Button.Create()
+            
+                #Resize Frame
+            Fixture = self.Frame.Locate(28, 20, 66, 66)
+            self.Resize_Frame = self.Global['Gluonix'].Frame(self.Frame)
+            self.Resize_Frame.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Resize_Frame.Config(Border_Size=3, Display=False, Background='#FFFFFF')
+            self.Resize_Frame.Create()
+            
+                    #Resize Label
+            Fixture = self.Resize_Frame.Locate(90, 50, 5, 10)
+            self.Resize_Label = self.Global['Gluonix'].Label(self.Resize_Frame)
+            self.Resize_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Resize_Label.Config(Foreground='black', Value="", Font_Size=12, Font_Weight='normal', Align='center', Border_Size=0)
+            self.Resize_Label.Create()
+            self.Resize_Label.Set("Resize all widgets to adjust for new screen size?")
+            
+                    #Resize Reject Button
+            Fixture = self.Resize_Frame.Locate(35, 25, 55, 65)
+            self.Resize_Reject_Button = self.Global['Gluonix'].Label(self.Resize_Frame)
+            self.Resize_Reject_Button.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Resize_Reject_Button.Config(Background='#F5B7B1', Foreground='black', Value='Reject', Font_Size=9, Font_Weight='normal', Border_Size=1, Border_Color='#1D8348')
+            self.Resize_Reject_Button.Bind(On_Hover_In=lambda E: self.Resize_Reject_Button.Config(Background='#E74C3C'))
+            self.Resize_Reject_Button.Bind(On_Hover_Out=lambda E: self.Resize_Reject_Button.Config(Background='#F5B7B1'))
+            self.Resize_Reject_Button.Bind(On_Click=lambda E: self.Resize_Reject())
+            self.Resize_Reject_Button.Create()
+            
+                    #Resize Accept Button
+            Fixture = self.Resize_Frame.Locate(35, 25, 10, 65)
+            self.Resize_Accept_Button = self.Global['Gluonix'].Label(self.Resize_Frame)
+            self.Resize_Accept_Button.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Resize_Accept_Button.Config(Background='#ABEBC6', Foreground='black', Value='Accept', Font_Size=9, Font_Weight='normal', Border_Size=1, Border_Color='#1D8348')
+            self.Resize_Accept_Button.Bind(On_Hover_In=lambda E: self.Resize_Accept_Button.Config(Background='#2ECC71'))
+            self.Resize_Accept_Button.Bind(On_Hover_Out=lambda E: self.Resize_Accept_Button.Config(Background='#ABEBC6'))
+            self.Resize_Accept_Button.Bind(On_Click=lambda E: self.Resize_Accept())
+            self.Resize_Accept_Button.Create()
             
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             
-    def Save(self, Launch=False, Loading=True, Direct=False):
+    def Save(self, Loading=True):
         try:
             if Loading:
                 self.Global['Loading'].Show()
-                self.Global['GUI'].After(500, lambda:self.Save(Launch=Launch, Loading=False, Direct=Direct))
+                self.Global['GUI'].After(500, lambda:self.Save(Loading=False))
             else:
                 Error = False
                 if not Error and self.Title_Entry.Get()=='':
@@ -423,6 +462,7 @@ class Overview:
                     self.Display_Data['Toolbar'] = str(int(self.Toolbar_Check.Get()))
                     self.Display_Data['Topmost'] = str(int(self.Topmost_Check.Get()))
                     TempDatabase = self.Global['Gluonix'].SQL(f'{self.Project_Path}/Data/NGD.dll')
+                    Display_Data_Temp = TempDatabase.Get(f"SELECT * FROM `Display` WHERE `ID`='{self.Display_ID}'", Keys=True)
                     TempDatabase.Post(f"UPDATE `Display` SET `Title`='{self.Display_Data['Title']}' WHERE `ID`='{self.Display_ID}'")
                     TempDatabase.Post(f"UPDATE `Display` SET `Background`='{self.Display_Data['Background']}' WHERE `ID`='{self.Display_ID}'")
                     TempDatabase.Post(f"UPDATE `Display` SET `Alignment`='{self.Display_Data['Alignment']}' WHERE `ID`='{self.Display_ID}'")
@@ -436,26 +476,89 @@ class Overview:
                     TempDatabase.Post(f"UPDATE `Display` SET `Menu`='{self.Display_Data['Menu']}' WHERE `ID`='{self.Display_ID}'")
                     TempDatabase.Post(f"UPDATE `Display` SET `Toolbar`='{self.Display_Data['Toolbar']}' WHERE `ID`='{self.Display_ID}'")
                     TempDatabase.Post(f"UPDATE `Display` SET `Topmost`='{self.Display_Data['Topmost']}' WHERE `ID`='{self.Display_ID}'")
-                    TempDatabase.Close()
                     if f"{self.Project_Path}/Data/File/{self.Project_Data['Icon']}"!=self.Icon_Image.Config_Get('Path')['Path']:
                         if os.path.exists(f"{self.Project_Path}/Data/File/{self.Project_Data['Icon']}"):
                             os.remove(f"{self.Project_Path}/Data/File/{self.Project_Data['Icon']}")
                         shutil.copy(self.Icon_Image.Config_Get('Path')['Path'], f"{self.Project_Path}/Data/File/{self.Project_Data['Icon']}")
-                    if Launch:
+                    if not self.Direct:
+                        self.Direct = False
+                        self.Global['Loading'].Hide()
+                        self.Global['Message'].Show('Success', 'Save Successfull')
+                        self.Global['Message'].Hide(Delay=2)
+                    if self.Resize:
+                        self.Resize = False
+                        self.Display_Data = Display_Data_Temp[0]
+                        Old_Width = self.Display_Data['Width']
+                        Old_Height = self.Display_Data['Height']
+                        Current_Width = int(self.Width_Entry.Get())
+                        Current_Height = int(self.Height_Entry.Get())
+                        Width_Ratio = float(Current_Width) / Old_Width
+                        Height_Ratio = float(Current_Height) / Old_Height
+                        if Width_Ratio < 1.0 or Height_Ratio < 1.0:
+                            Font_Ratio = min(Width_Ratio, Height_Ratio)
+                        else:
+                            Font_Ratio = (Width_Ratio * Height_Ratio) ** 0.5
+                        def Update_Size(Frame_ID):
+                            TempDatabase.Post(f"UPDATE `Frame` SET Width=Width*{Width_Ratio}, Height=Height*{Height_Ratio}, Left=Left*{Width_Ratio}, Top=Top*{Height_Ratio} WHERE `ID`='{Frame_ID}'")
+                            TempDatabase.Post(f"UPDATE `Widget` SET Width=Width*{Width_Ratio}, Height=Height*{Height_Ratio}, Left=Left*{Width_Ratio}, Top=Top*{Height_Ratio}, Font_Size=CAST(Font_Size*{Font_Ratio} AS INTEGER) WHERE `Root`='{Frame_ID}'")
+                            TempDatabase.Post(f"UPDATE `Item` SET Width=Width*{Width_Ratio}, Height=Height*{Height_Ratio}, Left=Left*{Width_Ratio}, Top=Top*{Height_Ratio}, Size=CAST(Size*{Font_Ratio} AS INTEGER) WHERE `Root`='{Frame_ID}'")
+                            Frames = TempDatabase.Get(f"SELECT * FROM `Frame` WHERE `Root`='{Frame_ID}'", Keys=True)
+                            for Frame in Frames:
+                                Update_Size(Frame['ID'])
+                        Update_Size(self.Display_ID)
+                    if self.Launch:
+                        self.Launch = False
                         self.Panel.Home.Main.Design.Configure.Reset_All()
                         self.Panel.Home.Main.Design.Project_Path = self.Project_Path
                         self.Panel.Home.Main.Design.Project_Data = self.Project_Data
                         self.Panel.Home.Main.Design.Display_ID = self.Display_ID
                         self.Panel.Home.Frame.Hide()
                         self.Panel.Home.Main.Design.Update(Loading=False)
-                    if not Direct:
-                        self.Global['Loading'].Hide()
-                        self.Global['Message'].Show('Success', 'Save Successfull')
-                        self.Global['Message'].Hide(Delay=2)
+                    TempDatabase.Close()
                     return True
                 else:
                     self.Global['Loading'].Hide()
                     return False
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Save_Check(self, Launch=False, Direct=False):
+        try:
+            self.Launch = Launch
+            self.Direct = Direct
+            Save = True
+            TempDatabase = self.Global['Gluonix'].SQL(f'{self.Project_Path}/Data/NGD.dll')
+            Display_Data_Temp = TempDatabase.Get(f"SELECT * FROM `Display` WHERE `ID`='{self.Display_ID}'", Keys=True)
+            self.Display_Data = Display_Data_Temp[0]
+            Old_Alignment = self.Display_Data['Alignment']
+            Old_Width = self.Display_Data['Width']
+            Old_Height = self.Display_Data['Height']
+            Current_Alignment = self.Alignment_Select.Get()
+            Current_Width = int(self.Width_Entry.Get())
+            Current_Height = int(self.Height_Entry.Get())
+            if Old_Alignment=='Pixel' and Current_Alignment=='Pixel':
+                if Old_Width!=Current_Width or Old_Height!=Current_Height:
+                    Save = False
+                    self.Resize_Frame.Show()
+            if Save:
+                self.Save()
+            return True
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Resize_Accept(self):
+        try:
+            self.Resize_Frame.Hide()
+            self.Resize = True
+            self.Save()
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Resize_Reject(self):
+        try:
+            self.Resize_Frame.Hide()
+            self.Resize = False
+            self.Save()
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             
@@ -476,7 +579,7 @@ class Overview:
                     else:
                         self.Global['Message'].Show('Error', 'Project Path Cannot Be Runtime Path')
             else:
-                if self.Save(Loading=False, Direct=True):
+                if self.Save_Check(Direct=True):
                     if os.path.exists(f'{self.Runtime_Path}/Nucleon'):
                         shutil.rmtree(f'{self.Runtime_Path}/Nucleon')
                     shutil.copytree(self.Global['Relative_Path']('Nucleon'), f'{self.Runtime_Path}/Nucleon')

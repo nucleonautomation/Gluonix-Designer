@@ -42,7 +42,21 @@ class Stock_Canvas_Circle:
                 Root_ID = ID_List[0]
                 Root_Type = ID_List[1]
                 Root_Level = ID_List[2]
-            if (Root_Type=='Canvas' or Root_Type=='Scroll'):
+            Level = Root_Level+1
+            if (Root_Type!='Canvas' and Root_Type!='Scroll'):
+                Widget = self.Stock.Design.Database.Get(f"SELECT * FROM `Widget` WHERE `ID`='{Root_ID}'", Keys=True)
+                if len(Widget)==0:
+                    Widget = self.Stock.Design.Database.Get(f"SELECT * FROM `Item` WHERE `ID`='{Root_ID}'", Keys=True)
+                if len(Widget)==0:
+                    Widget = self.Stock.Design.Database.Get(f"SELECT * FROM `Frame` WHERE `ID`='{Root_ID}'", Keys=True)
+                Root_ID = Widget[0]['Root']
+                Level = Root_Level
+                Root_Container = self.Stock.Design.Database.Get(f"SELECT * FROM `Frame` WHERE `ID`='{Root_ID}'", Keys=True)
+                if len(Root_Container)>0:
+                    Root_Type = Root_Container[0]['Type']
+                else:
+                    Root_Type = 'Frame'
+            if  Root_Type=='Canvas' or Root_Type=='Scroll':
                 Number = 1
                 Exist = self.Stock.Design.Database.Get(f"SELECT * FROM `Item` WHERE (`Name`='{self.Type}{Number}' AND `Root`='{Root_ID}')")
                 while len(Exist)>0:
@@ -51,7 +65,6 @@ class Stock_Canvas_Circle:
                 Name = f"{self.Type.replace('Canvas_', '')}{Number}"
                 Random_Letter = ''.join(random.choices(string.ascii_letters, k=10))
                 ID = Random_Letter+self.Global['Custom'].MD5(Root_ID+Name+str(time.time()*1000000))
-                Level = Root_Level+1
                 Root = getattr(self.Stock.Design.Element, Root_ID)
                 Image = self.Global['Image'](self.Type)
                 setattr(self.Stock.Design.Element, ID, self.Stock.Design.Element.Tree.Add(Name=f' {Name}', Parent=Root, Value=[ID, self.Type, Level], Path=Image))
