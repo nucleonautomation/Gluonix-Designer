@@ -31,8 +31,8 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 # Global Variables
 # -------------------------------------------------------------------------------------------------------------------------------
 Title = "Gluonix Designer - Nucleon Automation"
-Version = 2
-Revision = 8
+Version = 3
+Revision = 0
 Error_List = []
 Error_Display = True
 Error_Log = True

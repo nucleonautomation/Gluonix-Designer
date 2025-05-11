@@ -17,8 +17,8 @@ class Popup():
         if self._GUI is not None:
             self._Type = "Popup"
             try:
-                self._Config = ['Error_Display', 'Resize_Delay', 'Title', 'Icon', 'Background', 'Topmost', 'Persistent', 'Resizable', 'Full_Screen', 'Toolbar', 'Menu_Enable', 'Width', 'Height', 'Left', 'Top', 'Alignment', 'Minimize']
-                self._Config_Get = ['Error_Display', 'Resize_Delay', 'Title', 'Icon', 'Background', 'Topmost','Persistent', 'Resizable', 'Full_Screen', 'Toolbar', 'Menu_Enable', 'Width', 'Height', 'Left', 'Top', 'Alignment', 'Full_Screen', 'Screen_Width', 'Screen_Height', 'Minimize']
+                self._Config = ['Error_Display', 'Resize_Delay', 'Title', 'Icon', 'Background', 'Light_Background', 'Dark_Background', 'Topmost', 'Persistent', 'Resizable', 'Full_Screen', 'Toolbar', 'Menu_Enable', 'Width', 'Height', 'Left', 'Top', 'Alignment', 'Minimize']
+                self._Config_Get = ['Error_Display', 'Resize_Delay', 'Title', 'Icon', 'Background', 'Light_Background', 'Dark_Background', 'Topmost','Persistent', 'Resizable', 'Full_Screen', 'Toolbar', 'Menu_Enable', 'Width', 'Height', 'Left', 'Top', 'Alignment', 'Full_Screen', 'Screen_Width', 'Screen_Height', 'Minimize']
                 self._Initialized = False
                 self._Error_Display = True
                 self._Error = []
@@ -340,6 +340,7 @@ class Popup():
     def Create(self):
         try:
             if not self._Initialized:
+                self._GUI.Initiate_Colors(self)
                 if self._Minimize:
                     self._Frame.iconify()
                 self._Screen_Width = self._Frame.winfo_screenwidth()

@@ -1,5 +1,10 @@
 # Change Log
 
+## V(3.0)
+- Dark & Light Modes. Software Automatically Configures Colors By Inverting Values
+- Custom Colors Can Be Set Through Config, i.e. Background, Light_Background, Dark_Background
+- Mode Trigger From Root, i.e. Root.Light_Mode() Root.Dark_Mode()
+
 ## V(2.8)
 - Full APP Resize Adjustment Option When Changing Display Size In Pixels.
 - Widgets Can Be Added To Container Even Other Widget Is Selected. Adds To Parent Container

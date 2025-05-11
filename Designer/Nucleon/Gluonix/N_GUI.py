@@ -26,8 +26,8 @@ class GUI():
 
     def __init__(self, *args, **kwargs):
         if not hasattr(self, '_Initialized'):
-            self._Config = ['Error_Display', 'Error_Log', 'Resize_Delay', 'Title', 'Icon', 'Background', 'Persistent', 'Resizable', 'Full_Screen', 'Toolbar', 'Menu_Enable', 'Width', 'Height', 'Left', 'Top', 'Alignment']
-            self._Config_Get = ['Error_Display', 'Error_Log', 'Resize_Delay', 'Title', 'Icon', 'Background', 'Persistent', 'Resizable', 'Full_Screen', 'Toolbar', 'Menu_Enable', 'Width', 'Height', 'Left', 'Top', 'Alignment', 'Full_Screen', 'Screen_Width', 'Screen_Height']
+            self._Config = ['Error_Display', 'Error_Log', 'Resize_Delay', 'Title', 'Icon', 'Background', 'Light_Background', 'Dark_Background', 'Persistent', 'Resizable', 'Full_Screen', 'Toolbar', 'Menu_Enable', 'Width', 'Height', 'Left', 'Top', 'Alignment']
+            self._Config_Get = ['Error_Display', 'Error_Log', 'Resize_Delay', 'Title', 'Icon', 'Background', 'Light_Background', 'Dark_Background', 'Persistent', 'Resizable', 'Full_Screen', 'Toolbar', 'Menu_Enable', 'Width', 'Height', 'Left', 'Top', 'Alignment', 'Full_Screen', 'Screen_Width', 'Screen_Height']
             self._Initialized = False
             self._Error_Display = False
             self._Error_Log = False
@@ -406,6 +406,7 @@ class GUI():
     def Create(self):
         try:
             if not self._Initialized:
+                self.Initiate_Colors(self)
                 self._Screen_Width = self._Frame.winfo_screenwidth()
                 self._Screen_Height = self._Frame.winfo_screenheight()
                 if self._Full_Screen:
@@ -437,6 +438,10 @@ class GUI():
             if not self._Full_Screen and not self._Toolbar:
                 self._Frame.geometry(f"{int(self._Width)}x{int(self._Height)}+{int(self._Left)}+{int(self._Top)}")
             self._Frame.config(bg=self._Background)
+            if not hasattr(self, "_Light_Background"):
+                setattr(self, "_Light_Background", self._Background)
+            if not hasattr(self, "_Dark_Background"):
+                setattr(self, "_Dark_Background", self.Invert(self._Background))
             if self._Title:
                 self._Frame.title(self._Title)
             else:
@@ -449,3 +454,86 @@ class GUI():
                 self._Frame.protocol("WM_DELETE_WINDOW", self.On_Close)
         except Exception as E:
             self.Error(f"{self._Type} -> Create -> {E}")
+            
+    def Invert(self, Hex):
+        try:
+            if Hex:
+                Html_To_Hex = {
+                    "black": "#000000",
+                    "white": "#FFFFFF",
+                    "red": "#FF0000",
+                    "green": "#008000",
+                    "blue": "#0000FF",
+                    "yellow": "#FFFF00",
+                    "cyan": "#00FFFF",
+                    "magenta": "#FF00FF",
+                    "gray": "#808080",
+                    "grey": "#808080",
+                    "orange": "#FFA500",
+                    "purple": "#800080",
+                    "pink": "#FFC0CB",
+                    "brown": "#A52A2A",
+                    "lime": "#00FF00",
+                    "navy": "#000080",
+                    "teal": "#008080",
+                    "maroon": "#800000",
+                    "olive": "#808000",
+                    "silver": "#C0C0C0"
+                }
+                if isinstance(Hex, str) and not Hex.startswith("#"):
+                    Hex = Html_To_Hex.get(Hex.lower(), Hex)
+                Hex = Hex.lstrip("#")
+                R = 255 - int(Hex[0:2], 16)
+                G = 255 - int(Hex[2:4], 16)
+                B = 255 - int(Hex[4:6], 16)
+                return f"#{R:02X}{G:02X}{B:02X}"
+            else:
+                return Hex
+        except Exception as E:
+            self.Error(f"{self._Type} -> Invert -> {E}")
+            
+    def Initiate_Colors(self, Widget):
+        try:
+            Variable_Names = ["_Background", "_Foreground", "_Border_Color", "_Shadow_Color", "_Hover_Background", "_Hover_Foreground", "_Hover_Border_Color", "_Hover_Shadow_Color"]
+            for Name in Variable_Names:
+                if hasattr(Widget, Name):
+                    Value = getattr(Widget, Name)
+                    Light_Name = "_Light" + Name
+                    Dark_Name = "_Dark" + Name
+                    if not hasattr(Widget, Light_Name):
+                        setattr(Widget, Light_Name, Value)
+                    if not hasattr(Widget, Dark_Name):
+                        setattr(Widget, Dark_Name, self.Invert(Value))
+        except Exception as E:
+            self.Error(f"{self._Type} -> Initiate_Colors -> {E}")
+            
+    def Apply_Mode(self, Widget, Mode='Light'):
+        try:
+            Variable_Names = ["Background", "Foreground", "Border_Color", "Shadow_Color", "Hover_Background", "Hover_Foreground", "Hover_Border_Color", "Hover_Shadow_Color"]
+            Config_Dict = {}
+            for Name in Variable_Names:
+                    Mode_Name = f"_{Mode}_{Name}" 
+                    if hasattr(Widget, Mode_Name):
+                        Value = getattr(Widget, Mode_Name)
+                        if isinstance(Value, str):
+                            Config_Dict[Name] = Value
+            if Config_Dict:
+                Widget.Config(**Config_Dict)
+            if hasattr(Widget, "_Widget"):
+                if isinstance(Widget._Widget, (list, tuple)):
+                    for Child in Widget._Widget:
+                        self.Apply_Mode(Child, Mode)
+        except Exception as E:
+            self.Error(f"{self._Type} -> Apply_Mode -> {E}")
+            
+    def Light_Mode(self):
+        try:
+            self.Apply_Mode(self, 'Light')
+        except Exception as E:
+            self.Error(f"{self._Type} -> Light_Mode -> {E}")
+
+    def Dark_Mode(self):
+        try:
+            self.Apply_Mode(self, 'Dark')
+        except Exception as E:
+            self.Error(f"{self._Type} -> Dark_Mode -> {E}")

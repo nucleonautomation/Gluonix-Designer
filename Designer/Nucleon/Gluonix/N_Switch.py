@@ -13,7 +13,7 @@ class Switch:
         if self._GUI is not None:
             self._Type = "Switch"
             try:
-                self._Config = ['Name', 'Background', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height']
+                self._Config = ['Name', 'Background', 'Light_Background', 'Dark_Background', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height']
                 self._Initialized = False
                 self._Name = False
                 self._Last_Name = False
@@ -225,7 +225,12 @@ class Switch:
         try:
             if not self._Background:
                 self._Background = self._Main._Background
+                if not hasattr(self, "_Light_Background"):
+                    setattr(self, "_Light_Background", self._Background)
+                if not hasattr(self, "_Dark_Background"):
+                    setattr(self, "_Dark_Background", self._GUI.Invert(self._Background))
             if not self._Initialized:
+                self._GUI.Initiate_Colors(self)
                 self._Width_Current, self._Height_Current, self._Left_Current, self._Top_Current, = self._Width, self._Height, self._Left, self._Top
                 self._Frame.Config(Width=self._Width_Current, Height=self._Height_Current, Left=self._Left_Current, Top=self._Top_Current)
                 self._Frame.Config(Background=self._Background)
