@@ -1,5 +1,10 @@
 # Change Log
 
+## V(3.1)
+- Update Color Function Introduces In Root To Update Light & Dark Mode Colors For All Widgets Automatically
+- Usage: Root.Update_Color() Or Popup1.Update_Color()
+- Note: Check Switchign From Dark To Light Or Vise Versa, It Only Work For Each Main Window. Has To be Done Seperatly For Root & Popups
+
 ## V(3.0)
 - Dark & Light Modes. Software Automatically Configures Colors By Inverting Values
 - Custom Colors Can Be Set Through Config, i.e. Background, Light_Background, Dark_Background

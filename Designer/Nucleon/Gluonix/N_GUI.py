@@ -498,25 +498,30 @@ class GUI():
             for Name in Variable_Names:
                 if hasattr(Widget, Name):
                     Value = getattr(Widget, Name)
-                    Light_Name = "_Light" + Name
-                    Dark_Name = "_Dark" + Name
-                    if not hasattr(Widget, Light_Name):
-                        setattr(Widget, Light_Name, Value)
-                    if not hasattr(Widget, Dark_Name):
-                        setattr(Widget, Dark_Name, self.Invert(Value))
+                    if Value:
+                        Light_Name = "_Light" + Name
+                        Dark_Name = "_Dark" + Name
+                        if not hasattr(Widget, Light_Name):
+                            setattr(Widget, Light_Name, Value)
+                        if not hasattr(Widget, Dark_Name):
+                            setattr(Widget, Dark_Name, self.Invert(Value))
         except Exception as E:
             self.Error(f"{self._Type} -> Initiate_Colors -> {E}")
             
     def Apply_Mode(self, Widget, Mode='Light'):
         try:
             Variable_Names = ["Background", "Foreground", "Border_Color", "Shadow_Color", "Hover_Background", "Hover_Foreground", "Hover_Border_Color", "Hover_Shadow_Color"]
+            Last_Variable_Names = ["Background", "Foreground", "Border_Color", "Shadow_Color"]
             Config_Dict = {}
             for Name in Variable_Names:
                     Mode_Name = f"_{Mode}_{Name}" 
                     if hasattr(Widget, Mode_Name):
                         Value = getattr(Widget, Mode_Name)
-                        if isinstance(Value, str):
+                        if Value:
                             Config_Dict[Name] = Value
+                            if Name in Last_Variable_Names:
+                                Last_Name = f"_Last_{Name}"
+                                setattr(Widget, Last_Name, Value)
             if Config_Dict:
                 Widget.Config(**Config_Dict)
             if hasattr(Widget, "_Widget"):
@@ -537,3 +542,26 @@ class GUI():
             self.Apply_Mode(self, 'Dark')
         except Exception as E:
             self.Error(f"{self._Type} -> Dark_Mode -> {E}")
+            
+    def Update_Colors(self, Widget):
+        try:
+            Variable_Names = ["_Background", "_Foreground", "_Border_Color", "_Shadow_Color", "_Hover_Background", "_Hover_Foreground", "_Hover_Border_Color", "_Hover_Shadow_Color"]
+            for Name in Variable_Names:
+                if hasattr(Widget, Name):
+                    Value = getattr(Widget, Name)
+                    Light_Name = "_Light" + Name
+                    Dark_Name = "_Dark" + Name
+                    setattr(Widget, Light_Name, Value)
+                    setattr(Widget, Dark_Name, self.Invert(Value))
+            if hasattr(Widget, "_Widget"):
+                if isinstance(Widget._Widget, (list, tuple)):
+                    for Child in Widget._Widget:
+                        self.Update_Colors(Child)
+        except Exception as E:
+            self.Error(f"{self._Type} -> Update_Colors -> {E}")
+            
+    def Update_Color(self):
+        try:
+            self.Update_Colors(self)
+        except Exception as E:
+            self.Error(f"{self._Type} -> Update_Color -> {E}")

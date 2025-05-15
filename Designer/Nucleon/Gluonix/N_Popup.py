@@ -395,3 +395,36 @@ class Popup():
                 
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Create -> {E}")
+            
+    def Initiate_Colors(self, Widget):
+        try:
+            Variable_Names = ["_Background", "_Foreground", "_Border_Color", "_Shadow_Color", "_Hover_Background", "_Hover_Foreground", "_Hover_Border_Color", "_Hover_Shadow_Color"]
+            for Name in Variable_Names:
+                if hasattr(Widget, Name):
+                    Value = getattr(Widget, Name)
+                    Light_Name = "_Light" + Name
+                    Dark_Name = "_Dark" + Name
+                    if not hasattr(Widget, Light_Name):
+                        setattr(Widget, Light_Name, Value)
+                    if not hasattr(Widget, Dark_Name):
+                        setattr(Widget, Dark_Name, self._GUI.Invert(Value))
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Initiate_Colors -> {E}")
+            
+    def Light_Mode(self):
+        try:
+            self._GUI.Apply_Mode(self, 'Light')
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Light_Mode -> {E}")
+
+    def Dark_Mode(self):
+        try:
+            self._GUI.Apply_Mode(self, 'Dark')
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Dark_Mode -> {E}")
+            
+    def Update_Color(self):
+        try:
+            self._GUI.Update_Colors(self)
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Update_Color -> {E}")
