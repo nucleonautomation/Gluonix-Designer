@@ -10,7 +10,7 @@ class Line:
         if self._GUI is not None:
             self._Type = "Line"
             try:
-                self._Config = ['Name', 'Background', 'Light_Background', 'Dark_Background', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Hover_Background']
+                self._Config = ['Name', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Hover_Background']
                 self._Initialized = False
                 self._Name = False
                 self._Last_Name = False
@@ -25,6 +25,7 @@ class Line:
                 self._Hover_Background = False
                 self._Last_Background = False
                 self._Resizable = self._Main._Resizable
+                self._Auto_Dark = True
                 self._On_Show = False
                 self._On_Hide = False
                 self._On_Hover_In = False
@@ -226,8 +227,9 @@ class Line:
                     setattr(self, "_Light_Background", self._Background)
                 if not hasattr(self, "_Dark_Background"):
                     setattr(self, "_Dark_Background", self._GUI.Invert(self._Background))
+            if self._Auto_Dark:
+                self.Update_Color()
             if not self._Initialized:
-                self._GUI.Initiate_Colors(self)
                 self._Width_Current, self._Height_Current, self._Left_Current, self._Top_Current, = self._Width, self._Height, self._Left, self._Top
                 self._Frame.Config(Width=self._Width_Current, Height=self._Height_Current, Left=self._Left_Current, Top=self._Top_Current)
                 self._Frame.Config(Background=self._Background, Border_Size=0, Border_Color='#000000')
@@ -247,6 +249,12 @@ class Line:
                 self._Last_Name = self._Name
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Create -> {E}")
+            
+    def Update_Color(self):
+        try:
+            self._GUI.Initiate_Colors(self)
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Update_Color -> {E}")
             
     def Adjustment(self):
         try:

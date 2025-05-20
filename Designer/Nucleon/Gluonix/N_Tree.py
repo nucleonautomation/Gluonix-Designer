@@ -14,7 +14,7 @@ class Tree:
         if self._GUI is not None:
             self._Type = "Tree"
             try:
-                self._Config = ['Name', 'Background', 'Light_Background', 'Dark_Background', 'Foreground', 'Light_Foreground', 'Dark_Foreground', 'Border_Color', 'Light_Border_Color', 'Dark_Border_Color', 'Border_Size', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Font_Size', 'Font_Weight', 'Background_Selected', 'Foreground_Selected', 'Hover_Background', 'Light_Hover_Background', 'Dark_Hover_Background', 'Hover_Foreground', 'Light_Hover_Foreground', 'Dark_Hover_Foreground', 'Hover_Border_Color', 'Light_Hover_Border_Color', 'Dark_Hover_Border_Color']
+                self._Config = ['Name', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Foreground', 'Light_Foreground', 'Dark_Foreground', 'Border_Color', 'Light_Border_Color', 'Dark_Border_Color', 'Border_Size', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Font_Size', 'Font_Weight', 'Background_Selected', 'Foreground_Selected', 'Hover_Background', 'Light_Hover_Background', 'Dark_Hover_Background', 'Hover_Foreground', 'Light_Hover_Foreground', 'Dark_Hover_Foreground', 'Hover_Border_Color', 'Light_Hover_Border_Color', 'Dark_Hover_Border_Color']
                 self._Initialized = False
                 self._Name = False
                 self._Last_Name = False
@@ -50,6 +50,7 @@ class Tree:
                 self._Font_Size = 12
                 self._Font_Weight = 'normal'
                 self._Resizable = self._Main._Resizable
+                self._Auto_Dark = True
                 self._Width_Item = None
                 self._Width_Text = ''
                 self._On_Show = False
@@ -465,8 +466,9 @@ class Tree:
                     setattr(self, "_Light_Background", self._Background)
                 if not hasattr(self, "_Dark_Background"):
                     setattr(self, "_Dark_Background", self._GUI.Invert(self._Background))
+            if self._Auto_Dark:
+                self.Update_Color()
             if not self._Initialized:
-                self._GUI.Initiate_Colors(self)
                 self._Width_Current, self._Height_Current, self._Left_Current, self._Top_Current = self._Width, self._Height, self._Left, self._Top
                 self._Frame.Config(Width=self._Width_Current, Height=self._Height_Current, Left=self._Left_Current, Top=self._Top_Current)
                 self._Frame.Config(Background=self._Background, Border_Size=self._Border_Size, Border_Color=self._Border_Color)
@@ -498,6 +500,12 @@ class Tree:
                 self._Last_Name = self._Name
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Create -> {E}")
+            
+    def Update_Color(self):
+        try:
+            self._GUI.Initiate_Colors(self)
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Update_Color -> {E}")
             
     def Adjustment(self):
         try:

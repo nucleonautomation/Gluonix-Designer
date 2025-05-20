@@ -26,8 +26,8 @@ class GUI():
 
     def __init__(self, *args, **kwargs):
         if not hasattr(self, '_Initialized'):
-            self._Config = ['Error_Display', 'Error_Log', 'Resize_Delay', 'Title', 'Icon', 'Background', 'Light_Background', 'Dark_Background', 'Persistent', 'Resizable', 'Full_Screen', 'Toolbar', 'Menu_Enable', 'Width', 'Height', 'Left', 'Top', 'Alignment']
-            self._Config_Get = ['Error_Display', 'Error_Log', 'Resize_Delay', 'Title', 'Icon', 'Background', 'Light_Background', 'Dark_Background', 'Persistent', 'Resizable', 'Full_Screen', 'Toolbar', 'Menu_Enable', 'Width', 'Height', 'Left', 'Top', 'Alignment', 'Full_Screen', 'Screen_Width', 'Screen_Height']
+            self._Config = ['Error_Display', 'Error_Log', 'Resize_Delay', 'Title', 'Icon', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Persistent', 'Resizable', 'Full_Screen', 'Toolbar', 'Menu_Enable', 'Width', 'Height', 'Left', 'Top', 'Alignment']
+            self._Config_Get = ['Error_Display', 'Error_Log', 'Resize_Delay', 'Title', 'Icon', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Persistent', 'Resizable', 'Full_Screen', 'Toolbar', 'Menu_Enable', 'Width', 'Height', 'Left', 'Top', 'Alignment', 'Full_Screen', 'Screen_Width', 'Screen_Height']
             self._Initialized = False
             self._Error_Display = False
             self._Error_Log = False
@@ -53,6 +53,7 @@ class GUI():
             self._On_Resize = False
             self._Restore_Width = False
             self._Restore_Height = False
+            self._Auto_Dark = True
             self._On_Show = False
             self._On_Hide = False
             self._Window = False
@@ -405,8 +406,9 @@ class GUI():
 
     def Create(self):
         try:
+            if self._Auto_Dark:
+                self.Update_Color()
             if not self._Initialized:
-                self.Initiate_Colors(self)
                 self._Screen_Width = self._Frame.winfo_screenwidth()
                 self._Screen_Height = self._Frame.winfo_screenheight()
                 if self._Full_Screen:
@@ -533,17 +535,17 @@ class GUI():
             
     def Light_Mode(self):
         try:
-            self.Apply_Mode(self, 'Light')
+            self.After(1, lambda : self.Apply_Mode(self, 'Light'))
         except Exception as E:
             self.Error(f"{self._Type} -> Light_Mode -> {E}")
 
     def Dark_Mode(self):
         try:
-            self.Apply_Mode(self, 'Dark')
+            self.After(1, lambda : self.Apply_Mode(self, 'Dark'))
         except Exception as E:
             self.Error(f"{self._Type} -> Dark_Mode -> {E}")
             
-    def Update_Colors(self, Widget):
+    def Update_Dark_Color(self, Widget):
         try:
             Variable_Names = ["_Background", "_Foreground", "_Border_Color", "_Shadow_Color", "_Hover_Background", "_Hover_Foreground", "_Hover_Border_Color", "_Hover_Shadow_Color"]
             for Name in Variable_Names:
@@ -556,12 +558,18 @@ class GUI():
             if hasattr(Widget, "_Widget"):
                 if isinstance(Widget._Widget, (list, tuple)):
                     for Child in Widget._Widget:
-                        self.Update_Colors(Child)
+                        self.Update_Dark_Color(Child)
+        except Exception as E:
+            self.Error(f"{self._Type} -> Update_Dark_Color -> {E}")
+            
+    def Update_Colors(self):
+        try:
+            self.Update_Dark_Color(self)
         except Exception as E:
             self.Error(f"{self._Type} -> Update_Colors -> {E}")
             
     def Update_Color(self):
         try:
-            self.Update_Colors(self)
+            self.Initiate_Colors(self)
         except Exception as E:
             self.Error(f"{self._Type} -> Update_Color -> {E}")

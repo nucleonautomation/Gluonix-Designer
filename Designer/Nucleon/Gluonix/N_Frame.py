@@ -10,7 +10,7 @@ class Frame:
         if self._GUI is not None:
             self._Type = "Frame"
             try:
-                self._Config = ['Name', 'Background', 'Light_Background', 'Dark_Background', 'Border_Color', 'Light_Border_Color', 'Dark_Border_Color', 'Border_Size', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Hover_Background', 'Light_Hover_Background', 'Dark_Hover_Background', 'Hover_Border_Color', 'Light_Hover_Border_Color', 'Dark_Hover_Border_Color']
+                self._Config = ['Name', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Border_Color', 'Light_Border_Color', 'Dark_Border_Color', 'Border_Size', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Hover_Background', 'Light_Hover_Background', 'Dark_Hover_Background', 'Hover_Border_Color', 'Light_Hover_Border_Color', 'Dark_Hover_Border_Color']
                 self._Initialized = False
                 self._Widget = []
                 self._Name = False
@@ -30,6 +30,7 @@ class Frame:
                 self._Last_Border_Color = False
                 self._On_Resize = False
                 self._Resizable = self._Main._Resizable
+                self._Auto_Dark = True
                 self._On_Show = False
                 self._On_Hide = False
                 self._On_Hover_In = False
@@ -263,8 +264,9 @@ class Frame:
                     setattr(self, "_Light_Background", self._Background)
                 if not hasattr(self, "_Dark_Background"):
                     setattr(self, "_Dark_Background", self._GUI.Invert(self._Background))
+            if self._Auto_Dark:
+                self.Update_Color()
             if not self._Initialized:
-                self._GUI.Initiate_Colors(self)
                 self._Width_Current, self._Height_Current, self._Left_Current, self._Top_Current = self._Width, self._Height, self._Left, self._Top
                 if not self._Display:
                     self.Hide()
@@ -285,6 +287,12 @@ class Frame:
                 self._Last_Name = self._Name
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Create -> {E}")
+            
+    def Update_Color(self):
+        try:
+            self._GUI.Initiate_Colors(self)
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Update_Color -> {E}")
             
     def Adjustment(self):
         try:

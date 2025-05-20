@@ -17,8 +17,8 @@ class Popup():
         if self._GUI is not None:
             self._Type = "Popup"
             try:
-                self._Config = ['Error_Display', 'Resize_Delay', 'Title', 'Icon', 'Background', 'Light_Background', 'Dark_Background', 'Topmost', 'Persistent', 'Resizable', 'Full_Screen', 'Toolbar', 'Menu_Enable', 'Width', 'Height', 'Left', 'Top', 'Alignment', 'Minimize']
-                self._Config_Get = ['Error_Display', 'Resize_Delay', 'Title', 'Icon', 'Background', 'Light_Background', 'Dark_Background', 'Topmost','Persistent', 'Resizable', 'Full_Screen', 'Toolbar', 'Menu_Enable', 'Width', 'Height', 'Left', 'Top', 'Alignment', 'Full_Screen', 'Screen_Width', 'Screen_Height', 'Minimize']
+                self._Config = ['Error_Display', 'Resize_Delay', 'Title', 'Icon', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Topmost', 'Persistent', 'Resizable', 'Full_Screen', 'Toolbar', 'Menu_Enable', 'Width', 'Height', 'Left', 'Top', 'Alignment', 'Minimize']
+                self._Config_Get = ['Error_Display', 'Resize_Delay', 'Title', 'Icon', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Topmost','Persistent', 'Resizable', 'Full_Screen', 'Toolbar', 'Menu_Enable', 'Width', 'Height', 'Left', 'Top', 'Alignment', 'Full_Screen', 'Screen_Width', 'Screen_Height', 'Minimize']
                 self._Initialized = False
                 self._Error_Display = True
                 self._Error = []
@@ -48,6 +48,7 @@ class Popup():
                 self._Restore_Width = False
                 self._Restore_Height = False
                 self._Window = self._GUI._Window
+                self._Auto_Dark = True
                 self._On_Show = False
                 self._On_Hide = False
             except Exception as E:
@@ -339,8 +340,9 @@ class Popup():
 
     def Create(self):
         try:
+            if self._Auto_Dark:
+                self.Update_Color()
             if not self._Initialized:
-                self._GUI.Initiate_Colors(self)
                 if self._Minimize:
                     self._Frame.iconify()
                 self._Screen_Width = self._Frame.winfo_screenwidth()
@@ -413,18 +415,24 @@ class Popup():
             
     def Light_Mode(self):
         try:
-            self._GUI.Apply_Mode(self, 'Light')
+            self.After(1, lambda : self._GUI.Apply_Mode(self, 'Light'))
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Light_Mode -> {E}")
 
     def Dark_Mode(self):
         try:
-            self._GUI.Apply_Mode(self, 'Dark')
+            self.After(1, lambda : self._GUI.Apply_Mode(self, 'Dark'))
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Dark_Mode -> {E}")
             
+    def Update_Colors(self):
+        try:
+            self._GUI.Update_Dark_Color(self)
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Update_Colors -> {E}")
+            
     def Update_Color(self):
         try:
-            self._GUI.Update_Colors(self)
+            self._GUI.Initiate_Colors(self)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Update_Color -> {E}")
