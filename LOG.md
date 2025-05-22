@@ -1,5 +1,8 @@
 # Change Log
 
+## V(3.3)
+- Interactive Image Zoom & Pan Are Updated For Better Performance With Large Images & In Depth Zoom
+
 ## V(3.2)
 - Update Color Functionality Is Changed To Update Colors i.e. Root.Update_Colors() Or Popup1.Update_Colors(). Update Color Method Introduces To Each Widget To Update Color For One Corresponding Widget Only i.e. Widget.Update_Color(). This Is Only Required If The Widget Auto_Dark Is Set To False
 - Auto_Dark Config Introduces, While It Is True, Widget Will Automatically Adjust Dark Colors Based On Changed Values
