@@ -404,12 +404,11 @@ class Popup():
             for Name in Variable_Names:
                 if hasattr(Widget, Name):
                     Value = getattr(Widget, Name)
-                    Light_Name = "_Light" + Name
-                    Dark_Name = "_Dark" + Name
-                    if not hasattr(Widget, Light_Name):
+                    if Value:
+                        Light_Name = "_Light" + Name
+                        Dark_Name = "_Dark" + Name
                         setattr(Widget, Light_Name, Value)
-                    if not hasattr(Widget, Dark_Name):
-                        setattr(Widget, Dark_Name, self._GUI.Invert(Value))
+                        setattr(Widget, Dark_Name, self.Invert(Value))
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Initiate_Colors -> {E}")
             

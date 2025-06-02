@@ -1,5 +1,9 @@
 # Change Log
 
+## V(3.4)
+- Bug Fixes In Dark Color Updateds And and Hover Color Updates.
+- Bug Fixes In Interective Zoom Image.
+
 ## V(3.3)
 - Interactive Image Zoom & Pan Are Updated For Better Performance With Large Images & In Depth Zoom
 

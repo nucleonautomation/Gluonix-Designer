@@ -503,10 +503,8 @@ class GUI():
                     if Value:
                         Light_Name = "_Light" + Name
                         Dark_Name = "_Dark" + Name
-                        if not hasattr(Widget, Light_Name):
-                            setattr(Widget, Light_Name, Value)
-                        if not hasattr(Widget, Dark_Name):
-                            setattr(Widget, Dark_Name, self.Invert(Value))
+                        setattr(Widget, Light_Name, Value)
+                        setattr(Widget, Dark_Name, self.Invert(Value))
         except Exception as E:
             self.Error(f"{self._Type} -> Initiate_Colors -> {E}")
             

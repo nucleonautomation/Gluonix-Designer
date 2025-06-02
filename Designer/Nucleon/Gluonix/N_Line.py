@@ -137,7 +137,7 @@ class Line:
         try:
             Config = {}
             if self._Hover_Background and self._Last_Background:
-                Config['Background'] = self._Last_Background
+                Config['Background'] = self._Last_Background if self._Background==self._Hover_Background else self._Background
             if len(Config)>0:
                 self.Config(**Config)
             if self._On_Hover_Out:

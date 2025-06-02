@@ -208,11 +208,11 @@ class Image:
         try:
             Config = {}
             if self._Hover_Background and self._Last_Background:
-                Config['Background'] = self._Last_Background
+                Config['Background'] = self._Last_Background if self._Background==self._Hover_Background else self._Background
             if self._Hover_Foreground and self._Last_Foreground:
-                Config['Foreground'] = self._Last_Foreground
+                Config['Foreground'] = self._Last_Foreground if self._Foreground==self._Hover_Foreground else self._Foreground
             if self._Hover_Border_Color and self._Last_Border_Color:
-                Config['Border_Color'] = self._Last_Border_Color
+                Config['Border_Color'] = self._Last_Border_Color if self._Border_Color==self._Hover_Border_Color else self._Border_Color
             if len(Config)>0:
                 self.Config(**Config)
             if self._On_Hover_Out:
@@ -666,9 +666,9 @@ class Image_Lite:
         try:
             Config = {}
             if self._Hover_Background and self._Last_Background:
-                Config['Background'] = self._Last_Background
+                Config['Background'] = self._Last_Background if self._Background==self._Hover_Background else self._Background
             if self._Hover_Foreground and self._Last_Foreground:
-                Config['Foreground'] = self._Last_Foreground
+                Config['Foreground'] = self._Last_Foreground if self._Foreground==self._Hover_Foreground else self._Foreground
             if len(Config)>0:
                 self.Config(**Config)
             if self._On_Hover_Out:
@@ -1059,7 +1059,7 @@ class Image_Zoom:
             if not self._Image_Window:
                 self.Relocate()
             else:
-                self.Load_Current()
+                self.Load()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Set -> {E}")
             
@@ -1134,9 +1134,9 @@ class Image_Zoom:
         try:
             Config = {}
             if self._Hover_Background and self._Last_Background:
-                Config['Background'] = self._Last_Background
+                Config['Background'] = self._Last_Background if self._Background==self._Hover_Background else self._Background
             if self._Hover_Border_Color and self._Last_Border_Color:
-                Config['Border_Color'] = self._Last_Border_Color
+                Config['Border_Color'] = self._Last_Border_Color if self._Border_Color==self._Hover_Border_Color else self._Border_Color
             if len(Config)>0:
                 self.Config(**Config)
             if self._On_Hover_Out:
@@ -1298,29 +1298,33 @@ class Image_Zoom:
         try:
             if not self._Image:
                 return {"Image": None, "Top": 0, "Left": 0}
-            Frame_Aspect = Frame_Width / Frame_Height
             Zoom_W = self._Image_Width / self._Zoom_Scale
             Zoom_H = self._Image_Height / self._Zoom_Scale
-            if Zoom_W / Zoom_H > Frame_Aspect:
-                View_H = int(Zoom_H)
-                View_W = int(View_H * Frame_Aspect)
-            else:
-                View_W = int(Zoom_W)
-                View_H = int(View_W / Frame_Aspect)
             CX, CY = self._Zoom_Center
-            CX = max(View_W // 2, min(self._Image_Width - View_W // 2, CX))
-            CY = max(View_H // 2, min(self._Image_Height - View_H // 2, CY))
+            CX = max(Zoom_W // 2, min(self._Image_Width - Zoom_W // 2, CX))
+            CY = max(Zoom_H // 2, min(self._Image_Height - Zoom_H // 2, CY))
             self._Zoom_Center = (CX, CY)
-            Left = CX - View_W // 2
-            Top = CY - View_H // 2
-            Right = Left + View_W
-            Bottom = Top + View_H
+            Left = CX - Zoom_W // 2
+            Top = CY - Zoom_H // 2
+            Right = Left + Zoom_W
+            Bottom = Top + Zoom_H
             Crop = self._Image.crop((int(Left), int(Top), int(Right), int(Bottom)))
             if self._Transparent:
                 Crop = Crop.convert("RGBA")
-            Crop = Crop.resize((int(Frame_Width), int(Frame_Height)), PIL_Image.NEAREST)
+            Image_Width, Image_Height = Crop.size
+            Image_Aspect = Image_Width / Image_Height
+            Frame_Aspect = Frame_Width / Frame_Height
+            if Image_Aspect > Frame_Aspect:
+                New_Width = int(Frame_Width)
+                New_Height = int(Frame_Width / Image_Aspect)
+            else:
+                New_Height = int(Frame_Height)
+                New_Width = int(Frame_Height * Image_Aspect)
+            Crop = Crop.resize((New_Width, New_Height), PIL_Image.NEAREST)
+            Left = (Frame_Width - New_Width) // 2
+            Top = (Frame_Height - New_Height) // 2
             Crop_TK = PIL_ImageTk.PhotoImage(Crop)
-            return {"Image": Crop_TK, "Top": 0, "Left": 0}
+            return {"Image": Crop_TK, "Top": Top, "Left": Left}
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Convert -> {E}")
             return {"Image": None, "Top": 0, "Left": 0}
@@ -1342,23 +1346,6 @@ class Image_Zoom:
                 self._Frame._Frame.tag_raise(self._Image_Window)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Load -> {E}")
-            
-    def Load_Current(self):
-        try:
-            if self._Height_Current > 0 and self._Width_Current > 0:
-                Image = self.Convert(self._Width_Current, self._Height_Current)
-                if Image["Image"] is None:
-                    return
-                if not self._Image_Window:
-                    self._Image_Window = self._Frame._Frame.create_image(0, 0, image=Image['Image'], anchor='nw')
-                else:
-                    self._Frame._Frame.itemconfig(self._Image_Window, image=Image['Image'])
-                    self._Frame._Frame.coords(self._Image_Window, 0, 0)
-                self._Frame._Frame.Temp_Image = Image['Image']
-                self._Frame._Frame.itemconfigure(self._Image_Window, state='normal')
-                self._Frame._Frame.tag_raise(self._Image_Window)
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Load_Current -> {E}")
                 
     def Drag_Start(self, Event):
         try:

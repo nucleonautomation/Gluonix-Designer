@@ -185,11 +185,11 @@ class Spinner:
         try:
             Config = {}
             if self._Hover_Background and self._Last_Background:
-                Config['Background'] = self._Last_Background
+                Config['Background'] = self._Last_Background if self._Background==self._Hover_Background else self._Background
             if self._Hover_Foreground and self._Last_Foreground:
-                Config['Foreground'] = self._Last_Foreground
+                Config['Foreground'] = self._Last_Foreground if self._Foreground==self._Hover_Foreground else self._Foreground
             if self._Hover_Border_Color and self._Last_Border_Color:
-                Config['Border_Color'] = self._Last_Border_Color
+                Config['Border_Color'] = self._Last_Border_Color if self._Border_Color==self._Hover_Border_Color else self._Border_Color
             if len(Config)>0:
                 self.Config(**Config)
             if self._On_Hover_Out:
