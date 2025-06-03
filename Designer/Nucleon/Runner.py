@@ -209,12 +209,17 @@ def Create_Popup(Display):
         if len(Display)==1:
             Display = Display[0]
             Temp_Popup = Gluonix.Popup(Global['Root'])
+            Temp_Popup._Name = Display['ID']
             Temp_Popup.Config(Width=int(Display['Width']), Height=int(Display['Height']), Left=int(Display['Left']), Top=int(Display['Top']))
             Temp_Popup.Config(Title=Display['Title'], Background=Display['Background'], Icon=File(Variable_Data['Icon']), Resizable=bool(int(Display['Resizable'])))
             Temp_Popup.Config(Persistent=bool(int(Display['Persistent'])), Full_Screen=bool(int(Display['Full_Screen'])), Toolbar=bool(int(Display['Toolbar'])), Alignment=Display['Alignment'], Topmost=bool(int(Display['Topmost'])), Menu_Enable=bool(int(Display['Menu'])))
             Temp_Popup.Create()
             Load_Child(Display['ID'], Temp_Popup, Global)
             Temp_Popup.Show()
+            if Global['Root']._Dark_Mode:
+                Global['Root'].After(1, lambda : Global['Root'].Apply_Mode(Temp_Popup, 'Dark'))
+            else:
+                Global['Root'].After(1, lambda : Global['Root'].Apply_Mode(Temp_Popup, 'Light'))
             return Temp_Popup
     except Exception as E:
         Error("Create_Popup -> "+str(E))

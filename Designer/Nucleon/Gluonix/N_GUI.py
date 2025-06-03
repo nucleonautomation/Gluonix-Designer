@@ -35,6 +35,7 @@ class GUI():
             self._Log_File = 'Gluonix_Error.log'
             self._Error = []
             self._Widget = []
+            self._Popup = []
             self._Type = "GUI"
             self._Frame = TK.Tk()
             self._Resize_Timer = False
@@ -57,6 +58,7 @@ class GUI():
             self._On_Show = False
             self._On_Hide = False
             self._Window = False
+            self._Dark_Mode = False
             if os.name == 'nt':
                 self._Window = True
                     
@@ -406,9 +408,10 @@ class GUI():
 
     def Create(self):
         try:
-            if self._Auto_Dark:
+            if self._Auto_Dark and not self._Dark_Mode:
                 self.Update_Color()
             if not self._Initialized:
+                self.Update_Color()
                 self._Screen_Width = self._Frame.winfo_screenwidth()
                 self._Screen_Height = self._Frame.winfo_screenheight()
                 if self._Full_Screen:
@@ -510,8 +513,9 @@ class GUI():
             
     def Apply_Mode(self, Widget, Mode='Light'):
         try:
+            if Widget._Type=="GUI" and Mode=='Dark':
+                self._Dark_Mode = True
             Variable_Names = ["Background", "Foreground", "Border_Color", "Shadow_Color", "Hover_Background", "Hover_Foreground", "Hover_Border_Color", "Hover_Shadow_Color"]
-            Last_Variable_Names = ["Background", "Foreground", "Border_Color", "Shadow_Color"]
             Config_Dict = {}
             for Name in Variable_Names:
                     Mode_Name = f"_{Mode}_{Name}" 
@@ -519,15 +523,18 @@ class GUI():
                         Value = getattr(Widget, Mode_Name)
                         if Value:
                             Config_Dict[Name] = Value
-                            if Name in Last_Variable_Names:
-                                Last_Name = f"_Last_{Name}"
-                                setattr(Widget, Last_Name, Value)
             if Config_Dict:
                 Widget.Config(**Config_Dict)
             if hasattr(Widget, "_Widget"):
                 if isinstance(Widget._Widget, (list, tuple)):
                     for Child in Widget._Widget:
                         self.Apply_Mode(Child, Mode)
+            if hasattr(Widget, "_Popup"):
+                if isinstance(Widget._Popup, (list, tuple)):
+                    for Popup in Widget._Popup:
+                        self.Apply_Mode(Popup, Mode)
+            if Widget._Type=="GUI" and Mode=='Light':
+                self._Dark_Mode = False
         except Exception as E:
             self.Error(f"{self._Type} -> Apply_Mode -> {E}")
             

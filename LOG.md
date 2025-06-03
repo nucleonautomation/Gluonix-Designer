@@ -1,5 +1,9 @@
 # Change Log
 
+## V(3.5)
+- Bug Fixes: Accidentally Introduces More Bugs In 3.4 In Color Updates :)
+- Root Mode Changes Will Apply To Popups Too.
+
 ## V(3.4)
 - Bug Fixes In Dark Color Updateds And and Hover Color Updates.
 - Bug Fixes In Interective Zoom Image.

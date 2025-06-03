@@ -230,9 +230,10 @@ class Switch:
                     setattr(self, "_Light_Background", self._Background)
                 if not hasattr(self, "_Dark_Background"):
                     setattr(self, "_Dark_Background", self._GUI.Invert(self._Background))
-            if self._Auto_Dark:
+            if self._Auto_Dark and not self._GUI._Dark_Mode:
                 self.Update_Color()
             if not self._Initialized:
+                self.Update_Color()
                 self._Width_Current, self._Height_Current, self._Left_Current, self._Top_Current, = self._Width, self._Height, self._Left, self._Top
                 self._Frame.Config(Width=self._Width_Current, Height=self._Height_Current, Left=self._Left_Current, Top=self._Top_Current)
                 self._Frame.Config(Background=self._Background)

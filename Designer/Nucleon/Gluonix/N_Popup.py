@@ -49,6 +49,7 @@ class Popup():
                 self._Restore_Height = False
                 self._Window = self._GUI._Window
                 self._Auto_Dark = True
+                self._On_Close = False
                 self._On_Show = False
                 self._On_Hide = False
             except Exception as E:
@@ -117,6 +118,7 @@ class Popup():
         try:
             if self._On_Close:
                 self._On_Close()
+            self._GUI._Popup.remove(self)
             self._Frame.destroy()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> On_Close -> {E}")
@@ -340,9 +342,10 @@ class Popup():
 
     def Create(self):
         try:
-            if self._Auto_Dark:
+            if self._Auto_Dark and not self._GUI._Dark_Mode:
                 self.Update_Color()
             if not self._Initialized:
+                self.Update_Color()
                 if self._Minimize:
                     self._Frame.iconify()
                 self._Screen_Width = self._Frame.winfo_screenwidth()
@@ -373,6 +376,7 @@ class Popup():
                     self._Menu = TK.Menu(self._Frame)
                     self._Frame.config(menu=self._Menu)
                 self._Initialized = True
+                self._GUI._Popup.append(self)
             if not self._Full_Screen and not self._Toolbar:
                 self._Frame.geometry(f"{int(self._Width)}x{int(self._Height)}+{int(self._Left)}+{int(self._Top)}")
             if self._Topmost:
@@ -394,41 +398,8 @@ class Popup():
                 self._Frame.protocol("WM_DELETE_WINDOW", self.Nothing)
             else:
                 self._Frame.protocol("WM_DELETE_WINDOW", self.On_Close)
-                
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Create -> {E}")
-            
-    def Initiate_Colors(self, Widget):
-        try:
-            Variable_Names = ["_Background", "_Foreground", "_Border_Color", "_Shadow_Color", "_Hover_Background", "_Hover_Foreground", "_Hover_Border_Color", "_Hover_Shadow_Color"]
-            for Name in Variable_Names:
-                if hasattr(Widget, Name):
-                    Value = getattr(Widget, Name)
-                    if Value:
-                        Light_Name = "_Light" + Name
-                        Dark_Name = "_Dark" + Name
-                        setattr(Widget, Light_Name, Value)
-                        setattr(Widget, Dark_Name, self.Invert(Value))
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Initiate_Colors -> {E}")
-            
-    def Light_Mode(self):
-        try:
-            self.After(1, lambda : self._GUI.Apply_Mode(self, 'Light'))
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Light_Mode -> {E}")
-
-    def Dark_Mode(self):
-        try:
-            self.After(1, lambda : self._GUI.Apply_Mode(self, 'Dark'))
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Dark_Mode -> {E}")
-            
-    def Update_Colors(self):
-        try:
-            self._GUI.Update_Dark_Color(self)
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Update_Colors -> {E}")
             
     def Update_Color(self):
         try:
