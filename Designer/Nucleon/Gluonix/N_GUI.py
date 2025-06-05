@@ -93,32 +93,67 @@ class GUI():
     def Nothing(self):
         return False
         
-    def Maximize(self):
+    def Maximize(self, Auto=True):
         try:
-            self._Restore_Width = self._Width_Current
-            self._Restore_Height = self._Height_Current
             if not self._Toolbar:
                 if self._Window:
-                    hwnd = DLL.user32.GetParent(self._Frame.winfo_id())
+                    Hwnd = DLL.user32.GetParent(self._Frame.winfo_id())
+                    Screen_Width = self._Frame.winfo_screenwidth()
+                    Screen_Height = self._Frame.winfo_screenheight()
+                    Current_Width = self._Frame.winfo_width()
+                    Current_Height = self._Frame.winfo_height()
+                    if Auto:
+                        if Current_Width >= Screen_Width and Current_Height >= (Screen_Height - 48):
+                            self.Restore()
+                            return
+                    self._Restore_Width = self._Width_Current
+                    self._Restore_Height = self._Height_Current
                     SWP_SHOWWINDOW = 0x40
-                    DLL.user32.SetWindowPos(hwnd, 0, 0, 0, int(self._Frame.winfo_screenwidth()), int(self._Frame.winfo_screenheight()-48), SWP_SHOWWINDOW)
+                    DLL.user32.SetWindowPos(
+                        Hwnd, 0, 0, 0,
+                        int(Screen_Width),
+                        int(Screen_Height - 48),
+                        SWP_SHOWWINDOW
+                    )
             else:
+                if Auto:
+                    if self._Frame.state() == 'zoomed':
+                        self.Restore()
+                        return
+                self._Restore_Width = self._Width_Current
+                self._Restore_Height = self._Height_Current
                 self._Frame.state('zoomed')
         except Exception as E:
             self.Error(f"{self._Type} -> Maximize -> {E}")
         
     def Restore(self):
         try:
+            Screen_Width = self._Frame.winfo_screenwidth()
+            Screen_Height = self._Frame.winfo_screenheight()
+            Current_Width = self._Frame.winfo_width()
+            Current_Height = self._Frame.winfo_height()
+            if self._Frame.state() != 'iconic' and not (
+                Current_Width >= Screen_Width and
+                Current_Height >= (Screen_Height - 48)
+            ):
+                return
             if self._Restore_Width and self._Restore_Height:
                 self._Width_Current = self._Restore_Width
                 self._Height_Current = self._Restore_Height
             if not self._Toolbar:
                 if self._Window:
-                    hwnd = DLL.user32.GetParent(self._Frame.winfo_id())
+                    Hwnd = DLL.user32.GetParent(self._Frame.winfo_id())
                     SWP_SHOWWINDOW = 0x40
-                    DLL.user32.SetWindowPos(hwnd, 0, int(self._Left_Current), int(self._Top_Current), int(self._Width_Current), int(self._Height_Current), SWP_SHOWWINDOW)
+                    DLL.user32.SetWindowPos(
+                        Hwnd, 0,
+                        int(self._Left_Current),
+                        int(self._Top_Current),
+                        int(self._Width_Current),
+                        int(self._Height_Current),
+                        SWP_SHOWWINDOW
+                    )
             else:
-                self._Frame.geometry(f"{int(self._Width_Current)}x{int(self._Height_Current)}+{int(self._Left_Current)}+{int(self._Top_Current)}")
+                self._Frame.state('normal')
             self._Frame.event_generate("<Configure>")
         except Exception as E:
             self.Error(f"{self._Type} -> Restore -> {E}")
@@ -340,6 +375,12 @@ class GUI():
     
     def Grab_Widget(self, Path=False, Widget=False, Custom=False):
         try:
+            Scale = 1.0
+            if self._Window:
+                try:
+                    Scale = DLL.shcore.GetScaleFactorForDevice(0) / 100
+                except Exception:
+                    Scale = 1.0
             if Widget:
                 X = self._Frame.winfo_rootx() + Widget._Frame.winfo_x()
                 Y = self._Frame.winfo_rooty() + Widget._Frame.winfo_y()
@@ -355,6 +396,10 @@ class GUI():
                 Y = self._Frame.winfo_rooty()
                 Width = X + self._Frame.winfo_width()
                 Height = Y + self._Frame.winfo_height()
+            X = int(X * Scale)
+            Y = int(Y * Scale)
+            Width = int(Width * Scale)
+            Height = int(Height * Scale)
             Temp_Image = PIL_ImageGrab.grab(bbox=(X, Y, Width, Height))
             if Path:
                 Temp_Image.save(Path)

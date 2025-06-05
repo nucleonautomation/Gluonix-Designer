@@ -12,7 +12,7 @@ class Select:
         if self._GUI is not None:
             self._Type = "Select"
             try:
-                self._Config = ['Name', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Foreground', 'Light_Foreground', 'Dark_Foreground', 'Border_Color', 'Light_Border_Color', 'Dark_Border_Color', 'Border_Size', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Align', 'Font_Size', 'Font_Weight', 'Font_Family','Height_List', 'Disable', 'Hover_Background', 'Light_Hover_Background', 'Dark_Hover_Background', 'Hover_Foreground', 'Light_Hover_Foreground', 'Dark_Hover_Foreground', 'Hover_Border_Color', 'Light_Hover_Border_Color', 'Dark_Hover_Border_Color']
+                self._Config = ['Name', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Foreground', 'Light_Foreground', 'Dark_Foreground', 'Border_Color', 'Light_Border_Color', 'Dark_Border_Color', 'Border_Size', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Align', 'Font_Size', 'Font_Weight', 'Font_Family','Height_List', 'Disable', 'Values', 'Hover_Background', 'Light_Hover_Background', 'Dark_Hover_Background', 'Hover_Foreground', 'Light_Hover_Foreground', 'Dark_Hover_Foreground', 'Hover_Border_Color', 'Light_Hover_Border_Color', 'Dark_Hover_Border_Color']
                 self._Initialized = False
                 self._Name = False
                 self._Last_Name = False
@@ -153,7 +153,7 @@ class Select:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Clear -> {E}")
             
-    def Refresh(self, Value):
+    def Refresh(self, Value=False):
         try:
             Values = self._Values.copy()
             self._Values = []
@@ -161,7 +161,8 @@ class Select:
             self._Widget.set('')
             self._Values = Values
             self._Widget.config(values=self._Values)
-            self.Set(Value)
+            if Value:
+                self.Set(Value)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Refresh -> {E}")
             
@@ -403,15 +404,33 @@ class Select:
     def Adjustment(self):
         try:
             Width_Difference = self._Main._Width_Current - self._Main._Width
-            Width_Ratio = self._Width / (self._Main._Width - self._Main._Border_Size*2)
-            self._Width_Adjustment = Width_Difference * Width_Ratio
             Height_Difference = self._Main._Height_Current - self._Main._Height
-            Height_Ratio = self._Height / (self._Main._Height - self._Main._Border_Size*2)
+            Width_Ratio = self._Width / (self._Main._Width - self._Main._Border_Size * 2)
+            Height_Ratio = self._Height / (self._Main._Height - self._Main._Border_Size * 2)
+            Center_X = self._Left + self._Width / 2
+            Center_Y = self._Top + self._Height / 2
+            Is_Right = Center_X > self._Main._Width / 2
+            Is_Bottom = Center_Y > self._Main._Height / 2
+            self._Width_Adjustment = Width_Difference * Width_Ratio
             self._Height_Adjustment = Height_Difference * Height_Ratio
-            Left_Ratio = self._Left / self._Main._Width
-            self._Left_Adjustment = Width_Difference * Left_Ratio
-            Top_Ratio = self._Top / self._Main._Height
-            self._Top_Adjustment = Height_Difference * Top_Ratio
+            if Is_Right:
+                Distance_From_Right = self._Main._Width - (self._Left + self._Width)
+                Ratio = Distance_From_Right / self._Main._Width
+                self._Left_Adjustment = Width_Difference * (1 - Ratio) - self._Width_Adjustment
+            else:
+                Ratio = self._Left / self._Main._Width
+                self._Left_Adjustment = Width_Difference * Ratio
+            if Is_Bottom:
+                Distance_From_Bottom = self._Main._Height - (self._Top + self._Height)
+                Ratio = Distance_From_Bottom / self._Main._Height
+                self._Top_Adjustment = Height_Difference * (1 - Ratio) - self._Height_Adjustment
+            else:
+                Ratio = self._Top / self._Main._Height
+                self._Top_Adjustment = Height_Difference * Ratio
+            if not self._Resize_Width and self._Move_Left and Is_Right:
+                self._Left_Adjustment += self._Width_Adjustment
+            if not self._Resize_Height and self._Move_Top and Is_Bottom:
+                self._Top_Adjustment += self._Height_Adjustment
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Adjustment -> {E}")
             

@@ -342,15 +342,33 @@ class Entry:
     def Adjustment(self):
         try:
             Width_Difference = self._Main._Width_Current - self._Main._Width
-            Width_Ratio = self._Width / (self._Main._Width - self._Main._Border_Size*2)
-            self._Width_Adjustment = Width_Difference * Width_Ratio
             Height_Difference = self._Main._Height_Current - self._Main._Height
-            Height_Ratio = self._Height / (self._Main._Height - self._Main._Border_Size*2)
+            Width_Ratio = self._Width / (self._Main._Width - self._Main._Border_Size * 2)
+            Height_Ratio = self._Height / (self._Main._Height - self._Main._Border_Size * 2)
+            Center_X = self._Left + self._Width / 2
+            Center_Y = self._Top + self._Height / 2
+            Is_Right = Center_X > self._Main._Width / 2
+            Is_Bottom = Center_Y > self._Main._Height / 2
+            self._Width_Adjustment = Width_Difference * Width_Ratio
             self._Height_Adjustment = Height_Difference * Height_Ratio
-            Left_Ratio = self._Left / self._Main._Width
-            self._Left_Adjustment = Width_Difference * Left_Ratio
-            Top_Ratio = self._Top / self._Main._Height
-            self._Top_Adjustment = Height_Difference * Top_Ratio
+            if Is_Right:
+                Distance_From_Right = self._Main._Width - (self._Left + self._Width)
+                Ratio = Distance_From_Right / self._Main._Width
+                self._Left_Adjustment = Width_Difference * (1 - Ratio) - self._Width_Adjustment
+            else:
+                Ratio = self._Left / self._Main._Width
+                self._Left_Adjustment = Width_Difference * Ratio
+            if Is_Bottom:
+                Distance_From_Bottom = self._Main._Height - (self._Top + self._Height)
+                Ratio = Distance_From_Bottom / self._Main._Height
+                self._Top_Adjustment = Height_Difference * (1 - Ratio) - self._Height_Adjustment
+            else:
+                Ratio = self._Top / self._Main._Height
+                self._Top_Adjustment = Height_Difference * Ratio
+            if not self._Resize_Width and self._Move_Left and Is_Right:
+                self._Left_Adjustment += self._Width_Adjustment
+            if not self._Resize_Height and self._Move_Top and Is_Bottom:
+                self._Top_Adjustment += self._Height_Adjustment
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Adjustment -> {E}")
             

@@ -42,12 +42,7 @@ Minimize.Button.Bind(On_Click = lambda E: Root.Minimize())
 Minimize.Bind(On_Hover_In = lambda E: (Minimize.Config(Background='#868686'), Minimize.Button.Config(Background='#868686')))
 Minimize.Bind(On_Hover_Out = lambda E: (Minimize.Config(Background=Background), Minimize.Button.Config(Background=Background)))
 
-Header.Bind(On_Double_Click = lambda E: Toggle_Maximize())
-Header.Bind(On_Resize = lambda : _thread.start_new_thread(Move_Control, ()))
-
-def Move_Control():
-    time.sleep(0.1)
-    Header.Control.Config(Left=Header.Size()[0]-Header.Control.Size()[0])
+Header.Bind(On_Double_Click = lambda E: Root.Maximize())
 
 #Top Menu
 class Menu_Frame_Item:

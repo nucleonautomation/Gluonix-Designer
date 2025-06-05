@@ -1,5 +1,10 @@
 # Change Log
 
+## V(3.6)
+- Left Right Top Bottom Anchoring Updated. Widgets Will Properly Relocated To Each Side Depending Upon The Position On Screen.
+- Minimize, Maximize & Restore Bug Fixes
+- Grab Function To Screenshot Any Widget Will According To Widnows Display Scalling
+
 ## V(3.5)
 - Bug Fixes: Accidentally Introduces More Bugs In 3.4 In Color Updates :)
 - Root Mode Changes Will Apply To Popups Too.
