@@ -20,7 +20,7 @@ class Configure_Scroll:
             self.Frame = self.Global['Gluonix'].Scroll(self.Configure.Frame)
             self.Frame.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Frame.Config(Background='#FFFFFF', Border_Size=0, Display=False)
-            self.Frame.Config(Resize=False, Move=False)
+            self.Frame.Config(Resize=True, Move=True)
             self.Frame.Create()
             self.Configure.Widget.append(self)
             

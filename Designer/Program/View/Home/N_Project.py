@@ -9,6 +9,7 @@ import sqlite3
 
 #Program
 from .N_Project_New import New
+from .N_Project_Compare import Compare
 
 class Project:
     def __init__(self, Global, Home):
@@ -64,6 +65,22 @@ class Project:
             self.Open_Label.Bind(On_Click=lambda E: self.Open_Project(), Cursor_Hand=True)
             self.Open_Label.Create()
             
+                #Compare
+                    #Image
+            Fixture = self.Frame.Locate(15, 4, 10, 16)
+            self.Compare_Image = self.Global['Gluonix'].Image(self.Frame)
+            self.Compare_Image.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Compare_Image.Config(Path=self.Global['Image']('Compare'), Border_Size=0)
+            self.Compare_Image.Bind(On_Click=lambda E: self.Open_Project(), Cursor_Hand=True)
+            self.Compare_Image.Create()
+                    #Label
+            Fixture = self.Frame.Locate(70, 4, 25, 16)
+            self.Compare_Label = self.Global['Gluonix'].Label(self.Frame)
+            self.Compare_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Compare_Label.Config(Foreground='black', Value="Compare project", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Compare_Label.Bind(On_Click=lambda E: self.Compare_Project(), Cursor_Hand=True)
+            self.Compare_Label.Create()
+            
                 #Version
                     #Current
             Fixture = self.Frame.Locate(17, 4, 10, 90)
@@ -74,6 +91,9 @@ class Project:
             
             #Create New Project
             self.New = New(self.Global, self)
+            
+            #Create New Project
+            self.Compare = Compare(self.Global, self)
                    
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
@@ -98,6 +118,13 @@ class Project:
             self.Global['Message'].Show('Error', 'Project Files Are Corrupted')
             self.Project_Path = False
             self.Project_Name = False
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Compare_Project(self):
+        try:
+            self.Compare.Reset()
+            self.Compare.Frame.Show()
+        except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             
     def Update_Database(self, Old_Structure_Database, New_Structure_Database):

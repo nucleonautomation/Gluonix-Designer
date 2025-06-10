@@ -50,7 +50,7 @@ class Stock:
             self.Line = self.Global['Gluonix'].Line(self.Design.Frame)
             self.Line.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Line.Config(Border_Size=0, Display=True)
-            self.Line.Config(Resize=False, Move=False)
+            self.Line.Config(Resize=True, Move=True)
             self.Line.Create()
             self.Design.Widget.append(self.Line)
             
@@ -59,7 +59,7 @@ class Stock:
             self.Frame = self.Global['Gluonix'].Frame(self.Design.Frame)
             self.Frame.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Frame.Config(Background='#FFFFFF', Border_Size=0, Display=True)
-            self.Frame.Config(Resize=False, Move=False)
+            self.Frame.Config(Resize=True, Move=True)
             self.Frame.Create()
             self.Design.Widget.append(self.Frame)
             
@@ -78,7 +78,7 @@ class Stock:
             self.Scroll = self.Global['Gluonix'].Scroll(self.Frame)
             self.Scroll.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Scroll.Config(Background='#FFFFFF', Border_Size=0, Display=True)
-            self.Scroll.Config(Resize=False, Move=False)
+            self.Scroll.Config(Resize=True, Move=True)
             self.Scroll.Create()
             
             #Objects

@@ -28,7 +28,7 @@ class Element:
             self.Frame = self.Global['Gluonix'].Frame(self.Design.Frame)
             self.Frame.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Frame.Config(Background='#FFFFFF', Border_Size=0, Display=True)
-            self.Frame.Config(Resize=False, Move=False)
+            self.Frame.Config(Resize=True, Move=True)
             self.Frame.Create()
             self.Design.Widget.append(self.Frame)
             
@@ -38,7 +38,7 @@ class Element:
             self.Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Label.Config(Background='#FFFFFF', Border_Size=0, Display=True)
             self.Label.Config(Foreground='#000000', Font_Size=16, Font_Weight='normal', Align='w')
-            self.Label.Config(Resize=False, Move=False)
+            self.Label.Config(Resize=True, Move=True)
             self.Label.Set(' PROJECT')
             self.Label.Create()
             
@@ -104,7 +104,7 @@ class Element:
             self.Tree.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Tree.Config(Background='#FFFFFF', Border_Size=0, Scroll_Width=Fixture[0]*3, Display=True)
             self.Tree.Config(Foreground='#000000', Font_Size=16, Font_Weight='normal')
-            self.Tree.Config(Resize=False, Move=False)
+            self.Tree.Config(Resize=True, Move=True)
             self.Tree.Bind(On_Release=lambda E: self.Reset_All(), On_Double_Click=lambda E: self.Get_Current(), On_Right_Click=lambda E: self.Get_Current())
             self.Tree.Create()
                    

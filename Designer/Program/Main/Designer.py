@@ -31,8 +31,8 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 # Global Variables
 # -------------------------------------------------------------------------------------------------------------------------------
 Title = "Gluonix Designer - Nucleon Automation"
-Version = 3
-Revision = 6
+Version = 4
+Revision = 0
 Error_List = []
 Error_Display = True
 Error_Log = True
@@ -171,7 +171,7 @@ def On_Close():
 # -------------------------------------------------------------------------------------------------------------------------------
 GUI = Gluonix.GUI()
 GUI.Config(Width=Width, Height=Height, Left=Left, Top=Top)
-GUI.Config(Title=Title, Background=Background, Icon=Image("Icon", "ico"), Resizable=False)
+GUI.Config(Title=Title, Background=Background, Icon=Image("Icon", "ico"), Resizable=True)
 GUI.Config(Error_Log=Error_Log, Error_Display=Error_Display)
 GUI.Bind(On_Close=lambda: On_Close())
 GUI.Create()

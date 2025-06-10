@@ -26,7 +26,7 @@ class Design:
             self.Frame = self.Global['Gluonix'].Frame(self.Main.Frame)
             self.Frame.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Frame.Config(Border_Size=0, Display=False)
-            self.Frame.Config(Resize=False, Move=False)
+            self.Frame.Config(Resize=True, Move=True)
             self.Frame.Create()
             self.Main.Widget.append(self.Frame)
             

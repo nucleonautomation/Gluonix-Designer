@@ -1,5 +1,9 @@
 # Change Log
 
+## V(4.0)
+- Compare Tool Is Added. Compare Two Projects Side By Side & Copy Widgets From One Project To Other.
+- Designer Has Resizeable Capabilities.
+
 ## V(3.6)
 - Left Right Top Bottom Anchoring Updated. Widgets Will Properly Relocated To Each Side Depending Upon The Position On Screen.
 - Minimize, Maximize & Restore Bug Fixes

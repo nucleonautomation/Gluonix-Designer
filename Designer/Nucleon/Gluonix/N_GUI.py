@@ -71,6 +71,8 @@ class GUI():
     def Error(self, E):
         Error_Time = int(time.time())
         self._Error.append([E, Error_Time])
+        if len(self._Error) > 1000:
+            self._Error.pop(0)
         if self._Error_Display:
             print(E)
         if self._Error_Log:
