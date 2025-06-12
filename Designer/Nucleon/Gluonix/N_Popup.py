@@ -305,7 +305,7 @@ class Popup():
                     Run = True
             if self._Initialized and Run:
                 self.Create()
-            if "Width" in Input or "Height" in Input:
+            if "Width" in Input or "Height" in Input or "Left" in Input or "Top" in Input:
                 self._Size_Update = True
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Config -> {E}")

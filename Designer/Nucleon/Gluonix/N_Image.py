@@ -19,7 +19,7 @@ class Image:
         if self._GUI is not None:
             self._Type = "Image"
             try:
-                self._Config = ['Name', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Foreground', 'Light_Foreground', 'Dark_Foreground', 'Border_Color', 'Light_Border_Color', 'Dark_Border_Color', 'Border_Size', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Path', 'Path_Initial', 'Url', 'Array', 'Pil', 'Rotate', 'Transparent', 'Aspect_Ratio', 'Convert_Type', 'Tolerance', 'Hover_Background', 'Light_Hover_Background', 'Dark_Hover_Background', 'Hover_Foreground', 'Light_Hover_Foreground', 'Dark_Hover_Foreground', 'Hover_Border_Color', 'Light_Hover_Border_Color', 'Dark_Hover_Border_Color']
+                self._Config = ['Name', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Use_Foreground', 'Foreground', 'Light_Foreground', 'Dark_Foreground', 'Border_Color', 'Light_Border_Color', 'Dark_Border_Color', 'Border_Size', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Path', 'Path_Initial', 'Url', 'Array', 'Pil', 'Rotate', 'Transparent', 'Aspect_Ratio', 'Convert_Type', 'Tolerance', 'Hover_Background', 'Light_Hover_Background', 'Dark_Hover_Background', 'Hover_Foreground', 'Light_Hover_Foreground', 'Dark_Hover_Foreground', 'Hover_Border_Color', 'Light_Hover_Border_Color', 'Dark_Hover_Border_Color']
                 self._Initialized = False
                 self._Name = False
                 self._Last_Name = False
@@ -35,6 +35,7 @@ class Image:
                 self._Border_Size = 0
                 self._Background = self._Main._Background
                 self._Background_Main = True
+                self._Use_Foreground = False
                 self._Foreground = False
                 self._Hover_Background = False
                 self._Hover_Foreground = False
@@ -135,9 +136,7 @@ class Image:
             self._Path = Path
             self._Path_Memory = self._Path
             self.Open()
-            if self._Size_Update:
-                self._Size_Update = False
-                self.Relocate()
+            self.Relocate()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Set -> {E}")
             
@@ -155,18 +154,14 @@ class Image:
         try:
             self._Angle = 0
             self.Open()
-            if self._Size_Update:
-                self._Size_Update = False
-                self.Relocate()
+            self.Relocate()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Reset -> {E}")
             
     def Refresh(self):
         try:
             self.Open()
-            if self._Size_Update:
-                self._Size_Update = False
-                self.Relocate()
+            self.Relocate()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Refresh -> {E}")
             
@@ -247,7 +242,7 @@ class Image:
                     setattr(self, "_"+Each, Value)
                     Run = True
             self._Frame.Config(**Input)
-            if "Width" in Input or "Height" in Input:
+            if "Width" in Input or "Height" in Input or "Left" in Input or "Top" in Input:
                 self._Size_Update = True
             if self._Initialized and Run:
                 self.Create()
@@ -411,8 +406,8 @@ class Image:
                 Top = 0
                 Left = (Frame_Width - Width) / 2
             if self._Transparent:
-                Temp_Image = Temp_Image.convert(self._Convert_Type)
-                if self._Convert_Type=='RGBA' and self._Foreground:
+                if self._Convert_Type=='RGBA' and self._Foreground and self._Use_Foreground:
+                    Temp_Image = Temp_Image.convert(self._Convert_Type)
                     Temp_Color = self.RGB(self._Foreground)
                     Pixel_Data = Temp_Image.load()
                     Temp_Width, Temp_Height = Temp_Image.size
@@ -519,7 +514,7 @@ class Image_Lite:
         if self._GUI is not None:
             self._Type = "Image_Lite"
             try:
-                self._Config = ['Name', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Foreground', 'Light_Foreground', 'Dark_Foreground', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Path', 'Path_Initial', 'Url', 'Array', 'Pil', 'Rotate', 'Transparent', 'Aspect_Ratio', 'Convert_Type', 'Tolerance', 'Hover_Background', 'Light_Hover_Background', 'Dark_Hover_Background', 'Hover_Foreground']
+                self._Config = ['Name', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Use_Foreground', 'Foreground', 'Light_Foreground', 'Dark_Foreground', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Path', 'Path_Initial', 'Url', 'Array', 'Pil', 'Rotate', 'Transparent', 'Aspect_Ratio', 'Convert_Type', 'Tolerance', 'Hover_Background', 'Light_Hover_Background', 'Dark_Hover_Background', 'Hover_Foreground']
                 self._Initialized = False
                 self._Name = False
                 self._Last_Name = False
@@ -532,6 +527,7 @@ class Image_Lite:
                 self._Widget = TK.Label(self._Main._Frame)
                 self._Background = self._Main._Background
                 self._Background_Main = True
+                self._Use_Foreground = False
                 self._Foreground = False
                 self._Hover_Background = False
                 self._Hover_Foreground = False
@@ -629,9 +625,7 @@ class Image_Lite:
             self._Path = Path
             self._Path_Memory = self._Path
             self.Open()
-            if self._Size_Update:
-                self._Size_Update = False
-                self.Relocate()
+            self.Relocate()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Set -> {E}")
             
@@ -649,18 +643,14 @@ class Image_Lite:
         try:
             self._Angle = 0
             self.Open()
-            if self._Size_Update:
-                self._Size_Update = False
-                self.Relocate()
+            self.Relocate()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Reset -> {E}")
             
     def Refresh(self):
         try:
             self.Open()
-            if self._Size_Update:
-                self._Size_Update = False
-                self.Relocate()
+            self.Relocate()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Refresh -> {E}")
             
@@ -734,7 +724,7 @@ class Image_Lite:
                     Value = Input[Each]
                     setattr(self, "_"+Each, Value)
                     Run = True
-            if "Width" in Input or "Height" in Input:
+            if "Width" in Input or "Height" in Input or "Left" in Input or "Top" in Input:
                 self._Size_Update = True
             if self._Initialized and Run:
                 self.Create()
@@ -895,8 +885,8 @@ class Image_Lite:
                 Top = 0
                 Left = (Frame_Width - Width) / 2
             if self._Transparent:
-                Temp_Image = Temp_Image.convert(self._Convert_Type)
-                if self._Convert_Type=='RGBA' and self._Foreground:
+                if self._Convert_Type=='RGBA' and self._Foreground and self._Use_Foreground:
+                    Temp_Image = Temp_Image.convert(self._Convert_Type)
                     Temp_Color = self.RGB(self._Foreground)
                     Pixel_Data = Temp_Image.load()
                     Temp_Width, Temp_Height = Temp_Image.size
@@ -1142,9 +1132,7 @@ class Image_Zoom:
     def Refresh(self):
         try:
             self.Open()
-            if self._Size_Update:
-                self._Size_Update = False
-                self.Relocate()
+            self.Relocate()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Refresh -> {E}")
             
@@ -1231,7 +1219,7 @@ class Image_Zoom:
                     setattr(self, "_"+Each, Value)
                     Run = True
             self._Frame.Config(**Input)
-            if "Width" in Input or "Height" in Input:
+            if "Width" in Input or "Height" in Input or "Left" in Input or "Top" in Input:
                 self._Size_Update = True
             if self._Initialized and Run:
                 self.Create()
@@ -1500,9 +1488,7 @@ class Image_Zoom:
             self._Zoom_Scale = 1.0
             if self._Image:
                 self._Zoom_Center = (self._Image_Width // 2, self._Image_Height // 2)
-            if self._Size_Update:
-                self._Size_Update = False
-                self.Relocate()
+            self.Relocate()
             if self._On_Right_Click:
                 self._On_Right_Click(Event)
         except Exception as E:

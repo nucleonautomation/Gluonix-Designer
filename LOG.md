@@ -1,5 +1,8 @@
 # Change Log
 
+## V(4.2)
+- Resizing & Dark Mode Bug Fix
+
 ## V(4.1)
 - The Application Is Now Fully Optimized For Resizing. It Will Only Trigger A Resize Operation When The Window Is Actually Resized, Avoiding Any Unnecessary Processing
 

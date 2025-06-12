@@ -206,7 +206,7 @@ class Label:
                     setattr(self, "_"+Each, Value)
                     Run = True
             self._Frame.Config(**Input)
-            if "Width" in Input or "Height" in Input:
+            if "Width" in Input or "Height" in Input or "Left" in Input or "Top" in Input:
                 self._Size_Update = True
             if self._Initialized and Run:
                 self.Create()
@@ -572,7 +572,7 @@ class Label_Lite:
                     Value = Input[Each]
                     setattr(self, "_"+Each, Value)
                     Run = True
-            if "Width" in Input or "Height" in Input:
+            if "Width" in Input or "Height" in Input or "Left" in Input or "Top" in Input:
                 self._Size_Update = True
             if self._Initialized and Run:
                 self.Create()
