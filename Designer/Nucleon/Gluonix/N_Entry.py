@@ -20,6 +20,8 @@ class Entry:
                 self._Resize_Font, self._Resize, self._Resize_Width, self._Resize_Height, self._Move, self._Move_Left, self._Move_Top = True, True, True, True, True, True, True
                 self._Popup = False
                 self._Display = True
+                self._Size_Update = False
+                self._Resize_Index = 0
                 self._Main = Main
                 self._Frame = Frame(self._Main)
                 self._Widget = TK.Entry(self._Frame._Frame)
@@ -97,7 +99,7 @@ class Entry:
     def Show(self):
         try:
             self._Display = True
-            if self._Resizable:
+            if self._Resizable and self._Resize_Index<self._GUI._Resize_Index:
                 self.Resize()
             else:
                 self.Display()
@@ -222,6 +224,8 @@ class Entry:
                     setattr(self, "_"+Each, Value)
                     Run = True
             self._Frame.Config(**Input)
+            if "Width" in Input or "Height" in Input:
+                self._Size_Update = True
             if self._Initialized and Run:
                 self.Create()
             if "Background" in Input:
@@ -400,6 +404,7 @@ class Entry:
             
     def Resize(self):
         try:
+            self._Resize_Index = self._GUI._Resize_Index
             self.Font()
             self.Relocate()
         except Exception as E:

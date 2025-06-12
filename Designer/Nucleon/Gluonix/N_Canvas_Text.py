@@ -53,7 +53,7 @@ class Canvas_Text:
     def Show(self):
         try:
             self._Display = True
-            if self._Resizable:
+            if self._Resizable and self._Resize_Index<self._GUI._Resize_Index:
                 self.Resize()
             else:
                 self.Display()
@@ -193,6 +193,7 @@ class Canvas_Text:
             
     def Resize(self):
         try:
+            self._Resize_Index = self._GUI._Resize_Index
             self.Relocate()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Resize -> {E}")

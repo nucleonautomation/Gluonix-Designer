@@ -23,6 +23,8 @@ class Compound:
                 self._Resize_Font, self._Resize, self._Resize_Width, self._Resize_Height, self._Move, self._Move_Left, self._Move_Top = True, True, True, True, True, True, True
                 self._Popup = False
                 self._Display = True
+                self._Size_Update = False
+                self._Resize_Index = 0
                 self._Main = Main
                 self._Frame = Frame(self._Main)
                 self._Widget = TK.Label(self._Frame._Frame)
@@ -104,7 +106,7 @@ class Compound:
     def Show(self):
         try:
             self._Display = True
-            if self._Resizable:
+            if self._Resizable and self._Resize_Index<self._GUI._Resize_Index:
                 self.Resize()
             else:
                 self.Display()
@@ -143,7 +145,9 @@ class Compound:
     def Refresh(self):
         try:
             self.Open()
-            self.Relocate()
+            if self._Size_Update:
+                self._Size_Update = False
+                self.Relocate()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Refresh -> {E}")
             
@@ -224,6 +228,8 @@ class Compound:
                     setattr(self, "_"+Each, Value)
                     Run = True
             self._Frame.Config(**Input)
+            if "Width" in Input or "Height" in Input:
+                self._Size_Update = True
             if self._Initialized and Run:
                 self.Create()
             if "Background" in Input:
@@ -463,6 +469,7 @@ class Compound:
             
     def Resize(self):
         try:
+            self._Resize_Index = self._GUI._Resize_Index
             self.Font()
             self.Relocate()
         except Exception as E:
@@ -483,6 +490,8 @@ class Compound_Lite:
                 self._Resize_Font, self._Resize, self._Resize_Width, self._Resize_Height, self._Move, self._Move_Left, self._Move_Top = True, True, True, True, True, True, True
                 self._Popup = False
                 self._Display = True
+                self._Size_Update = False
+                self._Resize_Index = 0
                 self._Main = Main
                 self._Widget = TK.Label(self._Main._Frame)
                 self._Background = self._Main._Background
@@ -558,7 +567,7 @@ class Compound_Lite:
     def Show(self):
         try:
             self._Display = True
-            if self._Resizable:
+            if self._Resizable and self._Resize_Index<self._GUI._Resize_Index:
                 self.Resize()
             else:
                 self.Display()
@@ -597,7 +606,9 @@ class Compound_Lite:
     def Refresh(self):
         try:
             self.Open()
-            self.Relocate()
+            if self._Size_Update:
+                self._Size_Update = False
+                self.Relocate()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Refresh -> {E}")
             
@@ -671,6 +682,8 @@ class Compound_Lite:
                     Value = Input[Each]
                     setattr(self, "_"+Each, Value)
                     Run = True
+            if "Width" in Input or "Height" in Input:
+                self._Size_Update = True
             if self._Initialized and Run:
                 self.Create()
             if "Background" in Input:
@@ -907,6 +920,7 @@ class Compound_Lite:
             
     def Resize(self):
         try:
+            self._Resize_Index = self._GUI._Resize_Index
             self.Font()
             self.Relocate()
         except Exception as E:

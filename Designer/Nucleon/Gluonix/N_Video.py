@@ -19,6 +19,8 @@ class Video:
                 self._Resize_Font, self._Resize, self._Resize_Width, self._Resize_Height, self._Move, self._Move_Left, self._Move_Top = False, True, True, True, True, True, True
                 self._Popup = False
                 self._Display = True
+                self._Size_Update = False
+                self._Resize_Index = 0
                 self._Main = Main
                 self._Frame = Canvas(self._Main)
                 self._Border_Color = '#000000'
@@ -89,7 +91,7 @@ class Video:
     def Show(self):
         try:
             self._Display = True
-            if self._Resizable:
+            if self._Resizable and self._Resize_Index<self._GUI._Resize_Index:
                 self.Resize()
             else:
                 self.Display()
@@ -192,6 +194,8 @@ class Video:
                     setattr(self, "_"+Each, Value)
                     Run = True
             self._Frame.Config(**Input)
+            if "Width" in Input or "Height" in Input:
+                self._Size_Update = True
             if self._Initialized and Run:
                 self.Create()
         except Exception as E:
@@ -241,7 +245,9 @@ class Video:
             if self._Path!=self._Path_Memory:
                 self._Path_Memory = self._Path
                 self.Open()
-            self.Relocate()
+            if self._Size_Update:
+                self._Size_Update = False
+                self.Relocate()
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
                     if self._Last_Name in self._Main.__dict__:
@@ -422,6 +428,7 @@ class Video:
             
     def Resize(self):
         try:
+            self._Resize_Index = self._GUI._Resize_Index
             self.Relocate()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Resize -> {E}")

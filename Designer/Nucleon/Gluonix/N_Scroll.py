@@ -36,6 +36,8 @@ class Scroll:
                 self._Resize_Font, self._Resize, self._Resize_Width, self._Resize_Height, self._Move, self._Move_Left, self._Move_Top = False, True, True, True, True, True, True
                 self._Popup = False
                 self._Display = True
+                self._Size_Update = False
+                self._Resize_Index = 0
                 self._Main = Main
                 self._Frame_Canvas = Frame(self._Main)
                 self._Canvas_Scroll = TK.Canvas(self._Frame_Canvas._Frame)
@@ -125,7 +127,7 @@ class Scroll:
     def Show(self):
         try:
             self._Display = True
-            if self._Resizable:
+            if self._Resizable and self._Resize_Index<self._GUI._Resize_Index:
                 self.Resize()
             else:
                 self.Display()
@@ -215,6 +217,8 @@ class Scroll:
                     setattr(self, "_"+Each, Value)
                     Run = True
             self._Frame_Canvas.Config(**Input)
+            if "Width" in Input or "Height" in Input:
+                self._Size_Update = True
             if self._Initialized and Run:
                 self.Create()
             if "Background" in Input:
@@ -311,7 +315,9 @@ class Scroll:
                 self._Scrollbar_Vertical.place(relx=1, rely=0, relheight=1, anchor="ne")
             if self._Horizontal:
                 self._Scrollbar_Horizontal.place(relx=0, rely=1, relwidth=1, anchor="sw")
-            self.Resize(Trigger=False)
+            if self._Size_Update:
+                self._Size_Update = False
+                self.Resize(Trigger=False)
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
                     if self._Last_Name in self._Main.__dict__:

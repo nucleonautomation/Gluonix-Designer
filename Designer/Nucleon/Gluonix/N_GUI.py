@@ -40,6 +40,7 @@ class GUI():
             self._Frame = TK.Tk()
             self._Resize_Timer = False
             self._Resize_Delay = 200
+            self._Resize_Index = 0
             self._Title = "Nucleon Gluonix"
             self._Icon = ""
             self._Background = "#F0F0F0"
@@ -254,6 +255,7 @@ class GUI():
             
     def Event_Runner(self):
         try:
+            self._Resize_Index += 1
             for Each in self._Widget:
                 try:
                     if Each._Display:

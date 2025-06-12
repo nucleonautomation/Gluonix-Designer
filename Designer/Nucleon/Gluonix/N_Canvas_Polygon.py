@@ -7,6 +7,7 @@ class Canvas_Polygon:
         self._Canvas = Main
         self._Config = ['Name', 'Outline', 'Fill', 'Thickness', 'Resize', 'Translucent']
         self._Display = True
+        self._Resize_Index = 0
         self._Resize = True
         self._Name = False
         self._Last_Name = False
@@ -50,7 +51,7 @@ class Canvas_Polygon:
     def Show(self):
         try:
             self._Display = True
-            if self._Resizable:
+            if self._Resizable and self._Resize_Index<self._GUI._Resize_Index:
                 self.Resize()
             else:
                 self.Display()
@@ -196,6 +197,7 @@ class Canvas_Polygon:
             
     def Resize(self):
         try:
+            self._Resize_Index = self._GUI._Resize_Index
             self.Relocate()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Resize -> {E}")

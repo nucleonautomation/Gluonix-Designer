@@ -18,6 +18,8 @@ class Separator:
                 self._Resize_Font, self._Resize, self._Resize_Width, self._Resize_Height, self._Move, self._Move_Left, self._Move_Top = False, True, True, True, True, True, True
                 self._Popup = False
                 self._Display = True
+                self._Size_Update = False
+                self._Resize_Index = 0
                 self._Main = Main
                 self._Frame = Frame(self._Main)
                 self._Background = self._Main._Background
@@ -81,7 +83,7 @@ class Separator:
     def Show(self):
         try:
             self._Display = True
-            if self._Resizable:
+            if self._Resizable and self._Resize_Index<self._GUI._Resize_Index:
                 self.Resize()
             else:
                 self.Display()
@@ -185,6 +187,8 @@ class Separator:
                     setattr(self, "_"+Each, Value)
                     Run = True
             self._Frame.Config(**Input)
+            if "Width" in Input or "Height" in Input:
+                self._Size_Update = True
             if self._Initialized and Run:
                 self.Create()
             if "Background" in Input:
@@ -260,7 +264,9 @@ class Separator:
                     self.Hide()
                 self._Main._Widget.append(self)
                 self._Initialized = True
-            self.Relocate()
+            if self._Size_Update:
+                self._Size_Update = False
+                self.Relocate()
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
                     if self._Last_Name in self._Main.__dict__:
@@ -387,6 +393,7 @@ class Separator:
             
     def Resize(self):
         try:
+            self._Resize_Index = self._GUI._Resize_Index
             self.Relocate()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Resize -> {E}")

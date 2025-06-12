@@ -40,6 +40,8 @@ class Canvas:
                 self._Resize_Font, self._Resize, self._Resize_Width, self._Resize_Height, self._Move, self._Move_Left, self._Move_Top = False, True, True, True, True, True, True
                 self._Popup = False
                 self._Display = True
+                self._Size_Update = False
+                self._Resize_Index = 0
                 self._Main = Main
                 self._Frame = TK.Canvas(self._Main._Frame)
                 self._Border_Color = '#000000'
@@ -131,7 +133,7 @@ class Canvas:
     def Show(self):
         try:
             self._Display = True
-            if self._Resizable:
+            if self._Resizable and self._Resize_Index<self._GUI._Resize_Index:
                 self.Resize()
             else:
                 self.Display()
@@ -246,6 +248,8 @@ class Canvas:
                     Value = Input[Each]
                     setattr(self, "_"+Each, Value)
                     Run = True
+            if "Width" in Input or "Height" in Input:
+                self._Size_Update = True
             if self._Initialized and Run:
                 self.Create()
             if "Background" in Input:
@@ -331,7 +335,9 @@ class Canvas:
                 Temp_Background = self._Main._Background
             self._Frame.config(background=Temp_Background, width=self._Width_Current, height=self._Height_Current, highlightthickness=0)
             self.Rounded()
-            self.Resize(Trigger=False)
+            if self._Size_Update:
+                self._Size_Update = False
+                self.Resize(Trigger=False)
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
                     if self._Last_Name in self._Main.__dict__:

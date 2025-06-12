@@ -26,6 +26,8 @@ class Image:
                 self._Resize_Font, self._Resize, self._Resize_Width, self._Resize_Height, self._Move, self._Move_Left, self._Move_Top = False, True, True, True, True, True, True
                 self._Popup = False
                 self._Display = True
+                self._Size_Update = False
+                self._Resize_Index = 0
                 self._Main = Main
                 self._Frame = Frame(self._Main)
                 self._Widget = TK.Label(self._Frame._Frame)
@@ -105,7 +107,7 @@ class Image:
     def Show(self):
         try:
             self._Display = True
-            if self._Resizable:
+            if self._Resizable and self._Resize_Index<self._GUI._Resize_Index:
                 self.Resize()
             else:
                 self.Display()
@@ -133,7 +135,9 @@ class Image:
             self._Path = Path
             self._Path_Memory = self._Path
             self.Open()
-            self.Relocate()
+            if self._Size_Update:
+                self._Size_Update = False
+                self.Relocate()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Set -> {E}")
             
@@ -151,14 +155,18 @@ class Image:
         try:
             self._Angle = 0
             self.Open()
-            self.Relocate()
+            if self._Size_Update:
+                self._Size_Update = False
+                self.Relocate()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Reset -> {E}")
             
     def Refresh(self):
         try:
             self.Open()
-            self.Relocate()
+            if self._Size_Update:
+                self._Size_Update = False
+                self.Relocate()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Refresh -> {E}")
             
@@ -239,6 +247,8 @@ class Image:
                     setattr(self, "_"+Each, Value)
                     Run = True
             self._Frame.Config(**Input)
+            if "Width" in Input or "Height" in Input:
+                self._Size_Update = True
             if self._Initialized and Run:
                 self.Create()
             if "Background" in Input:
@@ -325,7 +335,9 @@ class Image:
             elif type(self._Path) != type(self._Path_Memory):
                 self._Path_Memory = self._Path
                 self.Open()
-            self.Relocate()
+            if self._Size_Update:
+                self._Size_Update = False
+                self.Relocate()
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
                     if self._Last_Name in self._Main.__dict__:
@@ -495,6 +507,7 @@ class Image:
             
     def Resize(self):
         try:
+            self._Resize_Index = self._GUI._Resize_Index
             self.Relocate()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Resize -> {E}")
@@ -513,6 +526,8 @@ class Image_Lite:
                 self._Resize_Font, self._Resize, self._Resize_Width, self._Resize_Height, self._Move, self._Move_Left, self._Move_Top = False, True, True, True, True, True, True
                 self._Popup = False
                 self._Display = True
+                self._Size_Update = False
+                self._Resize_Index = 0
                 self._Main = Main
                 self._Widget = TK.Label(self._Main._Frame)
                 self._Background = self._Main._Background
@@ -586,7 +601,7 @@ class Image_Lite:
     def Show(self):
         try:
             self._Display = True
-            if self._Resizable:
+            if self._Resizable and self._Resize_Index<self._GUI._Resize_Index:
                 self.Resize()
             else:
                 self.Display()
@@ -614,7 +629,9 @@ class Image_Lite:
             self._Path = Path
             self._Path_Memory = self._Path
             self.Open()
-            self.Relocate()
+            if self._Size_Update:
+                self._Size_Update = False
+                self.Relocate()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Set -> {E}")
             
@@ -632,14 +649,18 @@ class Image_Lite:
         try:
             self._Angle = 0
             self.Open()
-            self.Relocate()
+            if self._Size_Update:
+                self._Size_Update = False
+                self.Relocate()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Reset -> {E}")
             
     def Refresh(self):
         try:
             self.Open()
-            self.Relocate()
+            if self._Size_Update:
+                self._Size_Update = False
+                self.Relocate()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Refresh -> {E}")
             
@@ -713,6 +734,8 @@ class Image_Lite:
                     Value = Input[Each]
                     setattr(self, "_"+Each, Value)
                     Run = True
+            if "Width" in Input or "Height" in Input:
+                self._Size_Update = True
             if self._Initialized and Run:
                 self.Create()
             if "Background" in Input:
@@ -796,7 +819,9 @@ class Image_Lite:
             elif type(self._Path) != type(self._Path_Memory):
                 self._Path_Memory = self._Path
                 self.Open()
-            self.Relocate()
+            if self._Size_Update:
+                self._Size_Update = False
+                self.Relocate()
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
                     if self._Last_Name in self._Main.__dict__:
@@ -966,6 +991,7 @@ class Image_Lite:
             
     def Resize(self):
         try:
+            self._Resize_Index = self._GUI._Resize_Index
             self.Relocate()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Resize -> {E}")            
@@ -984,6 +1010,8 @@ class Image_Zoom:
                 self._Resize_Font, self._Resize, self._Resize_Width, self._Resize_Height, self._Move, self._Move_Left, self._Move_Top = False, True, True, True, True, True, True
                 self._Popup = False
                 self._Display = True
+                self._Size_Update = False
+                self._Resize_Index = 0
                 self._Main = Main
                 self._Frame = Canvas(self._Main)
                 self._Frame.Bind(On_Click = self.Drag_Start)
@@ -1066,7 +1094,7 @@ class Image_Zoom:
     def Show(self):
         try:
             self._Display = True
-            if self._Resizable:
+            if self._Resizable and self._Resize_Index<self._GUI._Resize_Index:
                 self.Resize()
             else:
                 self.Display()
@@ -1114,7 +1142,9 @@ class Image_Zoom:
     def Refresh(self):
         try:
             self.Open()
-            self.Relocate()
+            if self._Size_Update:
+                self._Size_Update = False
+                self.Relocate()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Refresh -> {E}")
             
@@ -1201,6 +1231,8 @@ class Image_Zoom:
                     setattr(self, "_"+Each, Value)
                     Run = True
             self._Frame.Config(**Input)
+            if "Width" in Input or "Height" in Input:
+                self._Size_Update = True
             if self._Initialized and Run:
                 self.Create()
             if "Background" in Input:
@@ -1286,7 +1318,9 @@ class Image_Zoom:
             elif type(self._Path) != type(self._Path_Memory):
                 self._Path_Memory = self._Path
                 self.Open()
-            self.Relocate()
+            if self._Size_Update:
+                self._Size_Update = False
+                self.Relocate()
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
                     if self._Last_Name in self._Main.__dict__:
@@ -1466,7 +1500,9 @@ class Image_Zoom:
             self._Zoom_Scale = 1.0
             if self._Image:
                 self._Zoom_Center = (self._Image_Width // 2, self._Image_Height // 2)
-            self.Relocate()
+            if self._Size_Update:
+                self._Size_Update = False
+                self.Relocate()
             if self._On_Right_Click:
                 self._On_Right_Click(Event)
         except Exception as E:
@@ -1533,6 +1569,7 @@ class Image_Zoom:
             
     def Resize(self):
         try:
+            self._Resize_Index = self._GUI._Resize_Index
             self.Relocate()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Resize -> {E}")

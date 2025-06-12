@@ -24,6 +24,8 @@ class Tree:
                 self._Resize_Font, self._Resize, self._Resize_Width, self._Resize_Height, self._Move, self._Move_Left, self._Move_Top = False, True, True, True, True, True, True
                 self._Popup = False
                 self._Display = True
+                self._Size_Update = False
+                self._Resize_Index = 0
                 self._Main = Main
                 self._Style = TK.ttk.Style()
                 self._Style.theme_use('clam')
@@ -104,7 +106,7 @@ class Tree:
     def Show(self):
         try:
             self._Display = True
-            if self._Resizable:
+            if self._Resizable and self._Resize_Index<self._GUI._Resize_Index:
                 self.Resize()
             else:
                 self.Display()
@@ -405,6 +407,8 @@ class Tree:
                     setattr(self, "_"+Each, Value)
                     Run = True
             self._Frame.Config(**Input)
+            if "Width" in Input or "Height" in Input:
+                self._Size_Update = True
             if self._Initialized and Run:
                 self.Create()
             if "Background" in Input:
@@ -491,7 +495,9 @@ class Tree:
             self._Style.map(self._Style_Name, background=[("selected", self._Background_Selected)], foreground=[("selected", self._Foreground_Selected)])
             self._Scrollbar_Horizontal.place(relx=0, rely=1, relwidth=1, anchor="sw")
             self.Adjust_Width(self._Width_Text, self._Width_Item)
-            self.Relocate()
+            if self._Size_Update:
+                self._Size_Update = False
+                self.Relocate()
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
                     if self._Last_Name in self._Main.__dict__:
@@ -567,6 +573,7 @@ class Tree:
             
     def Resize(self):
         try:
+            self._Resize_Index = self._GUI._Resize_Index
             self.Relocate()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Resize -> {E}")

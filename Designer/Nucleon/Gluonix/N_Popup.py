@@ -31,6 +31,8 @@ class Popup():
                     self._Frame = TK.Toplevel(None)
                 self._Resize_Timer = False
                 self._Resize_Delay = 200
+                self._Size_Update = False
+                self._Resize_Index = 0
                 self._Title = "Nucleon Gluonix"
                 self._Icon = ""
                 self._Background = "#F0F0F0"
@@ -202,6 +204,7 @@ class Popup():
             
     def Event_Runner(self):
         try:
+            self._Resize_Index += 1
             for Each in self._Widget:
                 try:
                     if Each._Display:
@@ -302,6 +305,8 @@ class Popup():
                     Run = True
             if self._Initialized and Run:
                 self.Create()
+            if "Width" in Input or "Height" in Input:
+                self._Size_Update = True
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Config -> {E}")
             

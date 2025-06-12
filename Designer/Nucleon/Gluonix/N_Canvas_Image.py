@@ -11,6 +11,7 @@ class Canvas_Image:
         self._Canvas = Main
         self._Config = ['Width', 'Height', 'Left', 'Top', 'Anchor', 'Url', 'Array', 'Pil', 'Photo', 'Resize', 'Rotate', 'Path', 'Path_Initial', 'Transparent']
         self._Display = True
+        self._Resize_Index = 0
         self._Resize = True
         self._Name = False
         self._Last_Name = False
@@ -60,7 +61,7 @@ class Canvas_Image:
     def Show(self):
         try:
             self._Display = True
-            if self._Resizable:
+            if self._Resizable and self._Resize_Index<self._GUI._Resize_Index:
                 self.Resize()
             else:
                 self.Display()
@@ -283,6 +284,7 @@ class Canvas_Image:
             
     def Resize(self):
         try:
+            self._Resize_Index = self._GUI._Resize_Index
             self.Relocate()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Resize -> {E}")

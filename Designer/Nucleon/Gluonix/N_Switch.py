@@ -24,6 +24,8 @@ class Switch:
                 self._Image = {True: self.Create_Image(self._Image_True), False: self.Create_Image(self._Image_False)}
                 self._Popup = False
                 self._Display = True
+                self._Size_Update = False
+                self._Resize_Index = 0
                 self._Main = Main
                 self._Frame = Image_Lite(self._Main)
                 self._Background = self._Main._Background
@@ -80,7 +82,7 @@ class Switch:
     def Show(self):
         try:
             self._Display = True
-            if self._Resizable:
+            if self._Resizable and self._Resize_Index<self._GUI._Resize_Index:
                 self.Resize()
             else:
                 self.Display()
@@ -162,6 +164,8 @@ class Switch:
                     setattr(self, "_"+Each, Value)
                     Run = True
             self._Frame.Config(**Input)
+            if "Width" in Input or "Height" in Input:
+                self._Size_Update = True
             if self._Initialized and Run:
                 self.Create()
             if "Background" in Input:
@@ -246,7 +250,9 @@ class Switch:
                 self._Main._Widget.append(self)
                 self._Initialized = True
             self._Frame.Set(Path=self._Image[self._Check])
-            self.Relocate()
+            if self._Size_Update:
+                self._Size_Update = False
+                self.Relocate()
             if self._Display:
                 self.Display()
             if self._Name!=self._Last_Name:
@@ -273,6 +279,7 @@ class Switch:
             
     def Resize(self):
         try:
+            self._Resize_Index = self._GUI._Resize_Index
             self.Relocate()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Resize -> {E}")
