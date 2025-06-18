@@ -76,7 +76,8 @@ class Compound:
                 Main = self._Main
             Instance = type(self)(Main)
             for Key in self._Config:
-                setattr(Instance, "_"+Key, getattr(self, "_"+Key))
+                if hasattr(self, "_"+Key):
+                    setattr(Instance, "_"+Key, getattr(self, "_"+Key))
             if Name:
                 setattr(Instance, "_Name", Name)
             Instance.Create()
@@ -538,7 +539,8 @@ class Compound_Lite:
                 Main = self._Main
             Instance = type(self)(Main)
             for Key in self._Config:
-                setattr(Instance, "_"+Key, getattr(self, "_"+Key))
+                if hasattr(self, "_"+Key):
+                    setattr(Instance, "_"+Key, getattr(self, "_"+Key))
             if Name:
                 setattr(Instance, "_Name", Name)
             Instance.Create()

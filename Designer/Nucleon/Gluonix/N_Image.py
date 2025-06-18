@@ -79,7 +79,8 @@ class Image:
                 Main = self._Main
             Instance = type(self)(Main)
             for Key in self._Config:
-                setattr(Instance, "_"+Key, getattr(self, "_"+Key))
+                if hasattr(self, "_"+Key):
+                    setattr(Instance, "_"+Key, getattr(self, "_"+Key))
             setattr(Instance, "_Name", Name)
             Instance.Create()
             return Instance
@@ -569,7 +570,8 @@ class Image_Lite:
                 Main = self._Main
             Instance = type(self)(Main)
             for Key in self._Config:
-                setattr(Instance, "_"+Key, getattr(self, "_"+Key))
+                if hasattr(self, "_"+Key):
+                    setattr(Instance, "_"+Key, getattr(self, "_"+Key))
             setattr(Instance, "_Name", Name)
             Instance.Create()
             return Instance
@@ -1056,7 +1058,8 @@ class Image_Zoom:
                 Main = self._Main
             Instance = type(self)(Main)
             for Key in self._Config:
-                setattr(Instance, "_"+Key, getattr(self, "_"+Key))
+                if hasattr(self, "_"+Key):
+                    setattr(Instance, "_"+Key, getattr(self, "_"+Key))
             setattr(Instance, "_Name", Name)
             Instance.Create()
             return Instance

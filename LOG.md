@@ -1,5 +1,8 @@
 # Change Log
 
+## V(4.3)
+- Widget Copy() -> Error Attribute Not Found Bug Fix
+
 ## V(4.2)
 - Resizing & Dark Mode Bug Fix
 
