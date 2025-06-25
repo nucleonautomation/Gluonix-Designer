@@ -1,5 +1,11 @@
 # Change Log
 
+## V(4.4)
+- Canvas Item Widgets Bug Fix
+- Design Glid Lock Fixed To Permanent Value
+- Get Size Ratio With Root.Ratio()
+- New Example Added For Interactive Horizontal Slider
+
 ## V(4.3)
 - Widget Copy() -> Error Attribute Not Found Bug Fix
 

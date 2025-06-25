@@ -14,8 +14,11 @@ class Element:
         try:
             self.Global = Global
             self.Design = Design
+            self.Root = False
             self.Widget = []
             self.Grid_Lock = True
+            self.Grid_Width = 10
+            self.Grid_Height = 10
             self.Copy_ID = False
             self.Current = False
             self.Dragging = False
@@ -167,13 +170,9 @@ class Element:
                 self._Coord['X'] = E.x_root
                 self._Coord['Y'] = E.y_root
                 self.Element_Fixture = Element.Config_Get('Left', 'Top')
-                if self.Grid_Lock:
-                    Temp_Root = getattr(self.Design, self.Design.Display_ID)
-                    Window_Size = Temp_Root.Size()
-                    self.Grid_Width = Window_Size[0]/100
-                    self.Grid_Height = Window_Size[1]/100
                 self.Dragging = True
                 self.Current = Element._ID
+                self.Root = getattr(self.Design, self.Parent)
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
         self.Global['Loading'].Hide()
@@ -181,8 +180,9 @@ class Element:
     def Drag(self, E, Element):
         try:
             if not Element.Lock and self.Dragging and self.Current==Element._ID and 'Left' in self.Element_Fixture and 'Top' in self.Element_Fixture:
-                Difference_Left = (E.x_root - self._Coord['X'])
-                Difference_Top = (E.y_root - self._Coord['Y'])
+                Ratio = self.Root.Ratio()
+                Difference_Left = (E.x_root - self._Coord['X'])/Ratio[0]
+                Difference_Top = (E.y_root - self._Coord['Y'])/Ratio[1]
                 New_Left = self.Element_Fixture['Left']+Difference_Left
                 New_Top = self.Element_Fixture['Top']+Difference_Top
                 if self.Grid_Lock:
@@ -215,13 +215,9 @@ class Element:
                 self._Coord['Y'] = E.y_root
                 self.Element_Fixture = Element.Config_Get('Width', 'Height')
                 if len(self.Element_Fixture)==2:
-                    if self.Grid_Lock:
-                        Temp_Root = getattr(self.Design, self.Design.Display_ID)
-                        Window_Size = Temp_Root.Size()
-                        self.Grid_Width = Window_Size[0]/100
-                        self.Grid_Height = Window_Size[1]/100
                     self.Dragging = True
                     self.Current = Element._ID
+                    self.Root = getattr(self.Design, self.Parent)
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
         self.Global['Loading'].Hide()
@@ -229,8 +225,9 @@ class Element:
     def Drag_Size(self, E, Element):
         try:
             if not Element.Lock and self.Dragging and self.Current==Element._ID and 'Width' in self.Element_Fixture and 'Height' in self.Element_Fixture:
-                Difference_Width = (E.x_root - self._Coord['X'])
-                Difference_Height = (E.y_root - self._Coord['Y'])
+                Ratio = self.Root.Ratio()
+                Difference_Width = (E.x_root - self._Coord['X'])/Ratio[0]
+                Difference_Height = (E.y_root - self._Coord['Y'])/Ratio[1]
                 New_Width = self.Element_Fixture['Width']+Difference_Width
                 New_Height = self.Element_Fixture['Height']+Difference_Height
                 if self.Grid_Lock:
@@ -494,9 +491,9 @@ class Element:
         try:
             if self.Grid_Lock:
                 self.Grid_Lock = False
-                self.Grid_Image.Config(Path=self.Global['Image']('Grid_Unlock'))
+                self.Grid_Image.Set(self.Global['Image']('Grid_Unlock'))
             else:
                 self.Grid_Lock = True
-                self.Grid_Image.Config(Path=self.Global['Image']('Grid_Lock'))
+                self.Grid_Image.Set(self.Global['Image']('Grid_Lock'))
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))

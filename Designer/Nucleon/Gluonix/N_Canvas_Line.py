@@ -48,7 +48,7 @@ class Canvas_Line:
     def Show(self):
         try:
             self._Display = True
-            if self._Resizable and self._Resize_Index<self._GUI._Resize_Index:
+            if self._Resizable and self._Resize_Index<self._Canvas._GUI._Resize_Index:
                 self.Resize()
             else:
                 self.Display()
@@ -154,8 +154,8 @@ class Canvas_Line:
 
     def Adjustment(self):
         try:
-            self._Width_Ratio = self._Canvas._Width_Current / self._Canvas._Width
-            self._Height_Ratio = self._Canvas._Height_Current / self._Canvas._Height
+            self._Width_Ratio = self._Canvas._Width / self._Canvas._Width_Initial
+            self._Height_Ratio = self._Canvas._Height / self._Canvas._Height_Initial
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Adjustment -> {E}")
             
@@ -175,7 +175,7 @@ class Canvas_Line:
             
     def Resize(self):
         try:
-            self._Resize_Index = self._GUI._Resize_Index
+            self._Resize_Index = self._Canvas._GUI._Resize_Index
             self.Relocate()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Resize -> {E}")

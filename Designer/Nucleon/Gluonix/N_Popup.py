@@ -370,6 +370,14 @@ class Popup():
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Size -> {E}")
         
+    def Ratio(self):
+        try:
+            Width_Ratio = self._Width_Current/self._Width
+            Height_Ratio = self._Height_Current/self._Height
+            return [Width_Ratio, Height_Ratio]
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Ratio -> {E}")
+        
     def Locate(self, Width, Height, Left, Top):
         try:
             Width = self._Width*(Width/100)
