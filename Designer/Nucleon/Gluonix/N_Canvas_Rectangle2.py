@@ -5,7 +5,7 @@ from .N_Custom import Event_Bind_Canvas
 class Canvas_Rectangle2:
     def __init__(self, Main):
         self._Canvas = Main
-        self._Config = ['Name', 'Outline', 'Fill', 'Width', 'Height', 'Left', 'Top', 'Angle', 'Thickness', 'Resize', 'Translucent']
+        self._Config = ['Name', 'Outline', 'Fill', 'Width', 'Height', 'Left', 'Top', 'Angle', 'Thickness', 'Resize', 'Translucent', 'Alpha']
         self._Display = True
         self._Resize_Index = 0
         self._Resize = True
@@ -17,6 +17,7 @@ class Canvas_Rectangle2:
         self._Thickness = 1
         self._Angle = 0
         self._Translucent = False
+        self._Alpha = 25
         self._Width, self._Height, self._Left, self._Top = 1, 1, 1, 1
         self._Width_Current, self._Height_Current, self._Left_Current, self._Top_Current = 1, 1, 1, 1
         self._Widget = self.Rectangle()
@@ -165,10 +166,25 @@ class Canvas_Rectangle2:
             C_X = sum(X for X, Y in Corners) / len(Corners)
             C_Y = sum(Y for X, Y in Corners) / len(Corners)
             Rotated_Corners = [self.Rotate(X, Y, C_X, C_Y, Angle_Rad) for X, Y in Corners]
-            Stripple = 'gray12' if self._Translucent else ''
+            Stripple = f'gray{self.Stripple()}' if self._Translucent else ''
             return self._Canvas._Frame.create_polygon(Rotated_Corners, outline=self._Outline, width=self._Thickness, fill=self._Fill, stipple=Stripple)
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Rectangle -> {E}")
+            
+    def Stripple(self):
+        try:
+            if 0 <= self._Alpha <= 12:
+                return 12
+            elif 13 <= self._Alpha <= 25:
+                return 25
+            elif 26 <= self._Alpha <= 50:
+                return 50
+            elif 51 <= self._Alpha <= 75:
+                return 75
+            else:
+                return 100
+        except Exception as E:
+            self._Canvas._GUI.Error(f"{self._Type} -> Stripple -> {E}")
             
     def Create(self):
         try:
@@ -186,8 +202,8 @@ class Canvas_Rectangle2:
 
     def Adjustment(self):
         try:
-            self._Width_Ratio = self._Canvas._Width / self._Canvas._Width_Initial
-            self._Height_Ratio = self._Canvas._Height / self._Canvas._Height_Initial
+            self._Width_Ratio = self._Canvas._Width_Current / self._Canvas._Width
+            self._Height_Ratio = self._Canvas._Height_Current / self._Canvas._Height
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Adjustment -> {E}")
             

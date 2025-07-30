@@ -1,5 +1,9 @@
 # Change Log
 
+## V(4.5)
+- Canvas Item Widgets Bug Fix
+- Canvas Image Item Width Heigth Config Fixed
+
 ## V(4.4)
 - Canvas Item Widgets Bug Fix
 - Design Glid Lock Fixed To Permanent Value

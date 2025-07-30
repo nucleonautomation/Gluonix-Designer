@@ -5,7 +5,7 @@ from .N_Custom import Event_Bind_Canvas
 class Canvas_Text:
     def __init__(self, Main):
         self._Canvas = Main
-        self._Config = ['Name', 'Left', 'Top', 'Width', 'Height', 'Color', 'Size', 'Value', 'Weight', 'Font', 'Resize', 'Anchor', 'Resize_Font']
+        self._Config = ['Name', 'Left', 'Top', 'Width', 'Height', 'Color', 'Size', 'Value', 'Weight', 'Font', 'Resize', 'Anchor', 'Resize_Font', 'Translucent', 'Alpha']
         self._Display = True
         self._Resize_Index = 0
         self._Resize = True
@@ -17,6 +17,8 @@ class Canvas_Text:
         self._Value = ''
         self._Color = '#000000'
         self._Size = 20
+        self._Translucent = False
+        self._Alpha = 25
         self._Height = 0
         self._Weight = 'normal'
         self._Font = 'Helvetica'
@@ -151,10 +153,26 @@ class Canvas_Text:
             return [Width, Height]
         except Exception as E:
             self.Error(f"{self._Type} -> Size -> {E}")
+            
+    def Stripple(self):
+        try:
+            if 0 <= self._Alpha <= 12:
+                return 12
+            elif 13 <= self._Alpha <= 25:
+                return 25
+            elif 26 <= self._Alpha <= 50:
+                return 50
+            elif 51 <= self._Alpha <= 75:
+                return 75
+            else:
+                return 100
+        except Exception as E:
+            self._Canvas._GUI.Error(f"{self._Type} -> Stripple -> {E}")
         
     def Create(self):
         try:
-            self._Canvas._Frame.itemconfig(self._Widget, text=self._Value, fill=self._Color, font=(self._Font, self._Size_Current, self._Weight), anchor=self._Anchor, width=self._Width_Current, justify=self._Justify)
+            Stripple = f'gray{self.Stripple()}' if self._Translucent else ''
+            self._Canvas._Frame.itemconfig(self._Widget, text=self._Value, fill=self._Color, font=(self._Font, self._Size_Current, self._Weight), anchor=self._Anchor, width=self._Width_Current, justify=self._Justify, stipple=Stripple)
             self._Canvas._Frame.coords(self._Widget, self._X_Current, self._Y_Current)
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
@@ -168,8 +186,8 @@ class Canvas_Text:
 
     def Adjustment(self):
         try:
-            self._Width_Ratio = self._Canvas._Width / self._Canvas._Width_Initial
-            self._Height_Ratio = self._Canvas._Height / self._Canvas._Height_Initial
+            self._Width_Ratio = self._Canvas._Width_Current / self._Canvas._Width
+            self._Height_Ratio = self._Canvas._Height_Current / self._Canvas._Height
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Adjustment -> {E}")
             

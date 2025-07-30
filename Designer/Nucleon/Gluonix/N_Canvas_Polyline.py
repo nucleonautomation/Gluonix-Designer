@@ -177,8 +177,8 @@ class Canvas_Polyline:
 
     def Adjustment(self):
         try:
-            self._Width_Ratio = self._Canvas._Width / self._Canvas._Width_Initial
-            self._Height_Ratio = self._Canvas._Height / self._Canvas._Height_Initial
+            self._Width_Ratio = self._Canvas._Width_Current / self._Canvas._Width
+            self._Height_Ratio = self._Canvas._Height_Current / self._Canvas._Height
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Adjustment -> {E}")
             

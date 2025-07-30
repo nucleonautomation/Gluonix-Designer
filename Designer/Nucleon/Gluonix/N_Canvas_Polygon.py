@@ -5,7 +5,7 @@ from .N_Custom import Event_Bind_Canvas
 class Canvas_Polygon:
     def __init__(self, Main):
         self._Canvas = Main
-        self._Config = ['Name', 'Outline', 'Fill', 'Thickness', 'Resize', 'Translucent']
+        self._Config = ['Name', 'Outline', 'Fill', 'Thickness', 'Resize', 'Translucent', 'Alpha']
         self._Display = True
         self._Resize_Index = 0
         self._Resize = True
@@ -18,6 +18,7 @@ class Canvas_Polygon:
         self._Fill = '#000000'
         self._Thickness = 1
         self._Translucent = False
+        self._Alpha = 25
         Points = [0, 0, 0, 0]
         self._Widget = self._Canvas._Frame.create_polygon(Points, outline=self._Outline, width=self._Thickness, fill=self._Fill)
         self._Canvas._Widget.append(self)
@@ -159,9 +160,32 @@ class Canvas_Polygon:
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Remove -> {E}")
 
+    def Replace(self, Points):
+        try:
+            self._Points = Points
+            self._Points_Current = Points
+            self.Relocate()
+        except Exception as E:
+            self._Canvas._GUI.Error(f"{self._Type} -> Replace -> {E}")
+            
+    def Stripple(self):
+        try:
+            if 0 <= self._Alpha <= 12:
+                return 12
+            elif 13 <= self._Alpha <= 25:
+                return 25
+            elif 26 <= self._Alpha <= 50:
+                return 50
+            elif 51 <= self._Alpha <= 75:
+                return 75
+            else:
+                return 100
+        except Exception as E:
+            self._Canvas._GUI.Error(f"{self._Type} -> Stripple -> {E}")
+
     def Create(self):
         try:
-            Stripple = 'gray12' if self._Translucent else ''
+            Stripple = f'gray{self.Stripple()}' if self._Translucent else ''
             self._Canvas._Frame.itemconfig(self._Widget, outline=self._Outline, width=self._Thickness, fill=self._Fill, stipple=Stripple)
             if len(self._Points)>1:
                 Points = [Item for Pair in self._Points_Current for Item in Pair]
@@ -180,8 +204,8 @@ class Canvas_Polygon:
 
     def Adjustment(self):
         try:
-            self._Width_Ratio = self._Canvas._Width / self._Canvas._Width_Initial
-            self._Height_Ratio = self._Canvas._Height / self._Canvas._Height_Initial
+            self._Width_Ratio = self._Canvas._Width_Current / self._Canvas._Width
+            self._Height_Ratio = self._Canvas._Height_Current / self._Canvas._Height
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Adjustment -> {E}")
             

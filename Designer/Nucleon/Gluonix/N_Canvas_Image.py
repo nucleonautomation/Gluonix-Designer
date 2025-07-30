@@ -9,7 +9,7 @@ from .N_Custom import Event_Bind_Canvas
 class Canvas_Image:
     def __init__(self, Main):
         self._Canvas = Main
-        self._Config = ['Width', 'Height', 'Left', 'Top', 'Anchor', 'Url', 'Array', 'Pil', 'Photo', 'Resize', 'Rotate', 'Path', 'Path_Initial', 'Transparent']
+        self._Config = ['Name', 'Width', 'Height', 'Left', 'Top', 'Anchor', 'Url', 'Array', 'Pil', 'Photo', 'Resize', 'Rotate', 'Path', 'Path_Initial', 'Transparent']
         self._Display = True
         self._Resize_Index = 0
         self._Resize = True
@@ -224,7 +224,7 @@ class Canvas_Image:
             else:
                 Temp_Image = Temp_Image.copy()
             self._Width_Old, self._Height_Old = self._Width_Current, self._Height_Current
-            Temp_Image_TK = PIL_ImageTk.PhotoImage(Temp_Image_Convert)
+            Temp_Image_TK = PIL_ImageTk.PhotoImage(Temp_Image)
             return Temp_Image_TK
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Convert -> {E}")
@@ -232,7 +232,7 @@ class Canvas_Image:
     def Load(self):
         try:
             if self._Image:
-                Image = self._Image  if self._Photo else self.Convert()
+                Image = self._Image if self._Photo else self.Convert()
                 self._Image_Garbage = Image
                 self._Canvas._Frame.itemconfig(self._Widget, image=Image)
         except Exception as E:
@@ -264,8 +264,8 @@ class Canvas_Image:
 
     def Adjustment(self):
         try:
-            self._Width_Ratio = self._Canvas._Width / self._Canvas._Width_Initial
-            self._Height_Ratio = self._Canvas._Height / self._Canvas._Height_Initial
+            self._Width_Ratio = self._Canvas._Width_Current / self._Canvas._Width
+            self._Height_Ratio = self._Canvas._Height_Current / self._Canvas._Height
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Adjustment -> {E}")
             

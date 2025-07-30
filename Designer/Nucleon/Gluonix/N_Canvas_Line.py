@@ -5,7 +5,7 @@ from .N_Custom import Event_Bind_Canvas
 class Canvas_Line:
     def __init__(self, Main):
         self._Canvas = Main
-        self._Config = ['Name', 'Outline', 'Width', 'Height', 'Left', 'Top', 'Thickness', 'Resize']
+        self._Config = ['Name', 'Outline', 'Width', 'Height', 'Left', 'Top', 'Thickness', 'Resize', 'Translucent', 'Alpha']
         self._Display = True
         self._Resize_Index = 0
         self._Resize = True
@@ -14,6 +14,8 @@ class Canvas_Line:
         self._Type = 'Canvas_Line'
         self._Outline = '#000000'
         self._Thickness = 1
+        self._Translucent = False
+        self._Alpha = 25
         self._Width, self._Height, self._Left, self._Top = 0, 0, 0, 0
         self._Widget = self._Canvas._Frame.create_line(0, 0, 0, 0, fill=self._Outline, width=self._Thickness)
         self._Canvas._Widget.append(self)
@@ -137,10 +139,26 @@ class Canvas_Line:
             return [Width, Height]
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Size -> {E}")
+            
+    def Stripple(self):
+        try:
+            if 0 <= self._Alpha <= 12:
+                return 12
+            elif 13 <= self._Alpha <= 25:
+                return 25
+            elif 26 <= self._Alpha <= 50:
+                return 50
+            elif 51 <= self._Alpha <= 75:
+                return 75
+            else:
+                return 100
+        except Exception as E:
+            self._Canvas._GUI.Error(f"{self._Type} -> Stripple -> {E}")
         
     def Create(self):
         try:
-            self._Canvas._Frame.itemconfig(self._Widget, fill=self._Outline, width=self._Thickness)
+            Stripple = f'gray{self.Stripple()}' if self._Translucent else ''
+            self._Canvas._Frame.itemconfig(self._Widget, fill=self._Outline, width=self._Thickness, stipple=Stripple)
             self._Canvas._Frame.coords(self._Widget, self._X1_Current, self._Y1_Current, self._X2_Current, self._Y2_Current)
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
@@ -154,8 +172,8 @@ class Canvas_Line:
 
     def Adjustment(self):
         try:
-            self._Width_Ratio = self._Canvas._Width / self._Canvas._Width_Initial
-            self._Height_Ratio = self._Canvas._Height / self._Canvas._Height_Initial
+            self._Width_Ratio = self._Canvas._Width_Current / self._Canvas._Width
+            self._Height_Ratio = self._Canvas._Height_Current / self._Canvas._Height
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Adjustment -> {E}")
             
