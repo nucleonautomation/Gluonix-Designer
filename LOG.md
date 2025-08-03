@@ -1,5 +1,10 @@
 # Change Log
 
+## V(4.6)
+- Canvas Item Widgets Optimization & Bug Fix
+- All Widget Optimization
+- Design Mode Now Supports Hidden Widgets
+
 ## V(4.5)
 - Canvas Item Widgets Bug Fix
 - Canvas Image Item Width Heigth Config Fixed

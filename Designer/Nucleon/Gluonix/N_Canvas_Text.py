@@ -40,7 +40,7 @@ class Canvas_Text:
                     setattr(Instance, "_"+Key, getattr(self, "_"+Key))
             if Name:
                 setattr(Instance, "_Name", Name)
-            Instance.Create()
+            Instance.Relocate()
             return Instance
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Copy -> {E}")
@@ -193,18 +193,22 @@ class Canvas_Text:
             
     def Relocate(self, Direct=False):
         try:
-            if self._Resize:
+            if self._Resize and self._Resizable:
                 self.Adjustment()
                 self._X_Current = self._Left * self._Width_Ratio
                 self._Y_Current = self._Top * self._Height_Ratio
                 self._Width_Current = self._Width * self._Width_Ratio
-                if self._Resize_Font:
-                    if self._Width_Ratio < self._Height_Ratio:
-                        self._Size_Current = math.floor(self._Size * self._Width_Ratio)
-                    else:
-                        self._Size_Current = math.floor(self._Size * self._Height_Ratio)
+            else:
+                self._X_Current = self._Left
+                self._Y_Current = self._Top
+                self._Width_Current = self._Width
+            if self._Resize_Font:
+                if self._Width_Ratio < self._Height_Ratio:
+                    self._Size_Current = math.floor(self._Size * self._Width_Ratio)
                 else:
-                    self._Size_Current = self._Size
+                    self._Size_Current = math.floor(self._Size * self._Height_Ratio)
+            else:
+                self._Size_Current = self._Size
             self.Create()
             if self._Display:
                 self.Display()

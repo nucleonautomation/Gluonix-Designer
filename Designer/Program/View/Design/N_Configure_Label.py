@@ -39,6 +39,15 @@ class Configure_Label:
             self.Name_Entry.Bind(On_Key_Release=lambda E: self.Update_Name())
             self.Name_Entry.Create()
             
+            #Visibilty
+            Fixture = self.Frame.Locate(7, 5, 90, 2)
+            self.Visibilty_Image = {True: 'Visibilty_On', False: 'Visibilty_Off'}
+            self.Visibilty = self.Global['Gluonix'].Image(self.Frame)
+            self.Visibilty.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Visibilty.Config(Border_Size=0, Path=self.Global['Image'](self.Visibilty_Image[True]))
+            self.Visibilty.Bind(On_Click=lambda E: self.Update_Visibilty())
+            self.Visibilty.Create()
+            
             #Background Label
             Fixture = self.Frame.Locate(25, 5, 3, 9)
             self.Background_Label = self.Global['Gluonix'].Label(self.Frame)
@@ -480,6 +489,17 @@ class Configure_Label:
                 self.Name_Entry.Config(Border_Color='#000000', Border_Size=1)
             else:
                 self.Name_Entry.Config(Border_Color='red', Border_Size=2)
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Update_Visibilty(self):
+        try:
+            if self.Element:
+                if self.Element._Display:
+                    self.Element.Hide()
+                else:
+                    self.Element.Show()
+                self.Visibilty.Set(self.Global['Image'](self.Visibilty_Image[self.Element._Display]))
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             

@@ -39,13 +39,14 @@ class Configure_Scroll:
             self.Name_Entry.Bind(On_Key_Release=lambda E: self.Update_Name())
             self.Name_Entry.Create()
             
-            #Update_All
+            #Visibilty
             Fixture = self.Frame.Locate(7, 5, 90, 2)
-            self.Update_All = self.Global['Gluonix'].Image(self.Frame)
-            self.Update_All.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
-            self.Update_All.Config(Border_Size=0, Path=self.Global['Image']('Refresh'))
-            self.Update_All.Bind(On_Click=lambda E: self.Update_Frame())
-            self.Update_All.Create()
+            self.Visibilty_Image = {True: 'Visibilty_On', False: 'Visibilty_Off'}
+            self.Visibilty = self.Global['Gluonix'].Image(self.Frame)
+            self.Visibilty.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Visibilty.Config(Border_Size=0, Path=self.Global['Image'](self.Visibilty_Image[True]))
+            self.Visibilty.Bind(On_Click=lambda E: self.Update_Visibilty())
+            self.Visibilty.Create()
             
             #Background Label
             Fixture = self.Frame.Locate(25, 5, 3, 9)
@@ -70,6 +71,14 @@ class Configure_Scroll:
             self.Background_Check.Config(Border_Size=0)
             self.Background_Check.Bind(On_Change=lambda : self.Update_Background())
             self.Background_Check.Create()
+            
+            #Update_All
+            Fixture = self.Frame.Locate(7, 5, 90, 9)
+            self.Update_All = self.Global['Gluonix'].Image(self.Frame)
+            self.Update_All.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Update_All.Config(Border_Size=0, Path=self.Global['Image']('Refresh'))
+            self.Update_All.Bind(On_Click=lambda E: self.Update_Frame())
+            self.Update_All.Create()
             
             #Border Color Label
             Fixture = self.Frame.Locate(25, 5, 3, 16)
@@ -370,6 +379,17 @@ class Configure_Scroll:
                 self.Name_Entry.Config(Border_Color='#000000', Border_Size=1)
             else:
                 self.Name_Entry.Config(Border_Color='red', Border_Size=2)
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Update_Visibilty(self):
+        try:
+            if self.Element:
+                if self.Element._Display:
+                    self.Element.Hide()
+                else:
+                    self.Element.Show()
+                self.Visibilty.Set(self.Global['Image'](self.Visibilty_Image[self.Element._Display]))
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             

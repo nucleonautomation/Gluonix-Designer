@@ -8,7 +8,6 @@ import shutil
 import random
 import string
 import time
-import traceback
 
 #Program
 from .Compare.N_Element import Element
@@ -211,7 +210,6 @@ class Compare:
                 for Each in From.Tree.Child(ID):
                     self.Paste(Each, Temp_ID)
         except Exception as E:
-            traceback.print_exc()
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
         
     def Update(self, Loading=True, Partial=False):

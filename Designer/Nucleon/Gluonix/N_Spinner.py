@@ -302,7 +302,9 @@ class Spinner:
             self.Font()
             self._Font = TK.font.Font(family=self._Font_Family, size=self._Font_Size_Current, weight=self._Font_Weight)
             self._Widget.config(background=self._Background, foreground=self._Foreground, font=self._Font, state=State, from_=self._Minimum, to=self._Maximum, increment=self._Increment, justify=self._Align, bd=0, highlightthickness=0, relief=TK.FLAT)
-            self.Resize()
+            if self._Size_Update:
+                self._Size_Update = False
+                self.Resize()
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
                     if self._Last_Name in self._Main.__dict__:
@@ -368,22 +370,28 @@ class Spinner:
             
     def Relocate(self, Direct=False):
         try:
-            self.Adjustment()
-            if Direct or (self._Resize and self._Resize_Width):
-                self._Width_Current = self._Width + self._Width_Adjustment
+            if self._Resizable:
+                self.Adjustment()
+                if Direct or (self._Resize and self._Resize_Width):
+                    self._Width_Current = self._Width + self._Width_Adjustment
+                else:
+                    self._Width_Current = self._Width
+                if Direct or (self._Resize and self._Resize_Height):
+                    self._Height_Current = self._Height + self._Height_Adjustment
+                else:
+                    self._Height_Current = self._Height
+                if Direct or (self._Move and self._Move_Left):
+                    self._Left_Current = self._Left + self._Left_Adjustment
+                else:
+                    self._Left_Current = self._Left
+                if Direct or (self._Move and self._Move_Top):
+                    self._Top_Current = self._Top + self._Top_Adjustment
+                else:
+                    self._Top_Current = self._Top
             else:
                 self._Width_Current = self._Width
-            if Direct or (self._Resize and self._Resize_Height):
-                self._Height_Current = self._Height + self._Height_Adjustment
-            else:
                 self._Height_Current = self._Height
-            if Direct or (self._Move and self._Move_Left):
-                self._Left_Current = self._Left + self._Left_Adjustment
-            else:
                 self._Left_Current = self._Left
-            if Direct or (self._Move and self._Move_Top):
-                self._Top_Current = self._Top + self._Top_Adjustment
-            else:
                 self._Top_Current = self._Top
             if self._Display:
                 self._Font = TK.font.Font(family=self._Font_Family, size=self._Font_Size_Current, weight=self._Font_Weight)

@@ -292,7 +292,7 @@ class Radio:
             self._Frame.Set(Path=self._Image[self._Check])
             if self._Size_Update:
                 self._Size_Update = False
-                self.Relocate()
+                self.Resize()
             if self._Display:
                 self.Display()
             if self._Name!=self._Last_Name:

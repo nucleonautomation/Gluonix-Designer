@@ -32,7 +32,7 @@ class Canvas_Oval:
                     setattr(Instance, "_"+Key, getattr(self, "_"+Key))
             if Name:
                 setattr(Instance, "_Name", Name)
-            Instance.Create()
+            Instance.Relocate()
             return Instance
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Copy -> {E}")
@@ -162,12 +162,17 @@ class Canvas_Oval:
             
     def Relocate(self, Direct=False):
         try:
-            if self._Resize:
+            if self._Resize and self._Resizable:
                 self.Adjustment()
                 self._X1_Current = self._Left * self._Width_Ratio
                 self._X2_Current = (self._Left + self._Width) * self._Width_Ratio
                 self._Y1_Current = self._Top * self._Height_Ratio
                 self._Y2_Current = (self._Top + self._Height) * self._Height_Ratio
+            else:
+                self._X1_Current = self._Left
+                self._X2_Current = (self._Left + self._Width)
+                self._Y1_Current = self._Top
+                self._Y2_Current = (self._Top + self._Height)
             self.Create()
             if self._Display:
                 self.Display()

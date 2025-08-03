@@ -36,7 +36,7 @@ class Canvas_Polygon:
                     setattr(Instance, "_"+Key, getattr(self, "_"+Key))
             if Name:
                 setattr(Instance, "_Name", Name)
-            Instance.Create()
+            Instance.Relocate()
             return Instance
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Copy -> {E}")
@@ -211,9 +211,11 @@ class Canvas_Polygon:
             
     def Relocate(self, Direct=False):
         try:
-            if self._Resize:
+            if self._Resize and self._Resizable:
                 self.Adjustment()
                 self._Points_Current = [[X * self._Width_Ratio, Y * self._Height_Ratio] for X, Y in self._Points]
+            else:
+                self._Points_Current = self._Points.copy()
             self.Create()
             if self._Display:
                 self.Display()

@@ -308,7 +308,7 @@ class Bar:
             self._Widget.config(background=self._Foreground, foreground='#000000')
             if self._Size_Update:
                 self._Size_Update = False
-                self.Relocate()
+                self.Resize()
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
                     if self._Last_Name in self._Main.__dict__:
@@ -360,22 +360,28 @@ class Bar:
             
     def Relocate(self, Direct=False):
         try:
-            self.Adjustment()
-            if Direct or (self._Resize and self._Resize_Width):
-                self._Width_Current = self._Width + self._Width_Adjustment
+            if self._Resizable:
+                self.Adjustment()
+                if Direct or (self._Resize and self._Resize_Width):
+                    self._Width_Current = self._Width + self._Width_Adjustment
+                else:
+                    self._Width_Current = self._Width
+                if Direct or (self._Resize and self._Resize_Height):
+                    self._Height_Current = self._Height + self._Height_Adjustment
+                else:
+                    self._Height_Current = self._Height
+                if Direct or (self._Move and self._Move_Left):
+                    self._Left_Current = self._Left + self._Left_Adjustment
+                else:
+                    self._Left_Current = self._Left
+                if Direct or (self._Move and self._Move_Top):
+                    self._Top_Current = self._Top + self._Top_Adjustment
+                else:
+                    self._Top_Current = self._Top
             else:
                 self._Width_Current = self._Width
-            if Direct or (self._Resize and self._Resize_Height):
-                self._Height_Current = self._Height + self._Height_Adjustment
-            else:
                 self._Height_Current = self._Height
-            if Direct or (self._Move and self._Move_Left):
-                self._Left_Current = self._Left + self._Left_Adjustment
-            else:
                 self._Left_Current = self._Left
-            if Direct or (self._Move and self._Move_Top):
-                self._Top_Current = self._Top + self._Top_Adjustment
-            else:
                 self._Top_Current = self._Top
             if self._Display:
                 self.Display()

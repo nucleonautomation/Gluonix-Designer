@@ -36,7 +36,7 @@ class Canvas_Rectangle2:
                     setattr(Instance, "_"+Key, getattr(self, "_"+Key))
             if Name:
                 setattr(Instance, "_Name", Name)
-            Instance.Create()
+            Instance.Relocate()
             return Instance
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Copy -> {E}")
@@ -209,12 +209,17 @@ class Canvas_Rectangle2:
             
     def Relocate(self, Direct=False):
         try:
-            if self._Resize:
+            if self._Resize and self._Resizable:
                 self.Adjustment()
                 self._Left_Current = self._Left * self._Width_Ratio
                 self._Width_Current = self._Width * self._Width_Ratio
                 self._Top_Current = self._Top * self._Height_Ratio
                 self._Height_Current = self._Height * self._Height_Ratio
+            else:
+                self._Left_Current = self._Left
+                self._Width_Current = self._Width
+                self._Top_Current = self._Top
+                self._Height_Current = self._Height
             self.Create()
             if self._Display:
                 self.Display()

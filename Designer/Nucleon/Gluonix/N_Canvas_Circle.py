@@ -36,7 +36,7 @@ class Canvas_Circle:
                     setattr(Instance, "_"+Key, getattr(self, "_"+Key))
             if Name:
                 setattr(Instance, "_Name", Name)
-            Instance.Create()
+            Instance.Relocate()
             return Instance
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Copy -> {E}")
@@ -127,19 +127,12 @@ class Canvas_Circle:
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Position -> {E}")
             
-    def Size(self, Width=False, Height=False):
+    def Radius(self, Value=False):
         try:
-            if Width:
-                self._Width = Width
-            if Height:
-                self._Height = Height
-            if Width or Height:
+            if Radius:
+                self._Radius = Radius
                 self.Relocate()
-            Box = self._Canvas._Frame.bbox(self._Widget)
-            X1, Y1, X2, Y2 = Box
-            Width = X2 - X1
-            Height = Y2 - Y1
-            return [Width, Height]
+            return self._Radius
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Size -> {E}")
         
@@ -166,7 +159,7 @@ class Canvas_Circle:
             
     def Relocate(self, Direct=False):
         try:
-            if self._Resize:
+            if self._Resize and self._Resizable:
                 self.Adjustment()
                 Left = self._Left * self._Width_Ratio
                 Top  = self._Top * self._Height_Ratio
@@ -176,6 +169,11 @@ class Canvas_Circle:
                 self._Y1 = abs(Top - Radius)
                 self._X2 = abs(Left + Radius)
                 self._Y2 = abs(Top + Radius)
+            else:
+                self._X1 = abs(self._Left - self._Radius)
+                self._Y1 = abs(self._Top - self._Radius)
+                self._X2 = abs(self._Left + self._Radius)
+                self._Y2 = abs(self._Top + self._Radius)
             self.Create()
             if self._Display:
                 self.Display()

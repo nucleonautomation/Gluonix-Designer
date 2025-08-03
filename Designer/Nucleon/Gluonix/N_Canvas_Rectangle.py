@@ -34,7 +34,7 @@ class Canvas_Rectangle:
                     setattr(Instance, "_"+Key, getattr(self, "_"+Key))
             if Name:
                 setattr(Instance, "_Name", Name)
-            Instance.Create()
+            Instance.Relocate()
             return Instance
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Copy -> {E}")
@@ -180,12 +180,17 @@ class Canvas_Rectangle:
             
     def Relocate(self, Direct=False):
         try:
-            if self._Resize:
+            if self._Resize and self._Resizable:
                 self.Adjustment()
                 self._X1_Current = self._Left * self._Width_Ratio
                 self._X2_Current = (self._Left + self._Width) * self._Width_Ratio
                 self._Y1_Current = self._Top * self._Height_Ratio
                 self._Y2_Current = (self._Top + self._Height) * self._Height_Ratio
+            else:
+                self._X1_Current = self._Left
+                self._X2_Current = (self._Left + self._Width)
+                self._Y1_Current = self._Top
+                self._Y2_Current = (self._Top + self._Height)
             self.Create()
             if self._Display:
                 self.Display()
@@ -198,30 +203,3 @@ class Canvas_Rectangle:
             self.Relocate()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Resize -> {E}")
-            
-    """
-    def RectangleXX(self, X, Y, Width, Heigth, Angle=0, Color='#000000', Size=2, Fill='', Tag=''):
-        try:
-            Angle_Rad = math.radians(Angle)
-            Half_Length = Width / 2
-            Half_Width = Heigth / 2
-            Corners = [
-                (X - Half_Length, Y - Half_Width),
-                (X + Half_Length, Y - Half_Width),
-                (X + Half_Length, Y + Half_Width),
-                (X - Half_Length, Y + Half_Width)
-            ]
-            Rotated_Corners = []
-            for Temp_X, Temp_Y in Corners:
-                Temp_X -= X
-                Temp_Y -= Y
-                Rotated_X = Temp_X * math.cos(Angle_Rad) - Temp_Y * math.sin(Angle_Rad)
-                Rotated_Y = Temp_X * math.sin(Angle_Rad) + Temp_Y * math.cos(Angle_Rad)
-                Rotated_X += X
-                Rotated_Y += Y
-                Rotated_Corners.append(Rotated_X)
-                Rotated_Corners.append(Rotated_Y)
-            return self._Frame.create_polygon(Rotated_Corners, outline=Color, width=Size, fill=Fill, tags=Tag)
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Rectangle -> {E}")
-    """

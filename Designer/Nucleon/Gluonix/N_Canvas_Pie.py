@@ -40,7 +40,7 @@ class Canvas_Pie:
                     setattr(Instance, "_"+Key, getattr(self, "_"+Key))
             if Name:
                 setattr(Instance, "_Name", Name)
-            Instance.Create()
+            Instance.Relocate()
             return Instance
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Copy -> {E}")
@@ -186,7 +186,7 @@ class Canvas_Pie:
             
     def Relocate(self, Direct=False):
         try:
-            if self._Resize:
+            if self._Resize and self._Resizable:
                 self.Adjustment()
                 Left = self._Left * self._Width_Ratio
                 Top  = self._Top * self._Height_Ratio
@@ -196,6 +196,11 @@ class Canvas_Pie:
                 self._Y1 = abs(Top - Radius)
                 self._X2 = abs(Left + Radius)
                 self._Y2 = abs(Top + Radius)
+            else:
+                self._X1 = abs(self._Left - self._Radius)
+                self._Y1 = abs(self._Top - self._Radius)
+                self._X2 = abs(self._Left + self._Radius)
+                self._Y2 = abs(self._Top + self._Radius)
             self.Create()
             if self._Display:
                 self.Display()
