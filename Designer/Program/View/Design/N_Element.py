@@ -3,6 +3,7 @@
 ################################################################################################################################
 import inspect
 import os
+import re
 import shutil
 import random
 import string
@@ -14,7 +15,7 @@ class Element:
         try:
             self.Global = Global
             self.Design = Design
-            self.Root = False
+            self.Window = False
             self.Widget = []
             self.Grid_Lock = True
             self.Grid_Width = 10
@@ -129,21 +130,21 @@ class Element:
                 Stock.Create(Widget['ID'])
                 Root = getattr(self, Widget['Root'])
                 Image = self.Global['Image'](Widget['Type'])
-                setattr(self, Widget['ID'], self.Tree.Add(Name=Widget['Name'], Parent=Root, Value=[Widget['ID'], Widget['Type'], 0], Path=Image))
+                setattr(self, Widget['ID'], self.Tree.Add(Name=f" {Widget['Name']}", Parent=Root, Value=[Widget['ID'], Widget['Type'], 0], Path=Image))
             Widgets = self.Design.Database.Get(f"SELECT * FROM `Item` WHERE `Root`='{Parent}'", Keys=True)
             for Widget in Widgets:
                 Stock = getattr(self.Design.Stock, f"Stock_{Widget['Type']}")
                 Stock.Create(Widget['ID'])
                 Root = getattr(self, Widget['Root'])
                 Image = self.Global['Image'](Widget['Type'])
-                setattr(self, Widget['ID'], self.Tree.Add(Name=Widget['Name'], Parent=Root, Value=[Widget['ID'], Widget['Type'], 0], Path=Image))
+                setattr(self, Widget['ID'], self.Tree.Add(Name=f" {Widget['Name']}", Parent=Root, Value=[Widget['ID'], Widget['Type'], 0], Path=Image))
             Widgets = self.Design.Database.Get(f"SELECT * FROM `Frame` WHERE `Root`='{Parent}'", Keys=True)
             for Widget in Widgets:
                 Stock = getattr(self.Design.Stock, f"Stock_{Widget['Type']}")
                 Stock.Create(Widget['ID'])
                 Root = getattr(self, Widget['Root'])
                 Image = self.Global['Image'](Widget['Type'])
-                setattr(self, Widget['ID'], self.Tree.Add(Name=Widget['Name'], Parent=Root, Value=[Widget['ID'], Widget['Type'], Widget['Level']], Path=Image))
+                setattr(self, Widget['ID'], self.Tree.Add(Name=f" {Widget['Name']}", Parent=Root, Value=[Widget['ID'], Widget['Type'], Widget['Level']], Path=Image))
                 self.Load_Child(Widget['ID'])
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
@@ -172,7 +173,7 @@ class Element:
                 self.Element_Fixture = Element.Config_Get('Left', 'Top')
                 self.Dragging = True
                 self.Current = Element._ID
-                self.Root = getattr(self.Design, self.Parent)
+                self.Window = getattr(self.Design, self.Parent)
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
         self.Global['Loading'].Hide()
@@ -180,7 +181,7 @@ class Element:
     def Drag(self, E, Element):
         try:
             if not Element.Lock and self.Dragging and self.Current==Element._ID and 'Left' in self.Element_Fixture and 'Top' in self.Element_Fixture:
-                Ratio = self.Root.Ratio()
+                Ratio = self.Window.Ratio()
                 Difference_Left = (E.x_root - self._Coord['X'])/Ratio[0]
                 Difference_Top = (E.y_root - self._Coord['Y'])/Ratio[1]
                 New_Left = self.Element_Fixture['Left']+Difference_Left
@@ -217,7 +218,7 @@ class Element:
                 if len(self.Element_Fixture)==2:
                     self.Dragging = True
                     self.Current = Element._ID
-                    self.Root = getattr(self.Design, self.Parent)
+                    self.Window = getattr(self.Design, self.Parent)
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
         self.Global['Loading'].Hide()
@@ -225,7 +226,7 @@ class Element:
     def Drag_Size(self, E, Element):
         try:
             if not Element.Lock and self.Dragging and self.Current==Element._ID and 'Width' in self.Element_Fixture and 'Height' in self.Element_Fixture:
-                Ratio = self.Root.Ratio()
+                Ratio = self.Window.Ratio()
                 Difference_Width = (E.x_root - self._Coord['X'])/Ratio[0]
                 Difference_Height = (E.y_root - self._Coord['Y'])/Ratio[1]
                 New_Width = self.Element_Fixture['Width']+Difference_Width
@@ -286,7 +287,7 @@ class Element:
         try:
             self.Parent = Parent
             self.Tree.Remove_All()
-            setattr(self, self.Parent, self.Tree.Add(self.Parent, Value=[self.Parent, 'Frame', 0]))
+            setattr(self, self.Parent, self.Tree.Add(f" {self.Parent}", Value=[self.Parent, 'Frame', 0]))
             self.Load()
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
@@ -454,15 +455,16 @@ class Element:
                 self.Design.Database.Post(f"DELETE FROM `{Type}_Copy`")
                 self.Design.Database.Post(f"INSERT INTO `{Type}_Copy` SELECT * FROM `{Type}` WHERE `ID`='{Element_ID}'")
                 Frame_Data = self.Design.Database.Get(f"SELECT * FROM `{Type}_Copy` WHERE `ID`='{Element_ID}'", Keys=True)[0]
-                Number = 0
-                Exist = self.Design.Database.Get(f"SELECT * FROM `{Type}` WHERE (`Name`='{Frame_Data['Name']}' AND `Root`='{Root_ID}')")
-                while len(Exist)>0:
+                Match = re.match(r'^(.*?)(\d+)?$', Frame_Data['Name'])
+                Base_Name = Match.group(1)
+                Number = int(Match.group(2)) if Match.group(2) else 0
+                Name_Attempt = f"{Base_Name}{Number}" if Number > 0 else Base_Name
+                Exist = self.Design.Database.Get(f"SELECT * FROM `{Type}` WHERE (`Name`='{Name_Attempt}' AND `Root`='{Root_ID}')")
+                while len(Exist) > 0:
                     Number += 1
-                    Exist = self.Design.Database.Get(f"SELECT * FROM `{Type}` WHERE (`Name`='{Frame_Data['Name']}{Number}' AND `Root`='{Root_ID}')")
-                if Number>0:
-                    Name = f"{Frame_Data['Name']}{Number}"
-                else:
-                    Name = Frame_Data['Name']
+                    Name_Attempt = f"{Base_Name}{Number}"
+                    Exist = self.Design.Database.Get(f"SELECT * FROM `{Type}` WHERE (`Name`='{Name_Attempt}' AND `Root`='{Root_ID}')")
+                Name = Name_Attempt
                 Random_Letter = ''.join(random.choices(string.ascii_letters, k=10))
                 New_ID = Random_Letter+self.Global['Custom'].MD5(Root_ID+Name+str(time.time()*1000000))
                 self.Design.Database.Post(f"UPDATE `{Type}_Copy` SET `ID`='{New_ID}',`Name`='{Name}',`Root`='{Root_ID}' WHERE `ID`='{Element_ID}'")
@@ -480,7 +482,7 @@ class Element:
                 if Type=='Frame':
                     Level = Widget['Level']
                 Image = self.Global['Image'](Widget['Type'])
-                setattr(self, Widget['ID'], self.Tree.Add(Name=Widget['Name'], Parent=Root, Value=[Widget['ID'], Widget['Type'], Level], Path=Image))
+                setattr(self, Widget['ID'], self.Tree.Add(Name=f" {Widget['Name']}", Parent=Root, Value=[Widget['ID'], Widget['Type'], Level], Path=Image))
                 for Each in self.Tree.Child(ID):
                     self.Paste_All(Each, getattr(self, Widget['ID']))
         except Exception as E:

@@ -2,9 +2,11 @@
 #Menu
 ################################################################################################################################
 import os
+import sys
 import math
 import shutil
 import inspect
+import subprocess
 from tkinter import colorchooser
 
 class Overview:
@@ -13,6 +15,7 @@ class Overview:
             self.Global = Global
             self.Panel = Panel
             self.Widget = []
+            self.Runtime = False
             self.Project_Path = False
             self.Runtime_Path = False
             self.TempDatabase = False
@@ -441,8 +444,9 @@ class Overview:
                         for File_Name in os.listdir(self.Project_Path):
                             if File_Name.endswith('.ng'):
                                 os.remove(f'{self.Project_Path}/{File_Name}')
-                        with open(f'{self.Project_Path}/{Project_Name}.ng', 'w') as File:
-                            File.write(Project_Name)
+                        if not self.Runtime:
+                            with open(f'{self.Project_Path}/{Project_Name}.ng', 'w') as File:
+                                File.write(Project_Name)
                         self.Project_Data['Name'] = Project_Name
                     self.Project_Data['Error_Log'] = str(int(self.Error_Log_Check.Get()))
                     self.Project_Data['Version'] = self.Version_Entry.Get()
@@ -564,33 +568,40 @@ class Overview:
             
     def Deploy(self, Loading=True):
         try:
-            if Loading:
-                if self.Runtime_Path:
-                    Initial = self.Runtime_Path
-                else:
-                    Initial = os.path.join(os.path.expanduser('~'), 'Documents')
-                Path = self.Global['GUI'].Folder(Initial=Initial, Title='Select Runtime Folder')
-                if Path:
-                    Temp_Path = Path.replace('/', '\\')
-                    if Temp_Path!=self.Project_Path:
-                        self.Runtime_Path = Path
-                        self.Global['Loading'].Show()
-                        self.Global['GUI'].After(500, lambda:self.Deploy(Loading=False))
-                    else:
-                        self.Global['Message'].Show('Error', 'Project Path Cannot Be Runtime Path')
+            if self.Runtime:
+                Project_Path = self.Project_Path.rsplit('/Nucleon', 1)[0]
+                Temp_Name = self.Title_Entry.Get()
+                File_Path = f'{Project_Path}/{Temp_Name}.py'
+                if os.path.exists(File_Path):
+                    subprocess.Popen([sys.executable, File_Path])
             else:
-                if self.Save_Check(Direct=True):
-                    if os.path.exists(f'{self.Runtime_Path}/Nucleon'):
-                        shutil.rmtree(f'{self.Runtime_Path}/Nucleon')
-                    shutil.copytree(self.Global['Relative_Path']('Nucleon'), f'{self.Runtime_Path}/Nucleon')
-                    shutil.copytree(f'{self.Project_Path}/Data', f'{self.Runtime_Path}/Nucleon/Data')
-                    Temp_Name = self.Title_Entry.Get()
-                    if not os.path.exists(f'{self.Runtime_Path}/{Temp_Name}.py'):
-                        shutil.copy(self.Global['Relative_Path']('Program/Base/GUI.py'), f'{self.Runtime_Path}/{Temp_Name}.py')
-                    self.Global['Message'].Show('Success', 'Project Deployed')
-                    if self.Global['GUI']._Window:
-                        os.startfile(self.Runtime_Path)
-                self.Global['Loading'].Hide()
+                if Loading:
+                    if self.Runtime_Path:
+                        Initial = self.Runtime_Path
+                    else:
+                        Initial = os.path.join(os.path.expanduser('~'), 'Documents')
+                    Path = self.Global['GUI'].Folder(Initial=Initial, Title='Select Runtime Folder')
+                    if Path:
+                        Temp_Path = Path.replace('/', '\\')
+                        if Temp_Path!=self.Project_Path:
+                            self.Runtime_Path = Path
+                            self.Global['Loading'].Show()
+                            self.Global['GUI'].After(500, lambda:self.Deploy(Loading=False))
+                        else:
+                            self.Global['Message'].Show('Error', 'Project Path Cannot Be Runtime Path')
+                else:
+                    if self.Save_Check(Direct=True):
+                        if os.path.exists(f'{self.Runtime_Path}/Nucleon'):
+                            shutil.rmtree(f'{self.Runtime_Path}/Nucleon')
+                        shutil.copytree(self.Global['Relative_Path']('Nucleon'), f'{self.Runtime_Path}/Nucleon')
+                        shutil.copytree(f'{self.Project_Path}/Data', f'{self.Runtime_Path}/Nucleon/Data')
+                        Temp_Name = self.Title_Entry.Get()
+                        if not os.path.exists(f'{self.Runtime_Path}/{Temp_Name}.py'):
+                            shutil.copy(self.Global['Relative_Path']('Program/Base/GUI.py'), f'{self.Runtime_Path}/{Temp_Name}.py')
+                        self.Global['Message'].Show('Success', 'Project Deployed')
+                        if self.Global['GUI']._Window:
+                            os.startfile(self.Runtime_Path)
+                    self.Global['Loading'].Hide()
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             
@@ -659,6 +670,20 @@ class Overview:
     def Update(self, Partial=False):
         try:
             if os.path.exists(f'{self.Project_Path}/Data/NGD.dll'):
+                if self.Runtime:
+                    Source = self.Global['Relative_Path']('Nucleon')
+                    Destination = self.Project_Path
+                    Gluonix_Source = os.path.join(Source, 'Gluonix')
+                    Gluonix_Destination = os.path.join(Destination, 'Gluonix')
+                    Runner_Source = os.path.join(Source, 'Runner.py')
+                    Runner_Destination = os.path.join(Destination, 'Runner.py')
+                    if os.path.exists(Gluonix_Destination):
+                        shutil.rmtree(Gluonix_Destination)
+                    if os.path.exists(Runner_Destination):
+                        os.remove(Runner_Destination)
+                    shutil.copytree(Gluonix_Source, Gluonix_Destination)
+                    shutil.copy2(Runner_Source, Runner_Destination)
+                self.Deploy_Button.Set('Run' if self.Runtime else 'Deploy')
                 TempDatabase = self.Global['Gluonix'].SQL(f'{self.Project_Path}/Data/NGD.dll')
                 if not Partial:
                     self.Project_Data = {}

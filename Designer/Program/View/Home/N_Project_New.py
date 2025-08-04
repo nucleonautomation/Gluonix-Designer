@@ -85,6 +85,23 @@ class New:
             self.Project_Path.Config(Foreground='black', Font_Size=9, Font_Weight='normal', Align='nw', Border_Size=0)
             self.Project_Path.Create()
             
+                #Type Label
+            Fixture = self.Frame.Locate(10, 6, 3, 50)
+            self.Type_Label = self.Global['Gluonix'].Label(self.Frame)
+            self.Type_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Type_Label.Config(Foreground='#000000', Value="Type:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Type_Label.Create()
+            
+                #Type Select
+            Fixture = self.Frame.Locate(20, 5, 13, 50)
+            self.Type_Select = self.Global['Gluonix'].Select(self.Frame)
+            self.Type_Select.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Type_Select.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Type_Select.Add('Design')
+            self.Type_Select.Add('Runtime')
+            self.Type_Select.Create()
+            self.Type_Select.Set('Runtime')
+            
                 #Ok Button
             Fixture = self.Frame.Locate(12, 6, 70, 88)
             self.Ok_Button = self.Global['Gluonix'].Label(self.Frame)
@@ -152,11 +169,19 @@ class New:
         try:
             Project_Path = self.Location_Entry.Get()
             Project_Name = self.Name_Entry.Get()
+            Project_Type = self.Type_Select.Get()
+            Runtime = True if Project_Type=='Runtime' else False
             if not self.Error:
                 if self.Global['Custom'].Is_Empty(Project_Path):
                     self.Global['Message'].Hide()
-                    with open(f'{Project_Path}/{Project_Name}.ng', 'w') as File:
-                        File.write(Project_Name)
+                    if Runtime:
+                        shutil.copy(self.Global['Relative_Path']('Program/Base/GUI.py'), f'{Project_Path}/{Project_Name}.py')
+                        shutil.copytree(self.Global['Relative_Path']('Nucleon'), f'{Project_Path}/Nucleon')
+                    else:
+                        with open(f'{Project_Path}/{Project_Name}.ng', 'w') as File:
+                            File.write(Project_Name)
+                    if Runtime:
+                        Project_Path = f'{Project_Path}/Nucleon'
                     os.makedirs(f'{Project_Path}/Data')
                     os.makedirs(f'{Project_Path}/Data/File')
                     Icon = self.Global['Custom'].MD5(Project_Name+str(time.time()))
@@ -169,6 +194,7 @@ class New:
                     TempDatabase.Post(f"UPDATE `Display` SET `Title`='{Project_Name}' WHERE `ID`='Root'")
                     TempDatabase.Close()
                     self.Project.Home.Panel.Overview.Project_Path = Project_Path
+                    self.Project.Home.Panel.Overview.Runtime = Runtime
                     self.Project.Home.Panel.Overview.Update()
                     self.Frame.Hide()
                 else:

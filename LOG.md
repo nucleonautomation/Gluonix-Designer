@@ -1,5 +1,10 @@
 # Change Log
 
+## V(4.7)
+- Design/Edit Direct Runtime Applications
+- Design Environment Bug Fixes
+- Naming Increment Fixed For Copy/Paste
+
 ## V(4.6)
 - Canvas Item Widgets Optimization & Bug Fix
 - All Widget Optimization

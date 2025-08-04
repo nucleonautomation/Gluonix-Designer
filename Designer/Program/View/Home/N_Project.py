@@ -107,11 +107,14 @@ class Project:
         
     def Open_Project(self):
         try:
-            Project_File_Path = self.Global['GUI'].File(Initial=os.path.join(os.path.expanduser('~'), 'Documents'), Title='Select Project', Default='.ng', Type=[["Nucleon Gluonix (*.ng)", "*.ng"]])
+            Project_File_Path = self.Global['GUI'].File(Initial=os.path.join(os.path.expanduser('~'), 'Documents'), Title='Select Project', Default='.py', Type=[["Python (*.py)", "*.py"], ["Nucleon Gluonix (*.ng)", "*.ng"]])
             if Project_File_Path:
                 Project_Path = os.path.dirname(Project_File_Path)
+                if Project_File_Path.endswith('.py'):
+                    Project_Path = f'{Project_Path}/Nucleon'
                 self.Update_Database(f'{Project_Path}/Data/NGD.dll', self.Global['Data']('NGD.dll'))
                 self.Home.Panel.Overview.Project_Path = Project_Path
+                self.Home.Panel.Overview.Runtime = Project_File_Path.endswith('.py')
                 self.Home.Panel.Overview.Update()
                 self.Global['Message'].Hide()
         except Exception as E:

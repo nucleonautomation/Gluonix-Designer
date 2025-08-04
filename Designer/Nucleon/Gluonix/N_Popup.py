@@ -356,8 +356,15 @@ class Popup():
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Grab_Widget -> {E}")
             
-    def Position(self):
+    def Position(self, Left=None, Top=None):
         try:
+            if Left is not None:
+                self._Left = Left
+            if Top is not None:
+                self._Top = Top
+            if Left is not None or Top is not None:
+                if not self._Full_Screen:
+                    self._Frame.geometry(f"{int(self._Width)}x{int(self._Height)}+{int(self._Left)}+{int(self._Top)}")
             Left = self._Frame.winfo_x()
             Top = self._Frame.winfo_y()
             return [Left, Top]
@@ -435,7 +442,7 @@ class Popup():
                     self._Frame.config(menu=self._Menu)
                 self._Initialized = True
                 self._GUI._Popup.append(self)
-            if not self._Full_Screen and not self._Toolbar:
+            if not self._Full_Screen:
                 self._Frame.geometry(f"{int(self._Width)}x{int(self._Height)}+{int(self._Left)}+{int(self._Top)}")
             if self._Topmost:
                 self._Frame.focus_set()

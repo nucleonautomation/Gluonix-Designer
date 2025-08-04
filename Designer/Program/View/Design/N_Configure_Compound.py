@@ -515,7 +515,7 @@ class Configure_Compound:
             TempName = self.Configure.Design.Database.Get(f"SELECT * FROM `Widget` WHERE (`ID`!='{self.ID}' AND `Root`=='{self.Root_ID}' AND `Name`='{Name}')")
             if self.Global['Custom'].Valid_Variable(Name) and len(TempName)==0:
                 self.Configure.Design.Database.Post(f"UPDATE `Widget` SET `Name`='{Name}' WHERE `ID`='{self.ID}'")
-                self.Configure.Design.Element.Tree.Edit(Name=f' {Name}')
+                self.Configure.Design.Element.Tree.Edit(Name=f'  {Name}')
                 self.Name_Entry.Config(Border_Color='#000000', Border_Size=1)
             else:
                 self.Name_Entry.Config(Border_Color='red', Border_Size=2)
