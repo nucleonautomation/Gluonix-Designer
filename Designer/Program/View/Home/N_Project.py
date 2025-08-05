@@ -100,6 +100,8 @@ class Project:
             
     def Create_Project(self):
         try:
+            self.Home.Panel.Overview.Frame.Hide()
+            self.Compare.Frame.Hide()
             self.New.Reset()
             self.New.Frame.Show()
         except Exception as E:
@@ -116,6 +118,8 @@ class Project:
                 self.Home.Panel.Overview.Project_Path = Project_Path
                 self.Home.Panel.Overview.Runtime = Project_File_Path.endswith('.py')
                 self.Home.Panel.Overview.Update()
+                self.New.Frame.Hide()
+                self.Compare.Frame.Hide()
                 self.Global['Message'].Hide()
         except Exception as E:
             self.Global['Message'].Show('Error', 'Project Files Are Corrupted')
@@ -125,6 +129,8 @@ class Project:
             
     def Compare_Project(self):
         try:
+            self.Home.Panel.Overview.Frame.Hide()
+            self.New.Frame.Hide()
             self.Compare.Reset()
             self.Compare.Frame.Show()
         except Exception as E:

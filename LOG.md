@@ -1,5 +1,9 @@
 # Change Log
 
+## V(5.0)
+- Opening Designer In Project Folder Will Autoload Project
+- Designer Bug Fixes
+
 ## V(4.7)
 - Design/Edit Direct Runtime Applications
 - Design Environment Bug Fixes

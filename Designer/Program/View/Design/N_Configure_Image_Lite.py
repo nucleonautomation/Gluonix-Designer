@@ -382,7 +382,9 @@ class Configure_Image_Lite:
                             Temp_Root.Show()
                     self.Root = self.Global['Custom'].Get_Attr_Class(self.Configure.Design, Root)
                     self.Element = getattr(self.Root, self.ID)
-                    self.Element.Show()
+                    self.Visibilty.Set(self.Global['Image'](self.Visibilty_Image[self.Element._Display]))
+                    if self.Element._Display:
+                        self.Element.Show()
                 else:
                     self.Global['Message'].Show('Error', 'Project Files Corrupted\nReopen Project')
         except Exception as E:

@@ -31,8 +31,8 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 # Global Variables
 # -------------------------------------------------------------------------------------------------------------------------------
 Title = "Gluonix Designer - Nucleon Automation"
-Version = 4
-Revision = 7
+Version = 5
+Revision = 0
 Error_List = []
 Error_Display = True
 Error_Log = True
@@ -75,7 +75,6 @@ def Error(E):
 # -------------------------------------------------------------------------------------------------------------------------------
 # Relative Path
 # -------------------------------------------------------------------------------------------------------------------------------
-
 def Image(Name, Ext="png"):
     try:
         Base_Dir = os.path.dirname(os.path.abspath(__file__))
@@ -93,7 +92,6 @@ def Image(Name, Ext="png"):
     except Exception as E:
         Error("Image -> " + str(E))
 
-
 def Data(Name):
     try:
         Base_Dir = os.path.dirname(os.path.abspath(__file__))
@@ -110,7 +108,6 @@ def Data(Name):
             return ""
     except Exception as E:
         Error("Data -> " + str(E))
-
 
 def Relative_Path(Name):
     try:
@@ -132,14 +129,12 @@ def Relative_Path(Name):
 # -------------------------------------------------------------------------------------------------------------------------------
 # Global Functions
 # -------------------------------------------------------------------------------------------------------------------------------
-
 def Error_Clear():
     try:
         global Error_List
         Error_List = []
     except Exception as E:
         Error("Error_Clear -> " + str(E))
-
 
 def Hide(Widget=[]):
     for Each in Widget:
@@ -148,12 +143,23 @@ def Hide(Widget=[]):
         except Exception as E:
             Error("Hide -> " + str(E))
 
-
 def StartUp():
     try:
         global Main
         Main = View.Main(globals())
+        Autoload = None
+        if os.path.exists('./Data/NGD.dll') and not os.path.exists('./Data/Image'):
+            Autoload = 'Design'
+            Project_Path = './'
+        if os.path.exists('./Nucleon/Data/NGD.dll'):
+            Autoload = 'Runtime'
+            Project_Path = './Nucleon'
         Main.Frame.Show()
+        if Autoload is not None:
+            Main.Home.Project.Update_Database(f'{Project_Path}/Data/NGD.dll', Data('NGD.dll'))
+            Main.Home.Panel.Overview.Project_Path = Project_Path
+            Main.Home.Panel.Overview.Runtime = True if Autoload=='Runtime' else False
+            Main.Home.Panel.Overview.Update()
         Loading.Hide()
     except Exception as E:
         Error("StartUp -> " + str(E))
@@ -164,8 +170,6 @@ def On_Close():
     except Exception as E:
         Error("On_Close -> " + str(E))
     
-
-
 # -------------------------------------------------------------------------------------------------------------------------------
 # GUI
 # -------------------------------------------------------------------------------------------------------------------------------
