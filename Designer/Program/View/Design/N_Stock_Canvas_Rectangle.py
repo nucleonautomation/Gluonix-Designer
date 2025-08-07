@@ -43,7 +43,7 @@ class Stock_Canvas_Rectangle:
                 Root_Type = ID_List[1]
                 Root_Level = ID_List[2]
             Level = Root_Level+1
-            if (Root_Type!='Canvas' and Root_Type!='Scroll'):
+            if (Root_Type!='Canvas' and Root_Type!='Scroll' and Root_Type!='Group' and Root_ID!='Root'):
                 Widget = self.Stock.Design.Database.Get(f"SELECT * FROM `Widget` WHERE `ID`='{Root_ID}'", Keys=True)
                 if len(Widget)==0:
                     Widget = self.Stock.Design.Database.Get(f"SELECT * FROM `Item` WHERE `ID`='{Root_ID}'", Keys=True)
@@ -56,26 +56,36 @@ class Stock_Canvas_Rectangle:
                     Root_Type = Root_Container[0]['Type']
                 else:
                     Root_Type = 'Frame'
-            if  Root_Type=='Canvas' or Root_Type=='Scroll':
-                Number = 1
-                Exist = self.Stock.Design.Database.Get(f"SELECT * FROM `Item` WHERE (`Name`='{self.Type}{Number}' AND `Root`='{Root_ID}')")
-                while len(Exist)>0:
-                    Number += 1
+            if  Root_Type=='Canvas' or Root_Type=='Scroll' or Root_Type=='Group':
+                if Root_ID!='Root':
+                    Widget = self.Stock.Design.Database.Get(f"SELECT * FROM `Frame` WHERE `ID`='{Root_ID}'", Keys=True)
+                    while Widget[0]['Type']=='Group' and Widget[0]['Root']!='Root':
+                        Temp_Root_ID = Widget[0]['Root']
+                        Widget = self.Stock.Design.Database.Get(f"SELECT * FROM `Frame` WHERE `ID`='{Temp_Root_ID}'", Keys=True)
+                if Widget[0]['Type']=='Canvas' or Widget[0]['Type']=='Scroll':
+                    Number = 1
                     Exist = self.Stock.Design.Database.Get(f"SELECT * FROM `Item` WHERE (`Name`='{self.Type}{Number}' AND `Root`='{Root_ID}')")
-                Name = f"{self.Type.replace('Canvas_', '')}{Number}"
-                Random_Letter = ''.join(random.choices(string.ascii_letters, k=10))
-                ID = Random_Letter+self.Global['Custom'].MD5(Root_ID+Name+str(time.time()*1000000))
-                Root = getattr(self.Stock.Design.Element, Root_ID)
-                Image = self.Global['Image'](self.Type)
-                setattr(self.Stock.Design.Element, ID, self.Stock.Design.Element.Tree.Add(Name=f' {Name}', Parent=Root, Value=[ID, self.Type, Level], Path=Image))
-                self.Stock.Design.Element.Tree.Expand(Root)
-                ID_Tree = getattr(self.Stock.Design.Element, ID)
-                self.Stock.Design.Element.Tree.Select(ID_Tree)
-                self.Stock.Design.Database.Post(f"INSERT INTO `Item` (`ID`, `Name`, `Type`, `Root`) VALUES ('{ID}', '{Name}', '{self.Type}', '{Root_ID}')")
-                self.Create(ID)
-                self.Stock.Design.Configure.Hide_All()
-                Configure = getattr(self.Stock.Design.Configure, f'Configure_{self.Type}')
-                Configure.Load(ID)
+                    while len(Exist)>0:
+                        Number += 1
+                        Exist = self.Stock.Design.Database.Get(f"SELECT * FROM `Item` WHERE (`Name`='{self.Type}{Number}' AND `Root`='{Root_ID}')")
+                    Name = f"{self.Type.replace('Canvas_', '')}{Number}"
+                    Random_Letter = ''.join(random.choices(string.ascii_letters, k=10))
+                    ID = Random_Letter+self.Global['Custom'].MD5(Root_ID+Name+str(time.time()*1000000))
+                    Level = Root_Level+1
+                    Root = getattr(self.Stock.Design.Element, Root_ID)
+                    Image = self.Global['Image'](self.Type)
+                    setattr(self.Stock.Design.Element, ID, self.Stock.Design.Element.Tree.Add(Name=f' {Name}', Parent=Root, Value=[ID, self.Type, Level], Path=Image))
+                    self.Stock.Design.Element.Tree.Expand(Root)
+                    ID_Tree = getattr(self.Stock.Design.Element, ID)
+                    self.Stock.Design.Element.Tree.Select(ID_Tree)
+                    self.Stock.Design.Database.Post(f"INSERT INTO `Item` (`ID`, `Name`, `Type`, `Root`, `Left`, `Top`, `Value`) VALUES ('{ID}', '{Name}', '{self.Type}', '{Root_ID}', '40', '40', '{Name}')")
+                    self.Create(ID)
+                    self.Stock.Design.Configure.Hide_All()
+                    Configure = getattr(self.Stock.Design.Configure, f'Configure_{self.Type}')
+                    Configure.Load(ID)
+                else:
+                    self.Global['Message'].Show('Error', 'Select A Canvas / Scroll')
+                    self.Global['Message'].Hide(Delay=2)
             else:
                 self.Global['Message'].Show('Error', 'Select A Canvas / Scroll')
                 self.Global['Message'].Hide(Delay=2)

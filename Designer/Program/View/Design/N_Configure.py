@@ -6,6 +6,7 @@ import inspect
 
 #Program
 from .N_Configure_Frame import Configure_Frame
+from .N_Configure_Group import Configure_Group
 from .N_Configure_Canvas import Configure_Canvas
 from .N_Configure_Scroll import Configure_Scroll
 from .N_Configure_Label import Configure_Label
@@ -122,20 +123,23 @@ class Configure:
             #Configure Text
             self.Configure_Text = Configure_Text(self.Global, self)
             
-            #Configure Text
+            #Configure Tree
             self.Configure_Tree = Configure_Tree(self.Global, self)
             
-            #Configure Text
+            #Configure Label Lite
             self.Configure_Label_Lite = Configure_Label_Lite(self.Global, self)
             
-            #Configure Text
+            #Configure Compound Lite
             self.Configure_Compound_Lite = Configure_Compound_Lite(self.Global, self)
             
-            #Configure Text
+            #Configure Image Lite
             self.Configure_Image_Lite = Configure_Image_Lite(self.Global, self)
             
-            #Configure Text
+            #Configure Button Lite
             self.Configure_Button_Lite = Configure_Button_Lite(self.Global, self)
+            
+            #Configure Group
+            self.Configure_Group = Configure_Group(self.Global, self)
             
             #Configure Canvas Line
             self.Configure_Canvas_Line = Configure_Canvas_Line(self.Global, self)

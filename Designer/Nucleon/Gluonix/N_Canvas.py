@@ -267,6 +267,18 @@ class Canvas:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Config -> {E}")
             
+    def Move(self, Left=None, Top=None):
+        try:
+            if Left is not None:
+                self._Left += Left
+            if Top is not None:
+                self._Top += Top
+            if Left is not None or Top is not None:
+                self.Position(Left=self._Left, Top=self._Top)
+            return True
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Move -> {E}")
+            
     def Position(self, Left=None, Top=None):
         try:
             if Left is not None:
@@ -336,9 +348,7 @@ class Canvas:
                 Temp_Background = self._Main._Background
             self._Frame.config(background=Temp_Background, width=self._Width_Current, height=self._Height_Current, highlightthickness=0)
             self.Rounded()
-            if self._Size_Update:
-                self._Size_Update = False
-                self.Resize(Trigger=False)
+            self.Resize(Trigger=False)
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
                     if self._Last_Name in self._Main.__dict__:
@@ -473,7 +483,7 @@ class Canvas:
             
     def Relocate(self, Direct=False):
         try:
-            if self._Resizable:
+            if Direct or self._Resizable:
                 self.Adjustment()
                 if Direct or (self._Resize and self._Resize_Width):
                     self._Width_Current = self._Width + self._Width_Adjustment

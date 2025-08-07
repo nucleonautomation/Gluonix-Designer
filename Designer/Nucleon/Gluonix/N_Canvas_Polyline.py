@@ -27,14 +27,25 @@ class Canvas_Polyline:
         try:
             if not Main:
                 Main = self._Canvas
-            Instance = type(self)(Main)
-            for Key in self._Config:
-                if hasattr(self, "_"+Key):
-                    setattr(Instance, "_"+Key, getattr(self, "_"+Key))
-            if Name:
-                setattr(Instance, "_Name", Name)
-            Instance.Relocate()
-            return Instance
+            if Main._Type in ['Canvas', 'Scroll', 'Group']:
+                Temp_Main = Main
+                Temp_Type = Temp_Main._Type
+                while Temp_Type=='Group':
+                    Temp_Main = Main._Main
+                    Temp_Type = Temp_Main._Type
+                if Temp_Type=='Canvas' or Temp_Type=='Scroll':
+                    Instance = type(self)(Main)
+                    for Key in self._Config:
+                        if hasattr(self, "_"+Key):
+                            setattr(Instance, "_"+Key, getattr(self, "_"+Key))
+                    if Name:
+                        setattr(Instance, "_Name", Name)
+                    Instance.Relocate()
+                    return Instance
+                else:
+                    raise Exception('Widget can only copy to Canvas/Scroll')
+            else:
+                raise Exception('Widget can only copy to Canvas/Scroll')
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Copy -> {E}")
 
@@ -109,6 +120,18 @@ class Canvas_Polyline:
                 self.Relocate()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Config -> {E}")
+            
+    def Move(self, Left=None, Top=None):
+        try:
+            if Left is not None:
+                self._Left += Left
+            if Top is not None:
+                self._Top += Top
+            if Left is not None or Top is not None:
+                self.Position(Left=self._Left, Top=self._Top)
+            return True
+        except Exception as E:
+            self._Canvas._GUI.Error(f"{self._Type} -> Move -> {E}")
         
     def Position(self, Left=None, Top=None):
         try:
@@ -184,7 +207,7 @@ class Canvas_Polyline:
             
     def Relocate(self, Direct=False):
         try:
-            if self._Resize and self._Resizable:
+            if Direct or (self._Resize and self._Resizable):
                 self.Adjustment()
                 self._Points_Current = [[X * self._Width_Ratio, Y * self._Height_Ratio] for X, Y in self._Points]
             else:

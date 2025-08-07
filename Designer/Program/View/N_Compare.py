@@ -176,39 +176,52 @@ class Compare:
                     Type = 'Item'
                 else:
                     Type = 'Widget'
-                From.Database.Post(f"DELETE FROM `{Type}_Copy`")
-                From.Database.Post(f"INSERT INTO `{Type}_Copy` SELECT * FROM `{Type}` WHERE `ID`='{Element_ID}'")
-                Frame_Data = From.Database.Get(f"SELECT * FROM `{Type}_Copy` WHERE `ID`='{Element_ID}'", Keys=True)[0]
-                Number = 0
-                Exist = From.Database.Get(f"SELECT * FROM `{Type}` WHERE (`Name`='{Frame_Data['Name']}' AND `Root`='{Root_ID}')")
-                while len(Exist)>0:
-                    Number += 1
-                    Exist = From.Database.Get(f"SELECT * FROM `{Type}` WHERE (`Name`='{Frame_Data['Name']}{Number}' AND `Root`='{Root_ID}')")
-                if Number>0:
-                    Name = f"{Frame_Data['Name']}{Number}"
-                else:
-                    Name = Frame_Data['Name']
-                Random_Letter = ''.join(random.choices(string.ascii_letters, k=10))
-                New_ID = Random_Letter+self.Global['Custom'].MD5(Root_ID+Name+str(time.time()*1000000))
-                From.Database.Post(f"UPDATE `{Type}_Copy` SET `ID`='{New_ID}',`Name`='{Name}',`Root`='{Root_ID}' WHERE `ID`='{Element_ID}'")
-                Data = From.Database.Get(f"SELECT * FROM `{Type}_Copy` WHERE `ID`='{New_ID}'", Keys=True)[0]
-                Columns = ','.join(f'`{K}`' for K in Data.keys())
-                Values = ','.join(self.Format(V) for V in Data.values())
-                To.Database.Post(f"INSERT INTO `{Type}` ({Columns}) VALUES ({Values})")
-                From.Database.Post(f"DELETE FROM `{Type}_Copy` WHERE `ID`='{New_ID}'")
-                if os.path.exists(f"{From.Project_Path}/Data/File/{Element_ID}"):
-                    shutil.copy(f"{From.Project_Path}/Data/File/{Element_ID}", f"{To.Project_Path}/Data/File/{New_ID}")
-                if Type=='Frame':
-                    Root_Level = To.Tree.Get(Root)[2]
-                    To.Database.Post(f"UPDATE `{Type}` SET `Level`='{Root_Level+1}' WHERE `ID`='{New_ID}'")
-                Widget = To.Database.Get(f"SELECT * FROM `{Type}` WHERE `ID`='{New_ID}'", Keys=True)[0]
-                Level = 0
-                if Type=='Frame':
-                    Level = Widget['Level']
-                Image = self.Global['Image'](Widget['Type'])
-                Temp_ID = To.Tree.Add(Name=Widget['Name'], Parent=Root, Value=[Widget['ID'], Widget['Type'], Level], Path=Image)
-                for Each in From.Tree.Child(ID):
-                    self.Paste(Each, Temp_ID)
+                Run = True
+                if Type == 'Item':
+                    if Root_ID!='Root':
+                        Run = False
+                        Widget = To.Database.Get(f"SELECT * FROM `Frame` WHERE `ID`='{Root_ID}'", Keys=True)
+                        while Widget[0]['Type']=='Group' and Widget[0]['Root']!='Root':
+                            Temp_Root_ID = Widget[0]['Root']
+                            Widget = To.Database.Get(f"SELECT * FROM `Frame` WHERE `ID`='{Temp_Root_ID}'", Keys=True)
+                        if Widget[0]['Type']=='Canvas' or Widget[0]['Type']=='Scroll':
+                            Run = True
+                    else:
+                        Run = False
+                if Run:
+                    From.Database.Post(f"DELETE FROM `{Type}_Copy`")
+                    From.Database.Post(f"INSERT INTO `{Type}_Copy` SELECT * FROM `{Type}` WHERE `ID`='{Element_ID}'")
+                    Frame_Data = From.Database.Get(f"SELECT * FROM `{Type}_Copy` WHERE `ID`='{Element_ID}'", Keys=True)[0]
+                    Number = 0
+                    Exist = From.Database.Get(f"SELECT * FROM `{Type}` WHERE (`Name`='{Frame_Data['Name']}' AND `Root`='{Root_ID}')")
+                    while len(Exist)>0:
+                        Number += 1
+                        Exist = From.Database.Get(f"SELECT * FROM `{Type}` WHERE (`Name`='{Frame_Data['Name']}{Number}' AND `Root`='{Root_ID}')")
+                    if Number>0:
+                        Name = f"{Frame_Data['Name']}{Number}"
+                    else:
+                        Name = Frame_Data['Name']
+                    Random_Letter = ''.join(random.choices(string.ascii_letters, k=10))
+                    New_ID = Random_Letter+self.Global['Custom'].MD5(Root_ID+Name+str(time.time()*1000000))
+                    From.Database.Post(f"UPDATE `{Type}_Copy` SET `ID`='{New_ID}',`Name`='{Name}',`Root`='{Root_ID}' WHERE `ID`='{Element_ID}'")
+                    Data = From.Database.Get(f"SELECT * FROM `{Type}_Copy` WHERE `ID`='{New_ID}'", Keys=True)[0]
+                    Columns = ','.join(f'`{K}`' for K in Data.keys())
+                    Values = ','.join(self.Format(V) for V in Data.values())
+                    To.Database.Post(f"INSERT INTO `{Type}` ({Columns}) VALUES ({Values})")
+                    From.Database.Post(f"DELETE FROM `{Type}_Copy` WHERE `ID`='{New_ID}'")
+                    if os.path.exists(f"{From.Project_Path}/Data/File/{Element_ID}"):
+                        shutil.copy(f"{From.Project_Path}/Data/File/{Element_ID}", f"{To.Project_Path}/Data/File/{New_ID}")
+                    if Type=='Frame':
+                        Root_Level = To.Tree.Get(Root)[2]
+                        To.Database.Post(f"UPDATE `{Type}` SET `Level`='{Root_Level+1}' WHERE `ID`='{New_ID}'")
+                    Widget = To.Database.Get(f"SELECT * FROM `{Type}` WHERE `ID`='{New_ID}'", Keys=True)[0]
+                    Level = 0
+                    if Type=='Frame':
+                        Level = Widget['Level']
+                    Image = self.Global['Image'](Widget['Type'])
+                    Temp_ID = To.Tree.Add(Name=Widget['Name'], Parent=Root, Value=[Widget['ID'], Widget['Type'], Level], Path=Image)
+                    for Each in From.Tree.Child(ID):
+                        self.Paste(Each, Temp_ID)
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
         

@@ -424,7 +424,7 @@ class Element:
             Root_ID = self.Tree.Current()
             if Root_ID:
                 Root_Type = self.Tree.Get(Root_ID)[1]
-                if Root_Type=='Frame' or Root_Type=='Canvas' or Root_Type=='Scroll':
+                if Root_Type=='Frame' or Root_Type=='Canvas' or Root_Type=='Scroll' or Root_Type=='Group':
                     Error = False
                     Parent = Root_ID
                     while self.Tree.Get(Parent)[0]!=self.Parent:
@@ -452,39 +452,52 @@ class Element:
                     Type = 'Item'
                 else:
                     Type = 'Widget'
-                self.Design.Database.Post(f"DELETE FROM `{Type}_Copy`")
-                self.Design.Database.Post(f"INSERT INTO `{Type}_Copy` SELECT * FROM `{Type}` WHERE `ID`='{Element_ID}'")
-                Frame_Data = self.Design.Database.Get(f"SELECT * FROM `{Type}_Copy` WHERE `ID`='{Element_ID}'", Keys=True)[0]
-                Match = re.match(r'^(.*?)(\d+)?$', Frame_Data['Name'])
-                Base_Name = Match.group(1)
-                Number = int(Match.group(2)) if Match.group(2) else 0
-                Name_Attempt = f"{Base_Name}{Number}" if Number > 0 else Base_Name
-                Exist = self.Design.Database.Get(f"SELECT * FROM `{Type}` WHERE (`Name`='{Name_Attempt}' AND `Root`='{Root_ID}')")
-                while len(Exist) > 0:
-                    Number += 1
-                    Name_Attempt = f"{Base_Name}{Number}"
+                Run = True
+                if Type == 'Item':
+                    if Root_ID!='Root':
+                        Run = False
+                        Widget = self.Design.Database.Get(f"SELECT * FROM `Frame` WHERE `ID`='{Root_ID}'", Keys=True)
+                        while Widget[0]['Type']=='Group' and Widget[0]['Root']!='Root':
+                            Temp_Root_ID = Widget[0]['Root']
+                            Widget = self.Design.Database.Get(f"SELECT * FROM `Frame` WHERE `ID`='{Temp_Root_ID}'", Keys=True)
+                        if Widget[0]['Type']=='Canvas' or Widget[0]['Type']=='Scroll':
+                            Run = True
+                    else:
+                        Run = False
+                if Run:
+                    self.Design.Database.Post(f"DELETE FROM `{Type}_Copy`")
+                    self.Design.Database.Post(f"INSERT INTO `{Type}_Copy` SELECT * FROM `{Type}` WHERE `ID`='{Element_ID}'")
+                    Frame_Data = self.Design.Database.Get(f"SELECT * FROM `{Type}_Copy` WHERE `ID`='{Element_ID}'", Keys=True)[0]
+                    Match = re.match(r'^(.*?)(\d+)?$', Frame_Data['Name'])
+                    Base_Name = Match.group(1)
+                    Number = int(Match.group(2)) if Match.group(2) else 0
+                    Name_Attempt = f"{Base_Name}{Number}" if Number > 0 else Base_Name
                     Exist = self.Design.Database.Get(f"SELECT * FROM `{Type}` WHERE (`Name`='{Name_Attempt}' AND `Root`='{Root_ID}')")
-                Name = Name_Attempt
-                Random_Letter = ''.join(random.choices(string.ascii_letters, k=10))
-                New_ID = Random_Letter+self.Global['Custom'].MD5(Root_ID+Name+str(time.time()*1000000))
-                self.Design.Database.Post(f"UPDATE `{Type}_Copy` SET `ID`='{New_ID}',`Name`='{Name}',`Root`='{Root_ID}' WHERE `ID`='{Element_ID}'")
-                self.Design.Database.Post(f"INSERT INTO `{Type}` SELECT * FROM `{Type}_Copy` WHERE `ID`='{New_ID}'")
-                self.Design.Database.Post(f"DELETE FROM `{Type}_Copy` WHERE `ID`='{New_ID}'")
-                if os.path.exists(f"{self.Design.Project_Path}/Data/File/{Element_ID}"):
-                    shutil.copy(f"{self.Design.Project_Path}/Data/File/{Element_ID}", f"{self.Design.Project_Path}/Data/File/{New_ID}")
-                if Type=='Frame':
-                    Root_Level = self.Tree.Get(Root)[2]
-                    self.Design.Database.Post(f"UPDATE `{Type}` SET `Level`='{Root_Level+1}' WHERE `ID`='{New_ID}'")
-                Widget = self.Design.Database.Get(f"SELECT * FROM `{Type}` WHERE `ID`='{New_ID}'", Keys=True)[0]
-                Stock = getattr(self.Design.Stock, f"Stock_{Widget['Type']}")
-                Stock.Create(Widget['ID'])
-                Level = 0
-                if Type=='Frame':
-                    Level = Widget['Level']
-                Image = self.Global['Image'](Widget['Type'])
-                setattr(self, Widget['ID'], self.Tree.Add(Name=f" {Widget['Name']}", Parent=Root, Value=[Widget['ID'], Widget['Type'], Level], Path=Image))
-                for Each in self.Tree.Child(ID):
-                    self.Paste_All(Each, getattr(self, Widget['ID']))
+                    while len(Exist) > 0:
+                        Number += 1
+                        Name_Attempt = f"{Base_Name}{Number}"
+                        Exist = self.Design.Database.Get(f"SELECT * FROM `{Type}` WHERE (`Name`='{Name_Attempt}' AND `Root`='{Root_ID}')")
+                    Name = Name_Attempt
+                    Random_Letter = ''.join(random.choices(string.ascii_letters, k=10))
+                    New_ID = Random_Letter+self.Global['Custom'].MD5(Root_ID+Name+str(time.time()*1000000))
+                    self.Design.Database.Post(f"UPDATE `{Type}_Copy` SET `ID`='{New_ID}',`Name`='{Name}',`Root`='{Root_ID}' WHERE `ID`='{Element_ID}'")
+                    self.Design.Database.Post(f"INSERT INTO `{Type}` SELECT * FROM `{Type}_Copy` WHERE `ID`='{New_ID}'")
+                    self.Design.Database.Post(f"DELETE FROM `{Type}_Copy` WHERE `ID`='{New_ID}'")
+                    if os.path.exists(f"{self.Design.Project_Path}/Data/File/{Element_ID}"):
+                        shutil.copy(f"{self.Design.Project_Path}/Data/File/{Element_ID}", f"{self.Design.Project_Path}/Data/File/{New_ID}")
+                    if Type=='Frame':
+                        Root_Level = self.Tree.Get(Root)[2]
+                        self.Design.Database.Post(f"UPDATE `{Type}` SET `Level`='{Root_Level+1}' WHERE `ID`='{New_ID}'")
+                    Widget = self.Design.Database.Get(f"SELECT * FROM `{Type}` WHERE `ID`='{New_ID}'", Keys=True)[0]
+                    Stock = getattr(self.Design.Stock, f"Stock_{Widget['Type']}")
+                    Stock.Create(Widget['ID'])
+                    Level = 0
+                    if Type=='Frame':
+                        Level = Widget['Level']
+                    Image = self.Global['Image'](Widget['Type'])
+                    setattr(self, Widget['ID'], self.Tree.Add(Name=f" {Widget['Name']}", Parent=Root, Value=[Widget['ID'], Widget['Type'], Level], Path=Image))
+                    for Each in self.Tree.Child(ID):
+                        self.Paste_All(Each, getattr(self, Widget['ID']))
         except Exception as E:
             traceback.print_exc()
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))

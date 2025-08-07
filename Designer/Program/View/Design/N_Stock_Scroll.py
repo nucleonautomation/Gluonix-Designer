@@ -43,7 +43,7 @@ class Stock_Scroll:
                 Root_Type = ID_List[1]
                 Root_Level = ID_List[2]
             Level = Root_Level+1
-            if (Root_Type!='Frame' and Root_Type!='Canvas' and Root_Type!='Scroll'):
+            if (Root_Type!='Frame' and Root_Type!='Canvas' and Root_Type!='Scroll' and Root_Type!='Group'):
                 Widget = self.Stock.Design.Database.Get(f"SELECT * FROM `Widget` WHERE `ID`='{Root_ID}'", Keys=True)
                 if len(Widget)==0:
                     Widget = self.Stock.Design.Database.Get(f"SELECT * FROM `Item` WHERE `ID`='{Root_ID}'", Keys=True)

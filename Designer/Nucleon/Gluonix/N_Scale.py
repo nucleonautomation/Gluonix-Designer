@@ -223,6 +223,18 @@ class Scale:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Config -> {E}")
             
+    def Move(self, Left=None, Top=None):
+        try:
+            if Left is not None:
+                self._Left += Left
+            if Top is not None:
+                self._Top += Top
+            if Left is not None or Top is not None:
+                self.Position(Left=self._Left, Top=self._Top)
+            return True
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Move -> {E}")
+            
     def Position(self, Left=None, Top=None):
         try:
             if Left is not None:
@@ -305,9 +317,7 @@ class Scale:
                 Maximum = self._Minimum
                 Width = self._Width_Current
             self._Widget.config(bg=self._Foreground, troughcolor=self._Background, state=State, width=Width, from_=Minimum, to=Maximum, resolution=self._Increment, orient=Direction, showvalue=False, bd=0, highlightthickness=0, relief=TK.FLAT)
-            if self._Size_Update:
-                self._Size_Update = False
-                self.Resize()
+            self.Resize()
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
                     if self._Last_Name in self._Main.__dict__:
@@ -359,7 +369,7 @@ class Scale:
             
     def Relocate(self, Direct=False):
         try:
-            if self._Resizable:
+            if Direct or self._Resizable:
                 self.Adjustment()
                 if Direct or (self._Resize and self._Resize_Width):
                     self._Width_Current = self._Width + self._Width_Adjustment

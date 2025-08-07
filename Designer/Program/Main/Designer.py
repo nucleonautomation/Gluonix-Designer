@@ -32,7 +32,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 # -------------------------------------------------------------------------------------------------------------------------------
 Title = "Gluonix Designer - Nucleon Automation"
 Version = 5
-Revision = 0
+Revision = 1
 Error_List = []
 Error_Display = True
 Error_Log = True
@@ -160,6 +160,20 @@ def StartUp():
             Main.Home.Panel.Overview.Project_Path = Project_Path
             Main.Home.Panel.Overview.Runtime = True if Autoload=='Runtime' else False
             Main.Home.Panel.Overview.Update()
+        try:
+            Current_Version = float(f"{Version}.{Revision}")
+            Latest_Version = Current_Version
+            Response = requests.get(f"https://pypi.org/pypi/GluonixDesigner/json", timeout=2)
+            if Response.status_code == 200:
+                Latest_Version = float(Response.json()["info"]["version"])
+            if Latest_Version>Current_Version:
+                Main.Home.Project.New_Label.Set(f"Update Available V({Latest_Version})")
+                Main.Home.Project.New_Label.Show()
+                GUI.Config(Title=f"{Title} - Update Available V({Latest_Version})")
+            else:
+                Main.Home.Project.New_Label.Hide()
+        except:
+            pass
         Loading.Hide()
     except Exception as E:
         Error("StartUp -> " + str(E))

@@ -143,12 +143,16 @@ class Compound:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Set -> {E}")
             
+    def Get(self):
+        try:
+            return self._Value
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Get -> {E}")
+            
     def Refresh(self):
         try:
             self.Open()
-            if self._Size_Update:
-                self._Size_Update = False
-                self.Relocate()
+            self.Relocate()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Refresh -> {E}")
             
@@ -238,6 +242,18 @@ class Compound:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Config -> {E}")
             
+    def Move(self, Left=None, Top=None):
+        try:
+            if Left is not None:
+                self._Left += Left
+            if Top is not None:
+                self._Top += Top
+            if Left is not None or Top is not None:
+                self.Position(Left=self._Left, Top=self._Top)
+            return True
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Move -> {E}")
+            
     def Position(self, Left=None, Top=None):
         try:
             if Left is not None:
@@ -311,9 +327,7 @@ class Compound:
             if self._Path!=self._Path_Memory:
                 self._Path_Memory = self._Path
                 self.Open()
-            if self._Size_Update:
-                self._Size_Update = False
-                self.Resize()
+            self.Resize()
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
                     if self._Last_Name in self._Main.__dict__:
@@ -444,7 +458,7 @@ class Compound:
             
     def Relocate(self, Direct=False):
         try:
-            if self._Resizable:
+            if Direct or self._Resizable:
                 self.Adjustment()
                 if Direct or (self._Resize and self._Resize_Width):
                     self._Width_Current = self._Width + self._Width_Adjustment
@@ -613,12 +627,16 @@ class Compound_Lite:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Set -> {E}")
             
+    def Get(self):
+        try:
+            return self._Value
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Get -> {E}")
+            
     def Refresh(self):
         try:
             self.Open()
-            if self._Size_Update:
-                self._Size_Update = False
-                self.Relocate()
+            self.Relocate()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Refresh -> {E}")
             
@@ -701,6 +719,18 @@ class Compound_Lite:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Config -> {E}")
             
+    def Move(self, Left=None, Top=None):
+        try:
+            if Left is not None:
+                self._Left += Left
+            if Top is not None:
+                self._Top += Top
+            if Left is not None or Top is not None:
+                self.Position(Left=self._Left, Top=self._Top)
+            return True
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Move -> {E}")
+            
     def Position(self, Left=None, Top=None):
         try:
             if Left is not None:
@@ -771,9 +801,7 @@ class Compound_Lite:
             if self._Path!=self._Path_Memory:
                 self._Path_Memory = self._Path
                 self.Open()
-            if self._Size_Update:
-                self._Size_Update = False
-                self.Resize()
+            self.Resize()
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
                     if self._Last_Name in self._Main.__dict__:
@@ -904,7 +932,7 @@ class Compound_Lite:
             
     def Relocate(self, Direct=False):
         try:
-            if self._Resizable:
+            if Direct or self._Resizable:
                 self.Adjustment()
                 if Direct or (self._Resize and self._Resize_Width):
                     self._Width_Current = self._Width + self._Width_Adjustment

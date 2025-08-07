@@ -181,6 +181,18 @@ class Check:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Config -> {E}")
             
+    def Move(self, Left=None, Top=None):
+        try:
+            if Left is not None:
+                self._Left += Left
+            if Top is not None:
+                self._Top += Top
+            if Left is not None or Top is not None:
+                self.Position(Left=self._Left, Top=self._Top)
+            return True
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Move -> {E}")
+            
     def Position(self, Left=None, Top=None):
         try:
             if Left is not None:
@@ -251,9 +263,7 @@ class Check:
                 self._Main._Widget.append(self)
                 self._Initialized = True
             self._Frame.Set(Path=self._Image[self._Check])
-            if self._Size_Update:
-                self._Size_Update = False
-                self.Resize()
+            self.Resize()
             if self._Display:
                 self.Display()
             if self._Name!=self._Last_Name:

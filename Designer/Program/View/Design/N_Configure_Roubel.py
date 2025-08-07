@@ -517,13 +517,13 @@ class Configure_Roubel:
     def Update_Name(self):
         try:
             Name = self.Name_Entry.Get()
-            TempName = self.Configure.Design.Database.Get(f"SELECT * FROM `Widget` WHERE (`ID`!='{self.ID}' AND `Root`=='{self.Root_ID}' AND `Name`='{Name}')")
+            TempName = self.Configure.Design.Database.Get(f"SELECT * FROM `Widget` WHERE (`ID`!='{self.ID}' AND `Root`='{self.Root_ID}' AND `Name`='{Name}')")
             if self.Global['Custom'].Valid_Variable(Name) and len(TempName)==0:
                 self.Configure.Design.Database.Post(f"UPDATE `Widget` SET `Name`='{Name}' WHERE `ID`='{self.ID}'")
                 self.Configure.Design.Element.Tree.Edit(Name=f'  {Name}')
                 self.Name_Entry.Config(Border_Color='#000000', Border_Size=1)
             else:
-                self.Name_Entry.Config(Border_Color='red', Border_Size=2)
+                self.Name_Entry.Config(Border_Color='red', Border_Size=1)
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             
@@ -571,7 +571,7 @@ class Configure_Roubel:
                 if self.Element:
                     self.Element.Config(Radius=Radius)
             else:
-                self.Radius_Entry.Config(Border_Color='red', Border_Size=2)
+                self.Radius_Entry.Config(Border_Color='red', Border_Size=1)
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             
@@ -594,7 +594,7 @@ class Configure_Roubel:
                 if self.Element:
                     self.Element.Config(Border_Size=Border_Size)
             else:
-                self.Border_Size_Entry.Config(Border_Color='red', Border_Size=2)
+                self.Border_Size_Entry.Config(Border_Color='red', Border_Size=1)
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             
@@ -639,7 +639,7 @@ class Configure_Roubel:
                         Fixture = [Width, 0, 0, 0]
                     self.Element.Config(Width=Fixture[0])
             else:
-                self.Width_Entry.Config(Border_Color='red', Border_Size=2)
+                self.Width_Entry.Config(Border_Color='red', Border_Size=1)
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             
@@ -657,7 +657,7 @@ class Configure_Roubel:
                         Fixture = [0, Height, 0, 0]
                     self.Element.Config(Height=Fixture[1])
             else:
-                self.Height_Entry.Config(Border_Color='red', Border_Size=2)
+                self.Height_Entry.Config(Border_Color='red', Border_Size=1)
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             
@@ -675,7 +675,7 @@ class Configure_Roubel:
                         Fixture = [0, 0, Left, 0]
                     self.Element.Config(Left=Fixture[2])
             else:
-                self.Left_Entry.Config(Border_Color='red', Border_Size=2)
+                self.Left_Entry.Config(Border_Color='red', Border_Size=1)
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             
@@ -693,7 +693,7 @@ class Configure_Roubel:
                         Fixture = [0, 0, 0, Top]
                     self.Element.Config(Top=Fixture[3])
             else:
-                self.Top_Entry.Config(Border_Color='red', Border_Size=2)
+                self.Top_Entry.Config(Border_Color='red', Border_Size=1)
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             
@@ -714,7 +714,7 @@ class Configure_Roubel:
                 if self.Element:
                     self.Element.Config(Shadow_Size=Shadow)
             else:
-                self.Shadow_Entry.Config(Border_Color='red', Border_Size=2)
+                self.Shadow_Entry.Config(Border_Color='red', Border_Size=1)
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             
@@ -798,7 +798,7 @@ class Configure_Roubel:
                 if self.Element:
                     self.Element.Config(Font_Size=Font_Size)
             else:
-                self.Font_Size_Entry.Config(Border_Color='red', Border_Size=2)
+                self.Font_Size_Entry.Config(Border_Color='red', Border_Size=1)
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             

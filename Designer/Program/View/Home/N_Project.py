@@ -83,11 +83,18 @@ class Project:
             
                 #Version
                     #Current
-            Fixture = self.Frame.Locate(17, 4, 10, 90)
+            Fixture = self.Frame.Locate(17, 3, 10, 90)
             self.Current_Label = self.Global['Gluonix'].Label(self.Frame)
             self.Current_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Current_Label.Config(Foreground='black', Value=f"V {self.Global['Version']}.{self.Global['Revision']}", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
             self.Current_Label.Create()
+            
+                    #New
+            Fixture = self.Frame.Locate(60, 3, 10, 93)
+            self.New_Label = self.Global['Gluonix'].Label(self.Frame)
+            self.New_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.New_Label.Config(Foreground='red', Value="", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0, Display=False)
+            self.New_Label.Create()
             
             #Create New Project
             self.New = New(self.Global, self)

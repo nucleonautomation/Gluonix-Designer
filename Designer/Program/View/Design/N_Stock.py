@@ -6,6 +6,7 @@ import inspect
 
 #Program
 from .N_Stock_Frame import Stock_Frame
+from .N_Stock_Group import Stock_Group
 from .N_Stock_Canvas import Stock_Canvas
 from .N_Stock_Scroll import Stock_Scroll
 from .N_Stock_Label import Stock_Label
@@ -109,6 +110,10 @@ class Stock:
             
             #Stock Scroll
             self.Stock_Scroll = Stock_Scroll(self.Global, self, self.Right, self.Top)
+            
+            #Stock Group
+            self.Top += 6
+            self.Stock_Group = Stock_Group(self.Global, self, self.Left, self.Top)
             
             # Widget
             

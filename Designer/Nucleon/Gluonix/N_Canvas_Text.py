@@ -34,14 +34,25 @@ class Canvas_Text:
         try:
             if not Main:
                 Main = self._Canvas
-            Instance = type(self)(Main)
-            for Key in self._Config:
-                if hasattr(self, "_"+Key):
-                    setattr(Instance, "_"+Key, getattr(self, "_"+Key))
-            if Name:
-                setattr(Instance, "_Name", Name)
-            Instance.Relocate()
-            return Instance
+            if Main._Type in ['Canvas', 'Scroll', 'Group']:
+                Temp_Main = Main
+                Temp_Type = Temp_Main._Type
+                while Temp_Type=='Group':
+                    Temp_Main = Main._Main
+                    Temp_Type = Temp_Main._Type
+                if Temp_Type=='Canvas' or Temp_Type=='Scroll':
+                    Instance = type(self)(Main)
+                    for Key in self._Config:
+                        if hasattr(self, "_"+Key):
+                            setattr(Instance, "_"+Key, getattr(self, "_"+Key))
+                    if Name:
+                        setattr(Instance, "_Name", Name)
+                    Instance.Create()
+                    return Instance
+                else:
+                    raise Exception('Widget can only copy to Canvas/Scroll')
+            else:
+                raise Exception('Widget can only copy to Canvas/Scroll')
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Copy -> {E}")
 
@@ -89,6 +100,12 @@ class Canvas_Text:
             self._Canvas._Frame.itemconfig(self._Widget, text=self._Value)
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Set -> {E}")
+    
+    def Get(self, Value):
+        try:
+            return self._Value
+        except Exception as E:
+            self._Canvas._GUI.Error(f"{self._Type} -> Get -> {E}")
         
     def Bind(self, **Input):
         try:
@@ -123,6 +140,18 @@ class Canvas_Text:
                 self.Relocate()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Config -> {E}")
+            
+    def Move(self, Left=None, Top=None):
+        try:
+            if Left is not None:
+                self._Left += Left
+            if Top is not None:
+                self._Top += Top
+            if Left is not None or Top is not None:
+                self.Position(Left=self._Left, Top=self._Top)
+            return True
+        except Exception as E:
+            self._Canvas._GUI.Error(f"{self._Type} -> Move -> {E}")
         
     def Position(self, Left=None, Top=None):
         try:
@@ -136,7 +165,7 @@ class Canvas_Text:
             X1, Y1, X2, Y2 = Box
             return [X1, Y1]
         except Exception as E:
-            self.Error(f"{self._Type} -> Position -> {E}")
+            self._Canvas._GUI.Error(f"{self._Type} -> Position -> {E}")
             
     def Size(self, Width=False, Height=False):
         try:
@@ -152,7 +181,7 @@ class Canvas_Text:
             Height = Y2 - Y1
             return [Width, Height]
         except Exception as E:
-            self.Error(f"{self._Type} -> Size -> {E}")
+            self._Canvas._GUI.Error(f"{self._Type} -> Size -> {E}")
             
     def Stripple(self):
         try:
@@ -203,6 +232,7 @@ class Canvas_Text:
                 self._Y_Current = self._Top
                 self._Width_Current = self._Width
             if self._Resize_Font:
+                self.Adjustment()
                 if self._Width_Ratio < self._Height_Ratio:
                     self._Size_Current = math.floor(self._Size * self._Width_Ratio)
                 else:

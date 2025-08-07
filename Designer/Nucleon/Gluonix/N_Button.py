@@ -136,6 +136,12 @@ class Button:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Set -> {E}")
             
+    def Get(self):
+        try:
+            return self._Value
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Get -> {E}")
+            
     def Widget(self):
         try:
             return self._Widget
@@ -222,6 +228,18 @@ class Button:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Config -> {E}")
             
+    def Move(self, Left=None, Top=None):
+        try:
+            if Left is not None:
+                self._Left += Left
+            if Top is not None:
+                self._Top += Top
+            if Left is not None or Top is not None:
+                self.Position(Left=self._Left, Top=self._Top)
+            return True
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Move -> {E}")
+            
     def Position(self, Left=None, Top=None):
         try:
             if Left is not None:
@@ -301,9 +319,7 @@ class Button:
             self._Font = TK.font.Font(family=self._Font_Family, size=self._Font_Size_Current, weight=self._Font_Weight)
             self._Widget.config(background=self._Background, foreground=self._Foreground, font=self._Font, text=self._Value, wraplength=self._Width_Current-(self._Border_Size*2), state=State, relief=Relief)
             self._Widget.config(disabledforeground=self._Disable_Foreground, activebackground=self._Active_Background, activeforeground=self._Active_Foreground)
-            if self._Size_Update:
-                self._Size_Update = False
-                self.Resize()
+            self.Resize()
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
                     if self._Last_Name in self._Main.__dict__:
@@ -369,7 +385,7 @@ class Button:
             
     def Relocate(self, Direct=False):
         try:
-            if self._Resizable:
+            if Direct or self._Resizable:
                 self.Adjustment()
                 if Direct or (self._Resize and self._Resize_Width):
                     self._Width_Current = self._Width + self._Width_Adjustment
@@ -520,6 +536,12 @@ class Button_Lite:
                 self._Widget.config(text=self._Value)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Set -> {E}")
+            
+    def Get(self):
+        try:
+            return self._Value
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Get -> {E}")
     
     def Grab(self, Path=False):
         try:
@@ -605,6 +627,18 @@ class Button_Lite:
                 self._Background_Main = not bool(Input["Background"])
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Config -> {E}")
+            
+    def Move(self, Left=None, Top=None):
+        try:
+            if Left is not None:
+                self._Left += Left
+            if Top is not None:
+                self._Top += Top
+            if Left is not None or Top is not None:
+                self.Position(Left=self._Left, Top=self._Top)
+            return True
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Move -> {E}")
             
     def Position(self, Left=None, Top=None):
         try:
@@ -695,9 +729,7 @@ class Button_Lite:
             self._Font = TK.font.Font(family=self._Font_Family, size=self._Font_Size_Current, weight=self._Font_Weight)
             self._Widget.config(background=self._Background, foreground=self._Foreground, font=self._Font, text=self._Value, wraplength=self._Width_Current, state=State, relief=Relief)
             self._Widget.config(disabledforeground=self._Disable_Foreground, activebackground=self._Active_Background, activeforeground=self._Active_Foreground)
-            if self._Size_Update:
-                self._Size_Update = False
-                self.Resize()
+            self.Resize()
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
                     if self._Last_Name in self._Main.__dict__:
@@ -763,7 +795,7 @@ class Button_Lite:
             
     def Relocate(self, Direct=False):
         try:
-            if self._Resizable:
+            if Direct or self._Resizable:
                 self.Adjustment()
                 if Direct or (self._Resize and self._Resize_Width):
                     self._Width_Current = self._Width + self._Width_Adjustment

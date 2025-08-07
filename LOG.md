@@ -1,5 +1,12 @@
 # Change Log
 
+## V(5.1)
+- Added New Widget 'Group', Can Add Multiple Items To Group. Group Has Basic Functionality Like, Show/Hide & Move
+- Widgets Bug Fixes
+- Designer Bug Fixes
+- Introduced Get() Function In Label, Button, Compound & Roubel
+- Move() Function Added To All Widgets, Which Moves Widget By Specific Offset
+
 ## V(5.0)
 - Opening Designer In Project Folder Will Autoload Project
 - Designer Bug Fixes

@@ -19,6 +19,7 @@ from tkinter import ttk
 from .N_GUI import GUI
 from .N_Popup import Popup
 from .N_Frame import Frame
+from .N_Group import Group
 from .N_Canvas import Canvas
 from .N_Canvas_Line import Canvas_Line
 from .N_Canvas_Polyline import Canvas_Polyline

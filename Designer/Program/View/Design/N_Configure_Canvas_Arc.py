@@ -286,13 +286,13 @@ class Configure_Canvas_Arc:
     def Update_Name(self):
         try:
             Name = self.Name_Entry.Get()
-            TempName = self.Configure.Design.Database.Get(f"SELECT * FROM `Item` WHERE (`ID`!='{self.ID}' AND `Root`=='{self.Root_ID}' AND `Name`='{Name}')")
+            TempName = self.Configure.Design.Database.Get(f"SELECT * FROM `Item` WHERE (`ID`!='{self.ID}' AND `Root`='{self.Root_ID}' AND `Name`='{Name}')")
             if self.Global['Custom'].Valid_Variable(Name) and len(TempName)==0:
                 self.Configure.Design.Database.Post(f"UPDATE `Item` SET `Name`='{Name}' WHERE `ID`='{self.ID}'")
                 self.Configure.Design.Element.Tree.Edit(Name=f'  {Name}')
                 self.Name_Entry.Config(Border_Color='#000000', Border_Size=1)
             else:
-                self.Name_Entry.Config(Border_Color='red', Border_Size=2)
+                self.Name_Entry.Config(Border_Color='red', Border_Size=1)
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             
@@ -336,7 +336,7 @@ class Configure_Canvas_Arc:
                 if self.Element:
                     self.Element.Config(Thickness=Thickness)
             else:
-                self.Thickness_Entry.Config(Border_Color='red', Border_Size=2)
+                self.Thickness_Entry.Config(Border_Color='red', Border_Size=1)
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             
@@ -350,7 +350,7 @@ class Configure_Canvas_Arc:
                 if self.Element:
                     self.Element.Config(Radius=Radius)
             else:
-                self.Radius_Entry.Config(Border_Color='red', Border_Size=2)
+                self.Radius_Entry.Config(Border_Color='red', Border_Size=1)
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             
@@ -365,7 +365,7 @@ class Configure_Canvas_Arc:
                     Fixture = [0, 0, Left, 0]
                     self.Element.Config(Left=Fixture[2])
             else:
-                self.Left_Entry.Config(Border_Color='red', Border_Size=2)
+                self.Left_Entry.Config(Border_Color='red', Border_Size=1)
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             
@@ -380,7 +380,7 @@ class Configure_Canvas_Arc:
                     Fixture = [0, 0, 0, Top]
                     self.Element.Config(Top=Fixture[3])
             else:
-                self.Top_Entry.Config(Border_Color='red', Border_Size=2)
+                self.Top_Entry.Config(Border_Color='red', Border_Size=1)
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             
@@ -411,7 +411,7 @@ class Configure_Canvas_Arc:
                 self.Start_Entry.Config(Border_Color='#000000', Border_Size=1)
                 self.Element.Config(Start=Start)
             else:
-                self.Start_Entry.Config(Border_Color='red', Border_Size=2)
+                self.Start_Entry.Config(Border_Color='red', Border_Size=1)
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             
@@ -424,6 +424,6 @@ class Configure_Canvas_Arc:
                 self.Extent_Entry.Config(Border_Color='#000000', Border_Size=1)
                 self.Element.Config(Extent=Extent)
             else:
-                self.Extent_Entry.Config(Border_Color='red', Border_Size=2)
+                self.Extent_Entry.Config(Border_Color='red', Border_Size=1)
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))

@@ -112,7 +112,7 @@ class Compare:
         
     def Project_1_File_Select(self):
         try:
-            Project_File_Path = self.Global['GUI'].File(Initial=os.path.join(os.path.expanduser('~'), 'Documents'), Title='Select Project', Default='.ng', Type=[["Nucleon Gluonix (*.ng)", "*.ng"]])
+            Project_File_Path = self.Global['GUI'].File(Initial=os.path.join(os.path.expanduser('~'), 'Documents'), Title='Select Project', Default='.py', Type=[["Python (*.py)", "*.py"], ["Nucleon Gluonix (*.ng)", "*.ng"]])
             if Project_File_Path:
                 self.Project_1_Entry.Set(Project_File_Path)
                 self.Project_1_Update_Path()
@@ -133,7 +133,7 @@ class Compare:
         
     def Project_2_File_Select(self):
         try:
-            Project_File_Path = self.Global['GUI'].File(Initial=os.path.join(os.path.expanduser('~'), 'Documents'), Title='Select Project', Default='.ng', Type=[["Nucleon Gluonix (*.ng)", "*.ng"]])
+            Project_File_Path = self.Global['GUI'].File(Initial=os.path.join(os.path.expanduser('~'), 'Documents'), Title='Select Project', Default='.py', Type=[["Python (*.py)", "*.py"], ["Nucleon Gluonix (*.ng)", "*.ng"]])
             if Project_File_Path:
                 self.Project_2_Entry.Set(Project_File_Path)
                 self.Project_2_Update_Path()
@@ -154,12 +154,16 @@ class Compare:
         
     def Create(self):
         try:
-            Project_1_Path = self.Project_1_Entry.Get()
-            Project_2_Path = self.Project_2_Entry.Get()
+            Project_1_File_Path = self.Project_1_Entry.Get()
+            Project_2_File_Path = self.Project_2_Entry.Get()
             if not self.Error_1 and not self.Error_2:
                 self.Global['Message'].Hide()
-                Project_1_Path = os.path.dirname(Project_1_Path)
-                Project_2_Path = os.path.dirname(Project_2_Path)
+                Project_1_Path = os.path.dirname(Project_1_File_Path)
+                Project_2_Path = os.path.dirname(Project_2_File_Path)
+                if Project_1_File_Path.endswith('.py'):
+                    Project_1_Path = f'{Project_1_Path}/Nucleon'
+                if Project_2_File_Path.endswith('.py'):
+                    Project_2_Path = f'{Project_2_Path}/Nucleon'
                 self.Project.Update_Database(f'{Project_1_Path}/Data/NGD.dll', self.Global['Data']('NGD.dll'))
                 self.Project.Update_Database(f'{Project_2_Path}/Data/NGD.dll', self.Global['Data']('NGD.dll'))
                 self.Project.Home.Main.Compare.Project_1_Path = Project_1_Path
