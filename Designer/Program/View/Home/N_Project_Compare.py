@@ -19,6 +19,7 @@ class Compare:
             self.Frame = self.Global['Gluonix'].Frame(self.Global['GUI'])
             self.Frame.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Frame.Config(Background='white', Border_Size=1, Display=False)
+            self.Frame.Config(Animate_Left=Fixture[2], Animate_Top=-1*(Fixture[1]+Fixture[3]), Animate_Time=0.5)
             self.Frame.Create()
             self.Project.Widget.append(self.Frame)
             

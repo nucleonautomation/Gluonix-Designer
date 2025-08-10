@@ -27,7 +27,6 @@ class Stock_Line:
             self.Label.Create()
             self.Label.Set(Path=self.Global['Image'](self.Type), Value=' Line')
             self.Stock.Widget.append(self.Label)
-            
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             
@@ -64,14 +63,14 @@ class Stock_Line:
             ID_Tree = getattr(self.Stock.Design.Element, ID)
             self.Stock.Design.Element.Tree.Select(ID_Tree)
             self.Stock.Design.Database.Post(f"INSERT INTO `Widget` (`ID`, `Name`, `Type`, `Root`, `Alignment`, `Value`) VALUES ('{ID}', '{Name}', '{self.Type}', '{Root_ID}', '{self.Stock.Design.Alignment}', '{Name}')")
-            self.Create(ID)
+            self.Create(ID, True)
             self.Stock.Design.Configure.Hide_All()
             Configure = getattr(self.Stock.Design.Configure, f'Configure_{self.Type}')
             Configure.Load(ID)
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             
-    def Create(self, ID=False):
+    def Create(self, ID=False, Latest=False):
         try:
             if ID:
                 Widget_Data = self.Stock.Design.Database.Get(f"SELECT * FROM `Widget` WHERE `ID`='{ID}'", Keys=True)
@@ -97,7 +96,27 @@ class Stock_Line:
                         Fixture = [Widget_Data['Width'], Widget_Data['Height'], Widget_Data['Left'], Widget_Data['Top']]
                     Widget = getattr(Root, ID)
                     Widget._ID = ID
-                    Widget.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+                    if Latest:
+                        Root_Width, Root_Height = Root.Size()
+                        Aspect_Ratio = 2.0
+                        Min_W = int(Root_Width * 0.25)
+                        Max_W = int(Root_Width * 0.50)
+                        Min_H = int(Root_Height * 0.25)
+                        Max_H = int(Root_Height * 0.50)
+                        if Aspect_Ratio >= 1.0:
+                            Width = random.randint(Min_W, Max_W)
+                            Height = max(1, int(Width / Aspect_Ratio))
+                            Height = max(Min_H, min(Height, Max_H))
+                        else:
+                            Height = random.randint(Min_H, Max_H)
+                            Width = max(1, int(Height * Aspect_Ratio))
+                            Width = max(Min_W, min(Width, Max_W))
+                        Left = random.randint(0, max(0, Root_Width - Width))
+                        Top = random.randint(0, max(0, Root_Height - Height))
+                        Widget.Config(Width=Width, Height=Height, Left=Left, Top=Top)
+                        self.Stock.Design.Database.Post(f"UPDATE `Widget` SET `Width`='{Width}', `Height`='{Height}', `Left`='{Left}', `Top`='{Top}' WHERE `ID`='{ID}'")
+                    else:
+                        Widget.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
                     if Widget_Data['Background']=='False':
                         Widget.Config(Background=False)
                     else:
@@ -114,6 +133,12 @@ class Stock_Line:
                     Widget.Config(Orient=Widget_Data['Orient'], Ridge=Widget_Data['Ridge'], Height_List=Widget_Data['Height_List'])
                     Widget.Lock = bool(Widget_Data['Lock'])
                     Widget.Create()
+                    if Latest:
+                        Widget.Hide()
+                        Widget.Config(Animate_Left=-1*(Left+Width), Animate_Top=-1*(Top+Height), Animate_Time=0.5)
+                        Widget.Animate()
+                        Configure = getattr(self.Stock.Design.Configure, f'Configure_{self.Type}')
+                        Configure.Movement_Update()
                     self.Stock.Design.Element.Intractive(Widget)
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))

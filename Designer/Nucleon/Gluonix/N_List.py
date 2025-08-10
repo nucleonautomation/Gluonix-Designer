@@ -131,6 +131,20 @@ class List:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Grab -> {E}")
             
+    def Animate(self):
+        try:
+            self._Frame.Animate(Widget=self._Widget)
+            self.Show()
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Animate -> {E}")
+            self.Animate_Cancel()
+            
+    def Animate_Cancel(self):
+        try:
+            self._Frame.Animate_Cancel()
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Animate_Cancel -> {E}")
+            
     def Top(self):
         try:
             self._Widget.yview_moveto(0)
@@ -321,7 +335,7 @@ class List:
             if Top is not None:
                 self._Top = Top
             if Left is not None or Top is not None:
-                self._Frame.Position(Left=Left, Top=Top)
+                self._Frame.Position(Left=self._Left, Top=self._Top)
                 self.Relocate()
             return self._Frame.Position()
         except Exception as E:
@@ -334,7 +348,7 @@ class List:
             if Height:
                 self._Height = Height
             if Width or Height:
-                self._Frame.Size(Width=Width, Height=Height)
+                self._Frame.Size(Width=self._Width, Height=self._Height)
                 self.Relocate()
             return self._Frame.Size()
         except Exception as E:

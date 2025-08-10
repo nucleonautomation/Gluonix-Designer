@@ -27,7 +27,6 @@ class Stock_Frame:
             self.Label.Create()
             self.Label.Set(Path=self.Global['Image'](self.Type), Value=' Frame')
             self.Stock.Widget.append(self.Label)
-            
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             
@@ -64,14 +63,14 @@ class Stock_Frame:
             ID_Tree = getattr(self.Stock.Design.Element, ID)
             self.Stock.Design.Element.Tree.Select(ID_Tree)
             self.Stock.Design.Database.Post(f"INSERT INTO `Frame` (`ID`, `Name`, `Type`, `Level`, `Root`, `Alignment`) VALUES ('{ID}', '{Name}', '{self.Type}', '{Level}', '{Root_ID}', '{self.Stock.Design.Alignment}')")
-            self.Create(ID)
+            self.Create(ID, True)
             self.Stock.Design.Configure.Hide_All()
             Configure = getattr(self.Stock.Design.Configure, f'Configure_{self.Type}')
             Configure.Load(ID)
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             
-    def Create(self, ID=False):
+    def Create(self, ID=False, Latest=False):
         try:
             if ID:
                 Frame_Data = self.Stock.Design.Database.Get(f"SELECT * FROM `Frame` WHERE `ID`='{ID}'", Keys=True)
@@ -97,7 +96,27 @@ class Stock_Frame:
                         Fixture = [Frame_Data['Width'], Frame_Data['Height'], Frame_Data['Left'], Frame_Data['Top']]
                     Frame = getattr(Root, ID)
                     Frame._ID = ID
-                    Frame.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+                    if Latest:
+                        Root_Width, Root_Height = Root.Size()
+                        Aspect_Ratio = 2.0
+                        Min_W = int(Root_Width * 0.25)
+                        Max_W = int(Root_Width * 0.50)
+                        Min_H = int(Root_Height * 0.25)
+                        Max_H = int(Root_Height * 0.50)
+                        if Aspect_Ratio >= 1.0:
+                            Width = random.randint(Min_W, Max_W)
+                            Height = max(1, int(Width / Aspect_Ratio))
+                            Height = max(Min_H, min(Height, Max_H))
+                        else:
+                            Height = random.randint(Min_H, Max_H)
+                            Width = max(1, int(Height * Aspect_Ratio))
+                            Width = max(Min_W, min(Width, Max_W))
+                        Left = random.randint(0, max(0, Root_Width - Width))
+                        Top = random.randint(0, max(0, Root_Height - Height))
+                        Frame.Config(Width=Width, Height=Height, Left=Left, Top=Top)
+                        self.Stock.Design.Database.Post(f"UPDATE `Frame` SET `Width`='{Width}', `Height`='{Height}', `Left`='{Left}', `Top`='{Top}' WHERE `ID`='{ID}'")
+                    else:
+                        Frame.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
                     if Frame_Data['Background']=='False':
                         Frame.Config(Background=False)
                     else:
@@ -108,6 +127,12 @@ class Stock_Frame:
                     Frame.Config(Move_Left=bool(Frame_Data['Move_Left']), Move_Top=bool(Frame_Data['Move_Top']))
                     Frame.Lock = bool(Frame_Data['Lock'])
                     Frame.Create()
+                    if Latest:
+                        Frame.Hide()
+                        Frame.Config(Animate_Left=-1*(Left+Width), Animate_Top=-1*(Top+Height), Animate_Time=0.5)
+                        Frame.Animate()
+                        Configure = getattr(self.Stock.Design.Configure, f'Configure_{self.Type}')
+                        Configure.Movement_Update()
                     self.Stock.Design.Element.Intractive(Frame)
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))

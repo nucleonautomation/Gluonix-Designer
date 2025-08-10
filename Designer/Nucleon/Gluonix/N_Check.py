@@ -3,7 +3,7 @@ import io
 import base64
 from PIL import Image as PIL_Image
 from .N_GUI import GUI
-from .N_Image import Image
+from .N_Image import Image_Lite
 from .N_Custom import Event_Bind
 
 def Create_Image(Image_Data):
@@ -35,14 +35,14 @@ class Check:
                 self._Size_Update = False
                 self._Resize_Index = 0
                 self._Main = Main
-                self._Frame = Image(self._Main)
+                self._Frame = Image_Lite(self._Main)
                 self._Frame.Config(Convert_Type='RGBA')
-                self._Border_Color = '#000000'
-                self._Border_Size = 0
                 self._Background = self._Main._Background
-                self._Auto_Dark = True
                 self._Background_Main = True
+                self._Auto_Dark = True
                 self._Check = False
+                self._On_Change = False
+                self._Resizable = self._Main._Resizable
                 self._On_Change = False
                 self._On_Show = False
                 self._On_Hide = False
@@ -111,6 +111,20 @@ class Check:
             return self._GUI.Grab_Widget(Path=Path, Widget=self)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Grab -> {E}")
+            
+    def Animate(self):
+        try:
+            self._Frame.Animate()
+            self.Show()
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Animate -> {E}")
+            self.Animate_Cancel()
+            
+    def Animate_Cancel(self):
+        try:
+            self._Frame.Animate_Cancel()
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Animate_Cancel -> {E}")
             
     def Get(self):
         try:
@@ -200,7 +214,7 @@ class Check:
             if Top is not None:
                 self._Top = Top
             if Left is not None or Top is not None:
-                self._Frame.Position(Left=Left, Top=Top)
+                self._Frame.Position(Left=self._Left, Top=self._Top)
                 self.Relocate()
             return self._Frame.Position()
         except Exception as E:
@@ -213,7 +227,7 @@ class Check:
             if Height:
                 self._Height = Height
             if Width or Height:
-                self._Frame.Size(Width=Width, Height=Height)
+                self._Frame.Size(Width=self._Width, Height=self._Height)
                 self.Relocate()
             return self._Frame.Size()
         except Exception as E:
@@ -253,7 +267,7 @@ class Check:
                 self.Update_Color()
                 self._Width_Current, self._Height_Current, self._Left_Current, self._Top_Current, = self._Width, self._Height, self._Left, self._Top
                 self._Frame.Config(Width=self._Width_Current, Height=self._Height_Current, Left=self._Left_Current, Top=self._Top_Current)
-                self._Frame.Config(Background=self._Background, Border_Size=self._Border_Size, Border_Color=self._Border_Color)
+                self._Frame.Config(Background=self._Background)
                 self._Frame.Config(Transparent=True, Use_Foreground=True)
                 self._Frame.Bind(On_Click=lambda E: self.Set_On_Click())
                 self._Frame.Create()

@@ -171,6 +171,7 @@ def Load_Child(Parent, Root, Global):
             Temp_Item.Config(Thickness=Item['Thickness'], Fill=Item['Fill'], Outline=Item['Outline'])
             Temp_Item.Config(Justify=Item['Justify'], Anchor=Item['Anchor'])
             Temp_Item.Config(Resize=bool(Item['Resize']), Move=bool(Item['Move']))
+            Temp_Item.Config(Angle=Item['Angle'])
             Temp_Item.Config(Url=bool(Item['Url']), Array=bool(Item['Array']), Pil=bool(Item['Pil']), Transparent=bool(Item['Transparent']), Rotate=Item['Rotate'], Aspect_Ratio=bool(Item['Aspect_Ratio']))
             Temp_Item.Config(Path=File(Item['ID']))
             Temp_Item.Create()

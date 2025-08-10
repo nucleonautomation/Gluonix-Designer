@@ -28,7 +28,7 @@ from .N_Canvas_Arc import Canvas_Arc
 from .N_Canvas_Circle import Canvas_Circle
 from .N_Canvas_Oval import Canvas_Oval
 from .N_Canvas_Rectangle import Canvas_Rectangle
-from .N_Canvas_Rectangle2 import Canvas_Rectangle2
+from .N_Canvas_RectangleR import Canvas_RectangleR
 from .N_Canvas_Polygon import Canvas_Polygon
 from .N_Canvas_Image import Canvas_Image
 from .N_Canvas_Text import Canvas_Text
@@ -40,6 +40,7 @@ from .N_Roubel import Roubel
 from .N_Button import Button
 from .N_Button import Button_Lite
 from .N_Entry import Entry
+from .N_Entry import Entry_Lite
 from .N_Line import Line
 from .N_Text import Text
 from .N_Tree import Tree

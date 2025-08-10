@@ -1,9 +1,4 @@
 # IMPORT LIBRARIES
-import math
-import os
-from io import BytesIO
-from requests import get as requests_get
-from PIL import Image as PIL_Image, ImageTk as PIL_ImageTk
 import tkinter as TK
 from .N_GUI import GUI
 from .N_Frame import Frame
@@ -16,7 +11,7 @@ from .N_Canvas_Arc import Canvas_Arc
 from .N_Canvas_Circle import Canvas_Circle
 from .N_Canvas_Oval import Canvas_Oval
 from .N_Canvas_Rectangle import Canvas_Rectangle
-from .N_Canvas_Rectangle2 import Canvas_Rectangle2
+from .N_Canvas_RectangleR import Canvas_RectangleR
 from .N_Canvas_Polygon import Canvas_Polygon
 from .N_Canvas_Image import Canvas_Image
 from .N_Canvas_Text import Canvas_Text
@@ -143,6 +138,33 @@ class Scroll:
             self._Display = True
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Display -> {E}")
+            
+    def Animate(self):
+        try:
+            self._Frame_Canvas.Animate()
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Animate -> {E}")
+            self.Animate_Cancel()
+            
+    def Animate_Cancel(self):
+        try:
+            self._Frame_Canvas.Animate_Cancel()
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Animate_Cancel -> {E}")
+            
+    def Animate_From(self, Left, Top, Time=None, Speed=None, Ease=None):
+        try:
+            if Time is not None: self._Animate_Time = Time
+            if Speed is not None: self._Animate_Speed = Speed
+            if Ease  is not None: self._Animate_Ease = Ease
+            self._Animate_Left, self._Animate_Top = Left, Top
+            if Time is not None: self._Frame_Canvas._Animate_Time = Time
+            if Speed is not None: self._Frame_Canvas._Animate_Speed = Speed
+            if Ease  is not None: self._Frame_Canvas._Animate_Ease = Ease
+            self._Frame_Canvas._Animate_Left, self._Frame_Canvas._Animate_Top = Left, Top
+            self._Frame_Canvas.Animate()
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Animate_From -> {E}")
     
     def Grab(self, Path=False):
         try:
@@ -236,6 +258,8 @@ class Scroll:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Config -> {E}")
             
+
+            
     def Move(self, Left=None, Top=None):
         try:
             if Left is not None:
@@ -255,8 +279,8 @@ class Scroll:
             if Top is not None:
                 self._Top = Top
             if Left is not None or Top is not None:
-                self.Resize()
-            return self._Frame_Canvas.Position(Left, Top)
+                self.Config(Left=self._Left, Top=self._Top)
+            return self._Frame_Canvas.Position()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Position -> {E}")
             
@@ -267,8 +291,8 @@ class Scroll:
             if Height:
                 self._Height = Height
             if Width or Height:
-                self.Resize()
-            return self._Frame_Canvas.Size(Width, Height)
+                self.Config(Width=self._Width, Height=self._Height)
+            return self._Frame_Canvas.Size()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Size -> {E}")
         
@@ -528,68 +552,101 @@ class Scroll:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Find_Overlap -> {E}")
             
-    def Line(self):
+    def Line(self, Name=False):
         try:
-            return Canvas_Line(self)
+            Item = Canvas_Line(self)
+            if Name:
+                Item.Config(Name=Name)
+            return Item
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Line -> {E}")
             
-    def Polyline(self):
+    def Polyline(self, Name=False):
         try:
-            return Canvas_Polyline(self)
+            Item = Canvas_Polyline(self)
+            if Name:
+                Item.Config(Name=Name)
+            return Item
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Polyline -> {E}")
                 
-    def Pie(self):
+    def Pie(self, Name=False):
         try:
-            return Canvas_Pie(self)
+            Item = Canvas_Pie(self)
+            if Name:
+                Item.Config(Name=Name)
+            return Item
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Pie -> {E}")
                 
-    def Arc(self):
+    def Arc(self, Name=False):
         try:
-            return Canvas_Arc(self)
+            Item = Canvas_Arc(self)
+            if Name:
+                Item.Config(Name=Name)
+            return Item
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Arc -> {E}")
                 
-    def Circle(self):
+    def Circle(self, Name=False):
         try:
-            return Canvas_Circle(self)
+            Item = Canvas_Circle(self)
+            if Name:
+                Item.Config(Name=Name)
+            return Item
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Circle -> {E}")
                 
-    def Oval(self):
+    def Oval(self, Name=False):
         try:
-            return Canvas_Oval(self)
+            Item = Canvas_Oval(self)
+            if Name:
+                Item.Config(Name=Name)
+            return Item
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Oval -> {E}")
             
-    def Polygon(self):
+    def Polygon(self, Name=False):
         try:
-            return Canvas_Polygon(self)
+            Item = Canvas_Polygon(self)
+            if Name:
+                Item.Config(Name=Name)
+            return Item
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Polygon -> {E}")
                 
-    def Rectangle(self):
+    def Rectangle(self, Name=False):
         try:
-            return Canvas_Rectangle(self)
+            Item = Canvas_Rectangle(self)
+            if Name:
+                Item.Config(Name=Name)
+            return Item
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Rectangle -> {E}")
                 
-    def Rectangle2(self):
+    def RectangleR(self, Name=False):
         try:
-            return Canvas_Rectangle2(self)
+            Item = Canvas_RectangleR(self)
+            if Name:
+                Item.Config(Name=Name)
+            return Item
         except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Rectangle2 -> {E}")
+            self._GUI.Error(f"{self._Type} -> RectangleR -> {E}")
                 
-    def Image(self):
+    def Image(self, Name=False):
         try:
-            return Canvas_Image(self)
+            Item = Canvas_Image(self)
+            if Name:
+                Item.Config(Name=Name)
+            return Item
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Image -> {E}")
             
-    def Text(self):
+    def Text(self, Name=False):
         try:
-            return Canvas_Text(self)
+            Item = Canvas_Text(self)
+            if Name:
+                Item.Config(Name=Name)
+            return Item
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Text -> {E}")

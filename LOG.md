@@ -1,5 +1,18 @@
 # Change Log
 
+## V(5.2)
+- Animation Added To Widgets, All Widgets Support Predefined Starting Animate_Left, Animate_Top, Animate_Height, Animate_Width, Animate_Time, And Animate() To Trigger Animation
+- Canvas Items Pie, Circle, Arc Use Animate_Radius Instead Of Animate_Height, Animate_Width
+- Animate_Time Variable (In Seconds, e.g., 0.5) Defines Total Duration Of Widget Animation, Controls Speed From Slow To Fast
+- New Example Added For Animation Setup
+- RectangleR Added To Designer Items, With Extra Options For Angle And Radius
+- Entry Added To Lite Widgets
+- Foreground Option To Switch
+- Switch, Check & Radio Changed To Non-Border Widgets
+- Canvas Item Name Increment Bug Fix
+- Widgets Bug Fixes
+- Designer Bug Fixes
+
 ## V(5.1)
 - Added New Widget 'Group', Can Add Multiple Items To Group. Group Has Basic Functionality Like, Show/Hide & Move
 - Widgets Bug Fixes

@@ -1,10 +1,6 @@
 # IMPORT LIBRARIES
-import math
-import os
-from io import BytesIO
-from requests import get as requests_get
-from PIL import Image as PIL_Image, ImageTk as PIL_ImageTk
 import tkinter as TK
+import threading, math, time
 from .N_GUI import GUI
 from .N_Custom import Event_Bind
 from .N_Custom import Event_Bind_Canvas
@@ -15,7 +11,7 @@ from .N_Canvas_Arc import Canvas_Arc
 from .N_Canvas_Circle import Canvas_Circle
 from .N_Canvas_Oval import Canvas_Oval
 from .N_Canvas_Rectangle import Canvas_Rectangle
-from .N_Canvas_Rectangle2 import Canvas_Rectangle2
+from .N_Canvas_RectangleR import Canvas_RectangleR
 from .N_Canvas_Polygon import Canvas_Polygon
 from .N_Canvas_Image import Canvas_Image
 from .N_Canvas_Text import Canvas_Text
@@ -32,7 +28,7 @@ class Canvas:
                     del TK.Canvas.tkraise, TK.Canvas.lift
                 except Exception:
                     self.Nothing = False
-                self._Config = ['Name', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Border_Color', 'Light_Border_Color', 'Dark_Border_Color', 'Border_Size', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Radius', 'Shadow_Size', 'Shadow_Color', 'Light_Shadow_Color', 'Dark_Shadow_Color', 'Shadow_Full', 'Hover_Background', 'Light_Hover_Background', 'Dark_Hover_Background', 'Hover_Border_Color', 'Light_Hover_Border_Color', 'Dark_Hover_Border_Color', 'Hover_Shadow_Color', 'Light_Hover_Shadow_Color', 'Dark_Hover_Shadow_Color']
+                self._Config = ['Name', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Border_Color', 'Light_Border_Color', 'Dark_Border_Color', 'Border_Size', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Animate_Left', 'Animate_Top', 'Animate_Width', 'Animate_Height', 'Animate_Time', 'Radius', 'Shadow_Size', 'Shadow_Color', 'Light_Shadow_Color', 'Dark_Shadow_Color', 'Shadow_Full', 'Hover_Background', 'Light_Hover_Background', 'Dark_Hover_Background', 'Hover_Border_Color', 'Light_Hover_Border_Color', 'Dark_Hover_Border_Color', 'Hover_Shadow_Color', 'Light_Hover_Shadow_Color', 'Dark_Hover_Shadow_Color']
                 self._Initialized = False
                 self._Name = False
                 self._Last_Name = False
@@ -57,6 +53,16 @@ class Canvas:
                 self._Last_Background = False
                 self._Last_Border_Color = False
                 self._Last_Shadow_Color = False
+                self._Animating = False
+                self._Anim_Stop = threading.Event()
+                self._Anim_Thread = None
+                self._Animate_Ease = lambda t: (1 - (1 - t)**3)
+                self._Animate_Speed = None
+                self._Animate_Left = 0
+                self._Animate_Top = 0
+                self._Animate_Width = 0
+                self._Animate_Height = 0
+                self._Animate_Time = 1.0
                 self._Rounded = []
                 self._Background = self._Main._Background
                 self._Background_Main = True
@@ -97,6 +103,7 @@ class Canvas:
         
     def Delete(self):
         try:
+            self.Animate_Cancel()
             self.Clear()
             self._Main._Widget.remove(self)
             self._Frame.delete(self._Border)
@@ -124,6 +131,7 @@ class Canvas:
             
     def Hide(self):
         try:
+            self.Animate_Cancel()
             self._Frame.place_forget()
             self._Display = False
             if self._On_Hide:
@@ -145,18 +153,159 @@ class Canvas:
             
     def Display(self):
         try:
+            if self._Animating:
+                return
             self._Frame.place(x=self._Left_Current, y=self._Top_Current, width=self._Width_Current, height=self._Height_Current)
-            try:
-                self._Frame.tagraise()
-            except Exception:
-                self.Nothing = False
+            for Each in self._Widget:
+                if Each._Display:
+                    Each.Show()
             self._Display = True
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Display -> {E}")
             
+    def Animate(self, Widget=None):
+        try:
+            self.Animate_Cancel()
+            if not hasattr(self, "_Width_Current") or not hasattr(self, "_Height_Current"):
+                self.Resize(Trigger=False)
+            Final_Left = float(self._Left)
+            Final_Top = float(self._Top)
+            Final_Width = float(self._Width_Current)
+            Final_Height = float(self._Height_Current)
+            Start_Left = float(self._Animate_Left)
+            Start_Top = float(self._Animate_Top)
+            Animate_Width = float(getattr(self, "_Animate_Width", 0) or 0)
+            Animate_Height = float(getattr(self, "_Animate_Height", 0) or 0)
+            Size_Anim = not (Animate_Width == 0 and Animate_Height == 0)
+            Start_Width = Animate_Width if Size_Anim else Final_Width
+            Start_Height = Animate_Height if Size_Anim else Final_Height
+            Same_Pos = int(round(Start_Left)) == int(round(Final_Left)) and int(round(Start_Top)) == int(round(Final_Top))
+            Same_Size = int(round(Start_Width)) == int(round(Final_Width)) and int(round(Start_Height)) == int(round(Final_Height))
+            if Same_Pos and (not Size_Anim or Same_Size):
+                self._Left_Current = int(round(Final_Left))
+                self._Top_Current = int(round(Final_Top))
+                self._Width_Current = int(round(Final_Width))
+                self._Height_Current = int(round(Final_Height))
+                self.Rounded()
+                self._Frame.place(x=self._Left_Current, y=self._Top_Current, width=self._Width_Current, height=self._Height_Current)
+                self._Frame.lift()
+                self._Display = True
+                self.Show()
+                return
+            def Show_Start():
+                if not self._Frame.winfo_exists():
+                    return
+                self._Left_Current = int(round(Start_Left))
+                self._Top_Current = int(round(Start_Top))
+                self._Width_Current = int(round(Start_Width))
+                self._Height_Current = int(round(Start_Height))
+                self.Rounded()
+                self._Frame.place(x=self._Left_Current, y=self._Top_Current, width=self._Width_Current, height=self._Height_Current)
+                self._Frame.lift()
+                self._Display = True
+            self._Frame.after(0, Show_Start)
+            Dx = Final_Left - Start_Left
+            Dy = Final_Top - Start_Top
+            Dw = Final_Width - Start_Width if Size_Anim else 0.0
+            Dh = Final_Height - Start_Height if Size_Anim else 0.0
+            Dist = math.hypot(math.hypot(Dx, Dy), math.hypot(Dw, Dh))
+            if Dist == 0.0:
+                def Snap_Same():
+                    if not self._Frame.winfo_exists():
+                        return
+                    self._Left_Current = int(round(Final_Left))
+                    self._Top_Current = int(round(Final_Top))
+                    self._Width_Current = int(round(Final_Width))
+                    self._Height_Current = int(round(Final_Height))
+                    self.Rounded()
+                    self._Frame.place(x=self._Left_Current, y=self._Top_Current, width=self._Width_Current, height=self._Height_Current)
+                    self._Frame.lift()
+                    self._Display = True
+                    self.Show()
+                self._Frame.after(0, Snap_Same)
+                return
+            if self._Animate_Speed and self._Animate_Speed > 0:
+                Duration = max(0.001, Dist / float(self._Animate_Speed))
+            else:
+                Duration = max(0.001, float(self._Animate_Time))
+            Ease = self._Animate_Ease or (lambda t: t)
+            Target_FPS = 90.0
+            Frame_Interval = 1.0 / Target_FPS
+            self._Animating = True
+            Stop = self._Anim_Stop
+            def Worker():
+                T0 = time.perf_counter()
+                Next_Tick = T0
+                Last = None
+                while not Stop.is_set():
+                    Now = time.perf_counter()
+                    T = (Now - T0) / Duration
+                    if T >= 1.0:
+                        def Snap_Final():
+                            if not self._Frame.winfo_exists():
+                                return
+                            self._Left_Current = int(round(Final_Left))
+                            self._Top_Current = int(round(Final_Top))
+                            self._Width_Current = int(round(Final_Width))
+                            self._Height_Current = int(round(Final_Height))
+                            self.Rounded()
+                            self._Frame.place(x=self._Left_Current, y=self._Top_Current, width=self._Width_Current, height=self._Height_Current)
+                            self._Animating = False
+                            if Widget is not None:
+                                self._Frame.itemconfigure(Widget, state='normal')
+                                self._Frame.tag_raise(Widget)
+                                self._Frame.coords(Widget, self._Width_Current/2, self._Height_Current/2)
+                        self._Frame.after(0, Snap_Final)
+                        return
+                    K = Ease(max(0.0, min(1.0, T)))
+                    X = Start_Left + Dx * K
+                    Y = Start_Top + Dy * K
+                    W = Start_Width + Dw * K
+                    H = Start_Height + Dh * K
+                    Cur = (int(round(X)), int(round(Y)), int(round(W)), int(round(H)))
+                    if Cur != Last:
+                        Last = Cur
+                        def Post(C=Cur):
+                            if not self._Frame.winfo_exists():
+                                return
+                            if self._Animating:
+                                self._Left_Current, self._Top_Current, self._Width_Current, self._Height_Current = C
+                                self.Rounded()
+                                self._Frame.place(x=C[0], y=C[1], width=C[2], height=C[3])
+                                if Widget is not None:
+                                    self._Frame.itemconfigure(Widget, state='normal')
+                                    self._Frame.tag_raise(Widget)
+                                    self._Frame.coords(Widget, self._Width_Current/2, self._Height_Current/2)
+                        self._Frame.after(0, Post)
+                    Next_Tick += Frame_Interval
+                    Sleep_For = Next_Tick - time.perf_counter()
+                    if Sleep_For < -2 * Frame_Interval:
+                        Next_Tick = time.perf_counter()
+                        Sleep_For = Frame_Interval
+                    if Sleep_For > 0:
+                        time.sleep(Sleep_For)
+            self.Show()
+            T = threading.Thread(target=Worker, daemon=True)
+            self._Anim_Thread = T
+            T.start()
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Animate -> {E}")
+            self.Animate_Cancel()
+        
+    def Animate_Cancel(self):
+        try:
+            self._Animating = False
+            if self._Anim_Thread and self._Anim_Thread.is_alive():
+                self._Anim_Stop.set()
+                self._Anim_Thread.join(timeout=0.2)
+            self._Anim_Stop.clear()
+            self._Anim_Thread = None
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Animate_Cancel -> {E}")
+            
     def Focus(self):
         try:
-            self._Widget.focus_set()
+            self._Frame.focus_set()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Focus -> {E}")
     
@@ -287,9 +436,7 @@ class Canvas:
                 self._Top = Top
             if Left is not None or Top is not None:
                 self.Relocate()
-            Left = self._Frame.winfo_x()
-            Top = self._Frame.winfo_y()
-            return [Left, Top]
+            return [self._Left, self._Top]
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Position -> {E}")
             
@@ -301,7 +448,7 @@ class Canvas:
                 self._Height = Height
             if Width or Height:
                 self.Resize()
-            return [self._Frame.winfo_width(), self._Frame.winfo_height()]
+            return [self._Width, self._Height]
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Size -> {E}")
         
@@ -483,6 +630,8 @@ class Canvas:
             
     def Relocate(self, Direct=False):
         try:
+            if self._Animating and not Direct:
+                return
             if Direct or self._Resizable:
                 self.Adjustment()
                 if Direct or (self._Resize and self._Resize_Width):
@@ -568,68 +717,101 @@ class Canvas:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Find_Overlap -> {E}")
             
-    def Line(self):
+    def Line(self, Name=False):
         try:
-            return Canvas_Line(self)
+            Item = Canvas_Line(self)
+            if Name:
+                Item.Config(Name=Name)
+            return Item
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Line -> {E}")
             
-    def Polyline(self):
+    def Polyline(self, Name=False):
         try:
-            return Canvas_Polyline(self)
+            Item = Canvas_Polyline(self)
+            if Name:
+                Item.Config(Name=Name)
+            return Item
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Polyline -> {E}")
                 
-    def Pie(self):
+    def Pie(self, Name=False):
         try:
-            return Canvas_Pie(self)
+            Item = Canvas_Pie(self)
+            if Name:
+                Item.Config(Name=Name)
+            return Item
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Pie -> {E}")
                 
-    def Arc(self):
+    def Arc(self, Name=False):
         try:
-            return Canvas_Arc(self)
+            Item = Canvas_Arc(self)
+            if Name:
+                Item.Config(Name=Name)
+            return Item
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Arc -> {E}")
                 
-    def Circle(self):
+    def Circle(self, Name=False):
         try:
-            return Canvas_Circle(self)
+            Item = Canvas_Circle(self)
+            if Name:
+                Item.Config(Name=Name)
+            return Item
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Circle -> {E}")
                 
-    def Oval(self):
+    def Oval(self, Name=False):
         try:
-            return Canvas_Oval(self)
+            Item = Canvas_Oval(self)
+            if Name:
+                Item.Config(Name=Name)
+            return Item
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Oval -> {E}")
             
-    def Polygon(self):
+    def Polygon(self, Name=False):
         try:
-            return Canvas_Polygon(self)
+            Item = Canvas_Polygon(self)
+            if Name:
+                Item.Config(Name=Name)
+            return Item
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Polygon -> {E}")
                 
-    def Rectangle(self):
+    def Rectangle(self, Name=False):
         try:
-            return Canvas_Rectangle(self)
+            Item = Canvas_Rectangle(self)
+            if Name:
+                Item.Config(Name=Name)
+            return Item
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Rectangle -> {E}")
                 
-    def Rectangle2(self):
+    def RectangleR(self, Name=False):
         try:
-            return Canvas_Rectangle2(self)
+            Item = Canvas_RectangleR(self)
+            if Name:
+                Item.Config(Name=Name)
+            return Item
         except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Rectangle2 -> {E}")
+            self._GUI.Error(f"{self._Type} -> RectangleR -> {E}")
                 
-    def Image(self):
+    def Image(self, Name=False):
         try:
-            return Canvas_Image(self)
+            Item = Canvas_Image(self)
+            if Name:
+                Item.Config(Name=Name)
+            return Item
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Image -> {E}")
             
-    def Text(self):
+    def Text(self, Name=False):
         try:
-            return Canvas_Text(self)
+            Item = Canvas_Text(self)
+            if Name:
+                Item.Config(Name=Name)
+            return Item
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Text -> {E}")

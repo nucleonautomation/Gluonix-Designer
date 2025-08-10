@@ -21,6 +21,7 @@ from .N_Stock_Image import Stock_Image
 from .N_Stock_Image_Lite import Stock_Image_Lite
 from .N_Stock_Line import Stock_Line
 from .N_Stock_Entry import Stock_Entry
+from .N_Stock_Entry_Lite import Stock_Entry_Lite
 from .N_Stock_List import Stock_List
 from .N_Stock_Select import Stock_Select
 from .N_Stock_Spinner import Stock_Spinner
@@ -32,6 +33,7 @@ from .N_Stock_Text import Stock_Text
 from .N_Stock_Tree import Stock_Tree
 from .N_Stock_Canvas_Line import Stock_Canvas_Line
 from .N_Stock_Canvas_Rectangle import Stock_Canvas_Rectangle
+from .N_Stock_Canvas_RectangleR import Stock_Canvas_RectangleR
 from .N_Stock_Canvas_Pie import Stock_Canvas_Pie
 from .N_Stock_Canvas_Arc import Stock_Canvas_Arc
 from .N_Stock_Canvas_Circle import Stock_Canvas_Circle
@@ -212,6 +214,9 @@ class Stock:
             self.Top += 6
             self.Stock_Button_Lite = Stock_Button_Lite(self.Global, self, self.Left, self.Top)
             
+            #Stock Image Lite
+            self.Stock_Entry_Lite = Stock_Entry_Lite(self.Global, self, self.Center, self.Top)
+            
             # Lite
             
             #Label
@@ -233,7 +238,7 @@ class Stock:
             self.Stock_Canvas_Rectangle = Stock_Canvas_Rectangle(self.Global, self, self.Center, self.Top)
             
             #Stock Canvas Circle
-            self.Stock_Canvas_Circle = Stock_Canvas_Circle(self.Global, self, self.Right, self.Top)
+            self.Stock_Canvas_RectangleR = Stock_Canvas_RectangleR(self.Global, self, self.Right, self.Top)
             
             #Stock Canvas Oval
             self.Top += 6
@@ -251,6 +256,9 @@ class Stock:
             
             #Stock Canvas Pie
             self.Stock_Canvas_Pie = Stock_Canvas_Pie(self.Global, self, self.Center, self.Top)
+            
+            #Stock Canvas Circle
+            self.Stock_Canvas_Circle = Stock_Canvas_Circle(self.Global, self, self.Right, self.Top)
             
             #Update Scroll
             #self.Scroll.Update(self.Stock_Button_Lite.Label)

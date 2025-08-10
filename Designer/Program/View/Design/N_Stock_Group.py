@@ -27,7 +27,6 @@ class Stock_Group:
             self.Label.Create()
             self.Label.Set(Path=self.Global['Image'](self.Type), Value=' Group')
             self.Stock.Widget.append(self.Label)
-            
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             
@@ -71,14 +70,14 @@ class Stock_Group:
             ID_Tree = getattr(self.Stock.Design.Element, ID)
             self.Stock.Design.Element.Tree.Select(ID_Tree)
             self.Stock.Design.Database.Post(f"INSERT INTO `Frame` (`ID`, `Name`, `Type`, `Level`, `Root`) VALUES ('{ID}', '{Name}', '{self.Type}', '{Level}', '{Root_ID}')")
-            self.Create(ID)
+            self.Create(ID, True)
             self.Stock.Design.Configure.Hide_All()
             Configure = getattr(self.Stock.Design.Configure, f'Configure_{self.Type}')
             Configure.Load(ID)
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             
-    def Create(self, ID=False):
+    def Create(self, ID=False, Latest=False):
         try:
             if ID:
                 Widget_Data = self.Stock.Design.Database.Get(f"SELECT * FROM `Frame` WHERE `ID`='{ID}'", Keys=True)

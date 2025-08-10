@@ -186,6 +186,30 @@ class Configure_Canvas_Image:
             self.Image_Label.Config(Foreground='#000000', Value="Image:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
             self.Image_Label.Create()
             
+            #Delete
+            Fixture = self.Frame.Locate(7, 5, 18, 65)
+            self.Delete_Image = self.Global['Gluonix'].Image(self.Frame)
+            self.Delete_Image.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Delete_Image.Config(Path=self.Global['Image']('Delete'), Border_Size=0, Hand_Cursor=True, Display=True)
+            self.Delete_Image.Bind(On_Click=lambda E: self.Show_Delete())
+            self.Delete_Image.Create()
+            
+            #Delete Comfirm
+            Fixture = self.Frame.Locate(7, 5, 18, 72)
+            self.Delete_Confirm_Image = self.Global['Gluonix'].Image(self.Frame)
+            self.Delete_Confirm_Image.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Delete_Confirm_Image.Config(Path=self.Global['Image']('Success'), Border_Size=0, Hand_Cursor=True, Display=False)
+            self.Delete_Confirm_Image.Bind(On_Click=lambda E: self.Delete())
+            self.Delete_Confirm_Image.Create()
+            
+            #Delete Cancel
+            Fixture = self.Frame.Locate(7, 5, 18, 65)
+            self.Delete_Cancel_Image = self.Global['Gluonix'].Image(self.Frame)
+            self.Delete_Cancel_Image.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Delete_Cancel_Image.Config(Path=self.Global['Image']('Close'), Border_Size=0, Hand_Cursor=True, Display=False)
+            self.Delete_Cancel_Image.Bind(On_Click=lambda E: self.Hide_Delete())
+            self.Delete_Cancel_Image.Create()
+            
             #Image Image
             Fixture = self.Frame.Locate(60, 30, 28, 65)
             self.Image_Image = self.Global['Gluonix'].Image(self.Frame)
@@ -257,6 +281,7 @@ class Configure_Canvas_Image:
                     self.Visibilty.Set(self.Global['Image'](self.Visibilty_Image[self.Element._Display]))
                     if self.Element._Display:
                         self.Element.Show()
+                    self.Hide_Delete()
                 else:
                     self.Global['Message'].Show('Error', 'Project Files Corrupted\nReopen Project')
             else:
@@ -421,5 +446,31 @@ class Configure_Canvas_Image:
                 shutil.copy(Icon_File_Path, f"{self.Configure.Design.Project_Path}/Data/File/{self.ID}")
                 self.Image_Image.Refresh()
                 self.Element.Refresh()
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Delete(self):
+        try:
+            if os.path.exists(f"{self.Configure.Design.Project_Path}/Data/File/{self.ID}"):
+                os.remove(f"{self.Configure.Design.Project_Path}/Data/File/{self.ID}")
+            self.Image_Image.Refresh()
+            self.Element.Refresh()
+            self.Hide_Delete()
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Show_Delete(self):
+        try:
+            self.Delete_Image.Hide()
+            self.Delete_Confirm_Image.Show()
+            self.Delete_Cancel_Image.Show()
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Hide_Delete(self):
+        try:
+            self.Delete_Confirm_Image.Hide()
+            self.Delete_Cancel_Image.Hide()
+            self.Delete_Image.Show()
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))

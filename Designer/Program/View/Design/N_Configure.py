@@ -21,6 +21,7 @@ from .N_Configure_Image import Configure_Image
 from .N_Configure_Image_Lite import Configure_Image_Lite
 from .N_Configure_Line import Configure_Line
 from .N_Configure_Entry import Configure_Entry
+from .N_Configure_Entry_Lite import Configure_Entry_Lite
 from .N_Configure_List import Configure_List
 from .N_Configure_Select import Configure_Select
 from .N_Configure_Spinner import Configure_Spinner
@@ -32,6 +33,7 @@ from .N_Configure_Text import Configure_Text
 from .N_Configure_Tree import Configure_Tree
 from .N_Configure_Canvas_Line import Configure_Canvas_Line
 from .N_Configure_Canvas_Rectangle import Configure_Canvas_Rectangle
+from .N_Configure_Canvas_RectangleR import Configure_Canvas_RectangleR
 from .N_Configure_Canvas_Pie import Configure_Canvas_Pie
 from .N_Configure_Canvas_Arc import Configure_Canvas_Arc
 from .N_Configure_Canvas_Circle import Configure_Canvas_Circle
@@ -138,6 +140,9 @@ class Configure:
             #Configure Button Lite
             self.Configure_Button_Lite = Configure_Button_Lite(self.Global, self)
             
+            #Configure Button Lite
+            self.Configure_Entry_Lite = Configure_Entry_Lite(self.Global, self)
+            
             #Configure Group
             self.Configure_Group = Configure_Group(self.Global, self)
             
@@ -147,7 +152,10 @@ class Configure:
             #Configure Canvas Rectangle
             self.Configure_Canvas_Rectangle = Configure_Canvas_Rectangle(self.Global, self)
             
-            #Configure Canvas Arc
+            #Configure Canvas RectangleR
+            self.Configure_Canvas_RectangleR = Configure_Canvas_RectangleR(self.Global, self)
+            
+            #Configure Canvas Pie
             self.Configure_Canvas_Pie = Configure_Canvas_Pie(self.Global, self)
             
             #Configure Canvas Arc

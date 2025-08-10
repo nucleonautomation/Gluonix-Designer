@@ -1,5 +1,6 @@
 # IMPORT LIBRARIES
 import tkinter as TK
+import threading, math, time
 from .N_GUI import GUI
 from .N_Custom import Event_Bind
 
@@ -10,7 +11,7 @@ class Frame:
         if self._GUI is not None:
             self._Type = "Frame"
             try:
-                self._Config = ['Name', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Border_Color', 'Light_Border_Color', 'Dark_Border_Color', 'Border_Size', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Hover_Background', 'Light_Hover_Background', 'Dark_Hover_Background', 'Hover_Border_Color', 'Light_Hover_Border_Color', 'Dark_Hover_Border_Color']
+                self._Config = ['Name', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Border_Color', 'Light_Border_Color', 'Dark_Border_Color', 'Border_Size', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Animate_Left', 'Animate_Top', 'Animate_Width', 'Animate_Height', 'Animate_Time', 'Hover_Background', 'Light_Hover_Background', 'Dark_Hover_Background', 'Hover_Border_Color', 'Light_Hover_Border_Color', 'Dark_Hover_Border_Color']
                 self._Initialized = False
                 self._Widget = []
                 self._Name = False
@@ -30,6 +31,16 @@ class Frame:
                 self._Hover_Border_Color = False
                 self._Last_Background = False
                 self._Last_Border_Color = False
+                self._Animating = False
+                self._Anim_Stop = threading.Event()
+                self._Anim_Thread = None
+                self._Animate_Ease = lambda t: (1 - (1 - t)**3)
+                self._Animate_Speed = None
+                self._Animate_Left = 0
+                self._Animate_Top = 0
+                self._Animate_Width = 0
+                self._Animate_Height = 0
+                self._Animate_Time = 1.0
                 self._On_Resize = False
                 self._Resizable = self._Main._Resizable
                 self._Auto_Dark = True
@@ -67,6 +78,7 @@ class Frame:
         
     def Delete(self):
         try:
+            self.Animate_Cancel()
             self.Clear()
             self._Main._Widget.remove(self)
             self._Frame.destroy()
@@ -86,6 +98,7 @@ class Frame:
             
     def Hide(self):
         try:
+            self.Animate_Cancel()
             self._Frame.place_forget()
             self._Display = False
             if self._On_Hide:
@@ -107,11 +120,125 @@ class Frame:
             
     def Display(self):
         try:
+            if self._Animating:
+                return
             self._Frame.place(x=self._Left_Current, y=self._Top_Current, width=self._Width_Current, height=self._Height_Current)
             self._Frame.lift()
             self._Display = True
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Display -> {E}")
+            
+    def Animate(self, Widget=None):
+        try:
+            self.Animate_Cancel()
+            if not hasattr(self, "_Width_Current") or not hasattr(self, "_Height_Current"):
+                self.Resize(Trigger=False)
+            Final_Left = float(self._Left)
+            Final_Top = float(self._Top)
+            Final_Width = float(self._Width_Current)
+            Final_Height = float(self._Height_Current)
+            Start_Left = float(self._Animate_Left)
+            Start_Top = float(self._Animate_Top)
+            Animate_Width = float(getattr(self, "_Animate_Width", 0) or 0)
+            Animate_Height = float(getattr(self, "_Animate_Height", 0) or 0)
+            Size_Anim = not (Animate_Width == 0 and Animate_Height == 0)
+            Start_Width = Animate_Width if Size_Anim else Final_Width
+            Start_Height = Animate_Height if Size_Anim else Final_Height
+            Same_Pos = int(round(Start_Left)) == int(round(Final_Left)) and int(round(Start_Top)) == int(round(Final_Top))
+            Same_Size = int(round(Start_Width)) == int(round(Final_Width)) and int(round(Start_Height)) == int(round(Final_Height))
+            if Same_Pos and (not Size_Anim or Same_Size):
+                self._Frame.place(x=int(round(Final_Left)), y=int(round(Final_Top)), width=int(round(Final_Width)), height=int(round(Final_Height)))
+                self._Frame.lift()
+                self._Display = True
+                self.Show()
+                return
+            def Show_Start():
+                if not self._Frame.winfo_exists():
+                    return
+                self._Frame.place(x=int(round(Start_Left)), y=int(round(Start_Top)), width=int(round(Start_Width)), height=int(round(Start_Height)))
+                self._Frame.lift()
+                self._Display = True
+            self._Frame.after(0, Show_Start)
+            Dx = Final_Left - Start_Left
+            Dy = Final_Top - Start_Top
+            Dw = Final_Width - Start_Width if Size_Anim else 0.0
+            Dh = Final_Height - Start_Height if Size_Anim else 0.0
+            Dist = math.hypot(math.hypot(Dx, Dy), math.hypot(Dw, Dh))
+            if Dist == 0.0:
+                def Snap_Same():
+                    if not self._Frame.winfo_exists():
+                        return
+                    self._Frame.place(x=int(round(Final_Left)), y=int(round(Final_Top)), width=int(round(Final_Width)), height=int(round(Final_Height)))
+                    self._Frame.lift()
+                    self._Display = True
+                    self.Show()
+                self._Frame.after(0, Snap_Same)
+                return
+            if self._Animate_Speed and self._Animate_Speed > 0:
+                Duration = max(0.001, Dist / float(self._Animate_Speed))
+            else:
+                Duration = max(0.001, float(self._Animate_Time))
+            Ease = self._Animate_Ease or (lambda t: t)
+            Target_FPS = 90.0
+            Frame_Interval = 1.0 / Target_FPS
+            self._Animating = True
+            Stop = self._Anim_Stop
+            def Worker():
+                T0 = time.perf_counter()
+                Next_Tick = T0
+                Last = None
+                while not Stop.is_set():
+                    Now = time.perf_counter()
+                    T = (Now - T0) / Duration
+                    if T >= 1.0:
+                        def Snap_Final():
+                            if not self._Frame.winfo_exists():
+                                return
+                            self._Frame.place(x=int(round(Final_Left)), y=int(round(Final_Top)), width=int(round(Final_Width)), height=int(round(Final_Height)))
+                            self._Animating = False
+                        self._Frame.after(0, Snap_Final)
+                        return
+                    K = Ease(max(0.0, min(1.0, T)))
+                    X = Start_Left + Dx * K
+                    Y = Start_Top + Dy * K
+                    W = Start_Width + Dw * K
+                    H = Start_Height + Dh * K
+                    Cur = (int(round(X)), int(round(Y)), int(round(W)), int(round(H)))
+                    if Cur != Last:
+                        Last = Cur
+                        def Post(C=Cur):
+                            if not self._Frame.winfo_exists():
+                                return
+                            if self._Animating:
+                                self._Frame.place(x=C[0], y=C[1], width=C[2], height=C[3])
+                                if Widget is not None:
+                                    Widget.place(x=0, y=0, width=C[2]-(self._Border_Size*2), height=C[3]-(self._Border_Size*2))
+                        self._Frame.after(0, Post)
+                    Next_Tick += Frame_Interval
+                    Sleep_For = Next_Tick - time.perf_counter()
+                    if Sleep_For < -2 * Frame_Interval:
+                        Next_Tick = time.perf_counter()
+                        Sleep_For = Frame_Interval
+                    if Sleep_For > 0:
+                        time.sleep(Sleep_For)
+            self.Show()
+            T = threading.Thread(target=Worker, daemon=True)
+            self._Anim_Thread = T
+            T.start()
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Animate -> {E}")
+            self.Animate_Cancel()
+            
+    def Animate_Cancel(self):
+        try:
+            self._Animating = False
+            if self._Anim_Thread and self._Anim_Thread.is_alive():
+                self._Anim_Stop.set()
+                self._Anim_Thread.join(timeout=0.2)
+            self._Anim_Stop.clear()
+            self._Anim_Thread = None
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Animate_Cancel -> {E}")
             
     def Focus(self):
         try:
@@ -235,9 +362,7 @@ class Frame:
                 self._Top = Top
             if Left is not None or Top is not None:
                 self.Relocate()
-            Left = self._Frame.winfo_x()
-            Top = self._Frame.winfo_y()
-            return [Left, Top]
+            return [self._Left, self._Top]
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Position -> {E}")
             
@@ -249,7 +374,7 @@ class Frame:
                 self._Height = Height
             if Width or Height:
                 self.Resize()
-            return [self._Frame.winfo_width(), self._Frame.winfo_height()]
+            return [self._Width, self._Height]
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Size -> {E}")
         
@@ -347,6 +472,8 @@ class Frame:
 
     def Relocate(self, Direct=False):
         try:
+            if self._Animating and not Direct:
+                return
             if Direct or self._Resizable:
                 self.Adjustment()
                 if Direct or (self._Resize and self._Resize_Width):

@@ -27,7 +27,6 @@ class Stock_Canvas_Image:
             self.Label.Create()
             self.Label.Set(Path=self.Global['Image'](self.Type), Value=' Image')
             self.Stock.Widget.append(self.Label)
-            
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             
@@ -64,11 +63,12 @@ class Stock_Canvas_Image:
                         Widget = self.Stock.Design.Database.Get(f"SELECT * FROM `Frame` WHERE `ID`='{Temp_Root_ID}'", Keys=True)
                 if Widget[0]['Type']=='Canvas' or Widget[0]['Type']=='Scroll':
                     Number = 1
-                    Exist = self.Stock.Design.Database.Get(f"SELECT * FROM `Item` WHERE (`Name`='{self.Type}{Number}' AND `Root`='{Root_ID}')")
+                    Name = f"{self.Type.replace('Canvas_', '')}{Number}"
+                    Exist = self.Stock.Design.Database.Get(f"SELECT * FROM `Item` WHERE (`Name`='{Name}' AND `Root`='{Root_ID}')")
                     while len(Exist)>0:
                         Number += 1
-                        Exist = self.Stock.Design.Database.Get(f"SELECT * FROM `Item` WHERE (`Name`='{self.Type}{Number}' AND `Root`='{Root_ID}')")
-                    Name = f"{self.Type.replace('Canvas_', '')}{Number}"
+                        Name = f"{self.Type.replace('Canvas_', '')}{Number}"
+                        Exist = self.Stock.Design.Database.Get(f"SELECT * FROM `Item` WHERE (`Name`='{Name}' AND `Root`='{Root_ID}')")
                     Random_Letter = ''.join(random.choices(string.ascii_letters, k=10))
                     ID = Random_Letter+self.Global['Custom'].MD5(Root_ID+Name+str(time.time()*1000000))
                     Level = Root_Level+1
@@ -79,7 +79,7 @@ class Stock_Canvas_Image:
                     ID_Tree = getattr(self.Stock.Design.Element, ID)
                     self.Stock.Design.Element.Tree.Select(ID_Tree)
                     self.Stock.Design.Database.Post(f"INSERT INTO `Item` (`ID`, `Name`, `Type`, `Root`, `Left`, `Top`, `Value`) VALUES ('{ID}', '{Name}', '{self.Type}', '{Root_ID}', '40', '40', '{Name}')")
-                    self.Create(ID)
+                    self.Create(ID, True)
                     self.Stock.Design.Configure.Hide_All()
                     Configure = getattr(self.Stock.Design.Configure, f'Configure_{self.Type}')
                     Configure.Load(ID)
@@ -92,7 +92,7 @@ class Stock_Canvas_Image:
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             
-    def Create(self, ID=False):
+    def Create(self, ID=False, Latest=False):
         try:
             if ID:
                 Widget_Data = self.Stock.Design.Database.Get(f"SELECT * FROM `Item` WHERE `ID`='{ID}'", Keys=True)
@@ -115,7 +115,27 @@ class Stock_Canvas_Image:
                     Fixture = [Widget_Data['Width'], Widget_Data['Height'], Widget_Data['Left'], Widget_Data['Top']]
                     Widget = getattr(Root, ID)
                     Widget._ID = ID
-                    Widget.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Radius=Widget_Data['Radius'])
+                    if Latest:
+                        Root_Width, Root_Height = Root.Size()
+                        Aspect_Ratio = 2.0
+                        Min_W = int(Root_Width * 0.25)
+                        Max_W = int(Root_Width * 0.50)
+                        Min_H = int(Root_Height * 0.25)
+                        Max_H = int(Root_Height * 0.50)
+                        if Aspect_Ratio >= 1.0:
+                            Width = random.randint(Min_W, Max_W)
+                            Height = max(1, int(Width / Aspect_Ratio))
+                            Height = max(Min_H, min(Height, Max_H))
+                        else:
+                            Height = random.randint(Min_H, Max_H)
+                            Width = max(1, int(Height * Aspect_Ratio))
+                            Width = max(Min_W, min(Width, Max_W))
+                        Left = random.randint(0, max(0, Root_Width - Width))
+                        Top = random.randint(0, max(0, Root_Height - Height))
+                        Widget.Config(Width=Width, Height=Height, Left=Left, Top=Top, Radius=Width)
+                        self.Stock.Design.Database.Post(f"UPDATE `Item` SET `Width`='{Width}', `Height`='{Height}', `Left`='{Left}', `Top`='{Top}', `Radius`='{Width}' WHERE `ID`='{ID}'")
+                    else:
+                        Widget.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Radius=Widget_Data['Radius'])
                     Widget.Config(Size=Widget_Data['Size'], Weight=Widget_Data['Weight'], Font=Widget_Data['Font'], Value=Widget_Data['Value'])
                     Widget.Config(Thickness=Widget_Data['Thickness'], Fill=Widget_Data['Fill'], Outline=Widget_Data['Outline'])
                     Widget.Config(Justify=Widget_Data['Justify'], Anchor=Widget_Data['Anchor'])
@@ -124,6 +144,12 @@ class Stock_Canvas_Image:
                     Widget.Config(Path=f"{self.Stock.Design.Project_Path}/Data/File/{ID}")
                     Widget.Lock = bool(Widget_Data['Lock'])
                     Widget.Create()
+                    if Latest:
+                        Widget.Hide()
+                        Widget.Config(Animate_Left=-1*(Left+Width), Animate_Top=-1*(Top+Height), Animate_Time=0.5)
+                        Widget.Animate()
+                        Configure = getattr(self.Stock.Design.Configure, f'Configure_{self.Type}')
+                        Configure.Movement_Update()
                     self.Stock.Design.Element.Intractive(Widget)
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))

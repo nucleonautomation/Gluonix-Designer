@@ -110,7 +110,7 @@ class Project:
             self.Home.Panel.Overview.Frame.Hide()
             self.Compare.Frame.Hide()
             self.New.Reset()
-            self.New.Frame.Show()
+            self.New.Frame.Animate()
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
         
@@ -139,7 +139,7 @@ class Project:
             self.Home.Panel.Overview.Frame.Hide()
             self.New.Frame.Hide()
             self.Compare.Reset()
-            self.Compare.Frame.Show()
+            self.Compare.Frame.Animate()
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             

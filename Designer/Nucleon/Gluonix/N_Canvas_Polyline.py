@@ -1,5 +1,5 @@
 # IMPORT LIBRARIES
-import math
+import threading, math, time
 from .N_Custom import Event_Bind_Canvas
 
 class Canvas_Polyline:
@@ -22,6 +22,12 @@ class Canvas_Polyline:
         self._Resizable = self._Canvas._Resizable
         self._On_Show = False
         self._On_Hide = False
+
+    def __str__(self):
+        return "Nucleon_Glunoix_Canvas_Polyline[]"
+
+    def __repr__(self):
+        return "Nucleon_Glunoix_Canvas_Polyline[]"
 
     def Copy(self, Name=False, Main=False):
         try:
@@ -123,12 +129,8 @@ class Canvas_Polyline:
             
     def Move(self, Left=None, Top=None):
         try:
-            if Left is not None:
-                self._Left += Left
-            if Top is not None:
-                self._Top += Top
             if Left is not None or Top is not None:
-                self.Position(Left=self._Left, Top=self._Top)
+                self.Position(Left=Left, Top=Top)
             return True
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Move -> {E}")
