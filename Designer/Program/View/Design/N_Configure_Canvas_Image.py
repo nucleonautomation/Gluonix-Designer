@@ -179,15 +179,45 @@ class Configure_Canvas_Image:
             self.Rotate_Entry.Bind(On_Key_Release=lambda E: self.Update_Rotate())
             self.Rotate_Entry.Create()
             
-            #Image Label
+            #Skew Horizontal Label
             Fixture = self.Frame.Locate(25, 5, 3, 65)
+            self.Skew_Horizontal_Label = self.Global['Gluonix'].Label(self.Frame)
+            self.Skew_Horizontal_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Skew_Horizontal_Label.Config(Foreground='#000000', Value="Skew Horizontal:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Skew_Horizontal_Label.Create()
+            
+            #Skew Horizontal Entry
+            Fixture = self.Frame.Locate(40, 5, 28, 65)
+            self.Skew_Horizontal_Entry = self.Global['Gluonix'].Entry(self.Frame)
+            self.Skew_Horizontal_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Skew_Horizontal_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Skew_Horizontal_Entry.Bind(On_Key_Release=lambda E: self.Update_Skew_Horizontal())
+            self.Skew_Horizontal_Entry.Create()
+            
+            #Skew Vertical Label
+            Fixture = self.Frame.Locate(25, 5, 3, 72)
+            self.Skew_Vertical_Label = self.Global['Gluonix'].Label(self.Frame)
+            self.Skew_Vertical_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Skew_Vertical_Label.Config(Foreground='#000000', Value="Skew Vertical:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Skew_Vertical_Label.Create()
+            
+            #Skew Vertical Entry
+            Fixture = self.Frame.Locate(40, 5, 28, 72)
+            self.Skew_Vertical_Entry = self.Global['Gluonix'].Entry(self.Frame)
+            self.Skew_Vertical_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Skew_Vertical_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Skew_Vertical_Entry.Bind(On_Key_Release=lambda E: self.Update_Skew_Vertical())
+            self.Skew_Vertical_Entry.Create()
+            
+            #Image Label
+            Fixture = self.Frame.Locate(25, 5, 3, 79)
             self.Image_Label = self.Global['Gluonix'].Label(self.Frame)
             self.Image_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Image_Label.Config(Foreground='#000000', Value="Image:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
             self.Image_Label.Create()
             
             #Delete
-            Fixture = self.Frame.Locate(7, 5, 18, 65)
+            Fixture = self.Frame.Locate(7, 5, 18, 79)
             self.Delete_Image = self.Global['Gluonix'].Image(self.Frame)
             self.Delete_Image.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Delete_Image.Config(Path=self.Global['Image']('Delete'), Border_Size=0, Hand_Cursor=True, Display=True)
@@ -195,7 +225,7 @@ class Configure_Canvas_Image:
             self.Delete_Image.Create()
             
             #Delete Comfirm
-            Fixture = self.Frame.Locate(7, 5, 18, 72)
+            Fixture = self.Frame.Locate(7, 5, 18, 86)
             self.Delete_Confirm_Image = self.Global['Gluonix'].Image(self.Frame)
             self.Delete_Confirm_Image.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Delete_Confirm_Image.Config(Path=self.Global['Image']('Success'), Border_Size=0, Hand_Cursor=True, Display=False)
@@ -203,7 +233,7 @@ class Configure_Canvas_Image:
             self.Delete_Confirm_Image.Create()
             
             #Delete Cancel
-            Fixture = self.Frame.Locate(7, 5, 18, 65)
+            Fixture = self.Frame.Locate(7, 5, 18, 79)
             self.Delete_Cancel_Image = self.Global['Gluonix'].Image(self.Frame)
             self.Delete_Cancel_Image.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Delete_Cancel_Image.Config(Path=self.Global['Image']('Close'), Border_Size=0, Hand_Cursor=True, Display=False)
@@ -211,7 +241,7 @@ class Configure_Canvas_Image:
             self.Delete_Cancel_Image.Create()
             
             #Image Image
-            Fixture = self.Frame.Locate(60, 30, 28, 65)
+            Fixture = self.Frame.Locate(60, 30, 28, 79)
             self.Image_Image = self.Global['Gluonix'].Image(self.Frame)
             self.Image_Image.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Image_Image.Config(Border_Size=1)
@@ -240,6 +270,8 @@ class Configure_Canvas_Image:
                     self.Height_Entry.Config(Border_Color='#000000', Border_Size=1)
                     self.Left_Entry.Config(Border_Color='#000000', Border_Size=1)
                     self.Top_Entry.Config(Border_Color='#000000', Border_Size=1)
+                    self.Skew_Horizontal_Entry.Config(Border_Color='#000000', Border_Size=1)
+                    self.Skew_Vertical_Entry.Config(Border_Color='#000000', Border_Size=1)
                     self.Name_Label.Set(Widget_Data['Type'])
                     self.Name_Entry.Set(Widget_Data['Name'])
                     self.Lock = bool(Widget_Data['Lock'])
@@ -252,6 +284,8 @@ class Configure_Canvas_Image:
                     self.Move_Check.Set(bool(Widget_Data['Move']))
                     self.Transparent_Check.Set(bool(Widget_Data['Transparent']))
                     self.Rotate_Entry.Set(Widget_Data['Rotate'])
+                    self.Skew_Horizontal_Entry.Set(Widget_Data['Skew_Horizontal'])
+                    self.Skew_Vertical_Entry.Set(Widget_Data['Skew_Vertical'])
                     self.Image_Image.Set(f"{self.Configure.Design.Project_Path}/Data/File/{self.ID}")
                     self.Configure.Hide_All()
                     self.Configure.Current = self
@@ -472,5 +506,33 @@ class Configure_Canvas_Image:
             self.Delete_Confirm_Image.Hide()
             self.Delete_Cancel_Image.Hide()
             self.Delete_Image.Show()
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Update_Skew_Horizontal(self):
+        try:
+            Skew_Horizontal = self.Skew_Horizontal_Entry.Get()
+            if self.Global['Custom'].Is_Float(Skew_Horizontal):
+                Skew_Horizontal = float(Skew_Horizontal)
+                self.Configure.Design.Database.Post(f"UPDATE `Item` SET `Skew_Horizontal`='{Skew_Horizontal}' WHERE `ID`='{self.ID}'")
+                self.Skew_Horizontal_Entry.Config(Border_Color='#000000', Border_Size=1)
+                if self.Element:
+                    self.Element.Config(Skew_Horizontal=Skew_Horizontal)
+            else:
+                self.Skew_Horizontal_Entry.Config(Border_Color='red', Border_Size=1)
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Update_Skew_Vertical(self):
+        try:
+            Skew_Vertical = self.Skew_Vertical_Entry.Get()
+            if self.Global['Custom'].Is_Float(Skew_Vertical):
+                Skew_Vertical = float(Skew_Vertical)
+                self.Configure.Design.Database.Post(f"UPDATE `Item` SET `Skew_Vertical`='{Skew_Vertical}' WHERE `ID`='{self.ID}'")
+                self.Skew_Vertical_Entry.Config(Border_Color='#000000', Border_Size=1)
+                if self.Element:
+                    self.Element.Config(Skew_Vertical=Skew_Vertical)
+            else:
+                self.Skew_Vertical_Entry.Config(Border_Color='red', Border_Size=1)
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))

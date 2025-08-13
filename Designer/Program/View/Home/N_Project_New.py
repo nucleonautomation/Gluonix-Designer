@@ -129,7 +129,10 @@ class New:
     def Reset(self):
         try:
             self.Name_Entry.Set("Project1")
-            self.Location_Entry.Set(os.path.join(os.path.expanduser('~'), 'Documents'))
+            if self.Global['Custom'].Is_Empty(os.getcwd()):
+                self.Location_Entry.Set(os.getcwd())
+            else:
+                self.Location_Entry.Set(os.path.join(os.path.expanduser('~'), 'Documents'))
             self.Project_Path.Set(self.Location_Entry.Get()+"/"+self.Name_Entry.Get())
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))

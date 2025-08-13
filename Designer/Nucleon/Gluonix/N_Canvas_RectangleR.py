@@ -5,7 +5,7 @@ from .N_Custom import Event_Bind_Canvas
 class Canvas_RectangleR:
     def __init__(self, Main):
         self._Canvas = Main
-        self._Config = ['Name', 'Outline', 'Fill', 'Width', 'Height', 'Left', 'Top', 'Animate_Left', 'Animate_Top', 'Animate_Width', 'Animate_Height', 'Animate_Time', 'Angle', 'Radius', 'Thickness', 'Resize', 'Translucent', 'Alpha']
+        self._Config = ['Name', 'Outline', 'Fill', 'Width', 'Height', 'Left', 'Top', 'Animate_Left', 'Animate_Top', 'Animate_Width', 'Animate_Height', 'Animate_Time', 'Angle', 'Radius', 'Thickness', 'Resize', 'Translucent', 'Alpha', 'Skew_Horizontal', 'Skew_Vertical']
         self._Display = True
         self._Resize_Index = 0
         self._Resize = True
@@ -29,6 +29,8 @@ class Canvas_RectangleR:
         self._Radius = 0
         self._Translucent = False
         self._Alpha = 25
+        self._Skew_Horizontal = 0
+        self._Skew_Vertical = 0
         self._Width, self._Height, self._Left, self._Top = 1, 1, 1, 1
         self._Width_Current, self._Height_Current, self._Left_Current, self._Top_Current = 1, 1, 1, 1
         self._Widget = self._Canvas._Frame.create_polygon([0, 0, 0, 0], outline=self._Outline, width=self._Thickness, fill=self._Fill, smooth=True)
@@ -36,6 +38,7 @@ class Canvas_RectangleR:
         self._Resizable = self._Canvas._Resizable
         self._On_Show = False
         self._On_Hide = False
+        self._On_Animate = False
 
     def __str__(self):
         return "Nucleon_Glunoix_Canvas_RectangleR[]"
@@ -99,7 +102,7 @@ class Canvas_RectangleR:
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Display -> {E}")
             
-    def Animate(self):
+    def Animate(self, Hide=False):
         try:
             self.Animate_Cancel()
             Final_Left = float(self._Left)
@@ -159,6 +162,10 @@ class Canvas_RectangleR:
                                 return
                             self.Config(Left=int(round(Final_Left)), Top=int(round(Final_Top)), Width=int(round(Final_Width)), Height=int(round(Final_Height)))
                             self._Animating = False
+                            if Hide:
+                                self.Hide()
+                            if self._On_Animate:
+                                self._On_Animate()
                         self._Canvas._Frame.after(0, Snap_Final)
                         return
                     K = Ease(max(0.0, min(1.0, T)))
@@ -217,6 +224,8 @@ class Canvas_RectangleR:
                 self._On_Show = Input['On_Show']
             if 'On_Hide' in Input:
                 self._On_Hide = Input['On_Hide']
+            if 'On_Animate' in Input:
+                self._On_Animate = Input['On_Animate']
             Event_Bind_Canvas(self._Canvas._Frame, self._Widget, **Input)
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Bind -> {E}")
@@ -247,11 +256,21 @@ class Canvas_RectangleR:
             
     def Move(self, Left=None, Top=None):
         try:
+            if Left is not None:
+                self._Left += Left
+            if Top is not None:
+                self._Top += Top
             if Left is not None or Top is not None:
-                self.Position(Left=Left, Top=Top)
+                self.Position(Left=self._Left, Top=self._Top)
             return True
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Move -> {E}")
+            
+    def Center(self, Left=None, Top=None):
+        try:
+            return self.Position(Left=Left, Top=Top)
+        except Exception as E:
+            self._Canvas._GUI.Error(f"{self._Type} -> Center -> {E}")
         
     def Position(self, Left=None, Top=None):
         try:
@@ -323,7 +342,7 @@ class Canvas_RectangleR:
             Width = self._Width_Current
             Height = self._Height_Current
             Radius = min(self._Radius, Width / 2, Height / 2)
-            Angle = math.radians(self._Angle)
+            Angle_Rad = math.radians(self._Angle)
             Steps = 5
             HW, HH = Width / 2, Height / 2
             Rect_Points = []
@@ -335,18 +354,75 @@ class Canvas_RectangleR:
             Rect_Points.append((-HW + Radius, HH))
             Rect_Points += self.Arc(-HW + Radius, HH - Radius, 90, Steps, Radius)
             Rect_Points.append((-HW, -HH + Radius))
+            Skew_X = max(-100.0, min(100.0, float(self._Skew_Horizontal or 0.0)))
+            Skew_Y = max(-100.0, min(100.0, float(self._Skew_Vertical or 0.0)))
+            Delta_X = min((Width - 1) * 0.5, (abs(Skew_X) / 100.0) * (Width * 0.5))
+            Delta_Y = min((Height - 1) * 0.5, (abs(Skew_Y) / 100.0) * (Height * 0.5))
+            TL_X, TL_Y = 0.0, 0.0
+            TR_X, TR_Y = float(Width), 0.0
+            BR_X, BR_Y = float(Width), float(Height)
+            BL_X, BL_Y = 0.0, float(Height)
+            if Skew_X > 0:
+                TL_X = Delta_X
+                TR_X = Width - Delta_X
+            elif Skew_X < 0:
+                BL_X = Delta_X
+                BR_X = Width - Delta_X
+            if Skew_Y > 0:
+                TR_Y = Delta_Y
+                BR_Y = Height - Delta_Y
+            elif Skew_Y < 0:
+                TL_Y = Delta_Y
+                BL_Y = Height - Delta_Y
+            Src = [(0.0, 0.0), (float(Width), 0.0), (float(Width), float(Height)), (0.0, float(Height))]
+            Dst = [(TL_X, TL_Y), (TR_X, TR_Y), (BR_X, BR_Y), (BL_X, BL_Y)]
+            A = []
+            B_Vals = []
+            for (X, Y), (U, V) in zip(Src, Dst):
+                A.append([X, Y, 1, 0, 0, 0, -U * X, -U * Y]); B_Vals.append(U)
+                A.append([0, 0, 0, X, Y, 1, -V * X, -V * Y]); B_Vals.append(V)
+            N = 8
+            for I in range(N):
+                A[I].append(B_Vals[I])
+            for Col in range(N):
+                Pivot = max(range(Col, N), key=lambda R: abs(A[R][Col]))
+                if abs(A[Pivot][Col]) < 1e-12:
+                    continue
+                if Pivot != Col:
+                    A[Col], A[Pivot] = A[Pivot], A[Col]
+                Pivot_Val = A[Col][Col]
+                Inv_Pivot = 1.0 / Pivot_Val
+                for J in range(Col, N + 1):
+                    A[Col][J] *= Inv_Pivot
+                for R in range(Col + 1, N):
+                    Factor = A[R][Col]
+                    if Factor != 0.0:
+                        for J in range(Col, N + 1):
+                            A[R][J] -= Factor * A[Col][J]
+            Coeffs = [0.0] * N
+            for I in reversed(range(N)):
+                S = A[I][N]
+                for J in range(I + 1, N):
+                    S -= A[I][J] * Coeffs[J]
+                Coeffs[I] = S
+            a, b, c, d, e, f, g, h = Coeffs
+            Skewed_Points = []
+            for (X, Y) in Rect_Points:
+                SX = X + HW
+                SY = Y + HH
+                Den = g * SX + h * SY + 1.0
+                NX = (a * SX + b * SY + c) / Den
+                NY = (d * SX + e * SY + f) / Den
+                Skewed_Points.append((NX - HW, NY - HH))
             C_X, C_Y = self._Left_Current, self._Top_Current
-            Final_Points = [
-                self.Rotation(X, Y, 0, 0, Angle, Translate=(C_X, C_Y))
-                for (X, Y) in Rect_Points
-            ]
+            Final_Points = [self.Rotation(X, Y, 0, 0, Angle_Rad, Translate=(C_X, C_Y)) for (X, Y) in Skewed_Points]
             Flat_Points = [Coord for Point in Final_Points for Coord in Point]
             Stripple = f'gray{self.Stripple()}' if self._Translucent else ''
             self._Canvas._Frame.itemconfig(self._Widget, outline=self._Outline, width=self._Thickness, fill=self._Fill, stipple=Stripple, smooth=True)
             self._Canvas._Frame.coords(self._Widget, Flat_Points)
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Rectangle -> {E}")
-            
+
     def Stripple(self):
         try:
             if 0 <= self._Alpha <= 12:

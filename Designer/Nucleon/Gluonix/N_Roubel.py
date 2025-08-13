@@ -125,9 +125,9 @@ class Roubel:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Grab -> {E}")
             
-    def Animate(self):
+    def Animate(self, Hide=False):
         try:
-            self._Frame.Animate(Widget=self._Widget)
+            self._Frame.Animate(Widget=self._Widget, Hide=Hide)
             self.Show()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Animate -> {E}")
@@ -242,6 +242,9 @@ class Roubel:
                 self.Create()
                 if self._On_Change:
                     self._On_Change()
+            elif self._Initialized:
+                if self._Display:
+                    self.Display()
             if "Background" in Input:
                 self._Background_Main = not bool(Input["Background"])
         except Exception as E:
@@ -268,7 +271,7 @@ class Roubel:
             if Left is not None or Top is not None:
                 self._Frame.Position(Left=self._Left, Top=self._Top)
                 self.Relocate()
-            return self._Frame.Position()
+            return [self._Left, self._Top]
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Position -> {E}")
             
@@ -281,7 +284,7 @@ class Roubel:
             if Width or Height:
                 self._Frame.Size(Width=self._Width, Height=self._Height)
                 self.Relocate()
-            return self._Frame.Size()
+            return [self._Width, self._Height]
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Size -> {E}")
         

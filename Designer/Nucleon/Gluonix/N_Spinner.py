@@ -254,6 +254,18 @@ class Spinner:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Move -> {E}")
             
+    def Center(self, Left=None, Top=None):
+        try:
+            if Left is not None:
+                self._Left = Left-self._Width/2
+            if Top is not None:
+                self._Top = Top-self._Height/2
+            if Left is not None or Top is not None:
+                self.Position(Left=self._Left, Top=self._Top)
+            return [self._Left+self._Width/2, self._Top+self._Height/2]
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Center -> {E}")
+            
     def Position(self, Left=None, Top=None):
         try:
             if Left is not None:

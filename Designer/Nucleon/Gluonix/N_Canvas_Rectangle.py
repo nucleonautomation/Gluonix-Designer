@@ -33,6 +33,7 @@ class Canvas_Rectangle:
         self._Resizable = self._Canvas._Resizable
         self._On_Show = False
         self._On_Hide = False
+        self._On_Animate = False
 
     def __str__(self):
         return "Nucleon_Glunoix_Canvas_Rectangle[]"
@@ -96,7 +97,7 @@ class Canvas_Rectangle:
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Display -> {E}")
             
-    def Animate(self):
+    def Animate(self, Hide=False):
         try:
             self.Animate_Cancel()
             Final_Left = float(self._Left)
@@ -156,6 +157,10 @@ class Canvas_Rectangle:
                                 return
                             self.Config(Left=int(round(Final_Left)), Top=int(round(Final_Top)), Width=int(round(Final_Width)), Height=int(round(Final_Height)))
                             self._Animating = False
+                            if Hide:
+                                self.Hide()
+                            if self._On_Animate:
+                                self._On_Animate()
                         self._Canvas._Frame.after(0, Snap_Final)
                         return
                     K = Ease(max(0.0, min(1.0, T)))
@@ -214,6 +219,8 @@ class Canvas_Rectangle:
                 self._On_Show = Input['On_Show']
             if 'On_Hide' in Input:
                 self._On_Hide = Input['On_Hide']
+            if 'On_Animate' in Input:
+                self._On_Animate = Input['On_Animate']
             Event_Bind_Canvas(self._Canvas._Frame, self._Widget, **Input)
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Bind -> {E}")
@@ -244,11 +251,27 @@ class Canvas_Rectangle:
             
     def Move(self, Left=None, Top=None):
         try:
+            if Left is not None:
+                self._Left += Left
+            if Top is not None:
+                self._Top += Top
             if Left is not None or Top is not None:
-                self.Position(Left=Left, Top=Top)
+                self.Position(Left=self._Left, Top=self._Top)
             return True
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Move -> {E}")
+            
+    def Center(self, Left=None, Top=None):
+        try:
+            if Left is not None:
+                self._Left = Left-self._Width/2
+            if Top is not None:
+                self._Top = Top-self._Height/2
+            if Left is not None or Top is not None:
+                self.Position(Left=self._Left, Top=self._Top)
+            return [self._Left+self._Width/2, self._Top+self._Height/2]
+        except Exception as E:
+            self._Canvas._GUI.Error(f"{self._Type} -> Center -> {E}")
         
     def Position(self, Left=None, Top=None):
         try:

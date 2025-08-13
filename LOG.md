@@ -1,5 +1,15 @@
 # Change Log
 
+## V(5.3)
+- Canvas Item Image & RectangleR Has Skew Options For Horizontal & Vertical Skew
+- On_Animate Bind Function Added To Widgets, As Animate() Triggers Inside A Thread
+- Center() Method Added To All The Widgets, Which Changes He Position By Giving Center Coords & Return Values Of Current Center
+- Video Player Directly Added TO Frame & Canvas
+- Group Widget Bug Fixes
+- Canvas Item Move Bug Fixes
+- New Example For Video Player
+- New Example For Game Using Animations
+
 ## V(5.2)
 - Animation Added To Widgets, All Widgets Support Predefined Starting Animate_Left, Animate_Top, Animate_Height, Animate_Width, Animate_Time, And Animate() To Trigger Animation
 - Canvas Items Pie, Circle, Arc Use Animate_Radius Instead Of Animate_Height, Animate_Width

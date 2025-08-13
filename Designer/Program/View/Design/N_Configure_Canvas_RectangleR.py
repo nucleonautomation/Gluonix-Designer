@@ -233,8 +233,38 @@ class Configure_Canvas_RectangleR:
             self.Fill_Check.Bind(On_Change=lambda : self.Update_Fill())
             self.Fill_Check.Create()
             
+            #Skew Horizontal Label
+            Fixture = self.Frame.Locate(25, 5, 3, 79)
+            self.Skew_Horizontal_Label = self.Global['Gluonix'].Label(self.Frame)
+            self.Skew_Horizontal_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Skew_Horizontal_Label.Config(Foreground='#000000', Value="Skew Horizontal:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Skew_Horizontal_Label.Create()
+            
+            #Skew Horizontal Entry
+            Fixture = self.Frame.Locate(40, 5, 28, 79)
+            self.Skew_Horizontal_Entry = self.Global['Gluonix'].Entry(self.Frame)
+            self.Skew_Horizontal_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Skew_Horizontal_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Skew_Horizontal_Entry.Bind(On_Key_Release=lambda E: self.Update_Skew_Horizontal())
+            self.Skew_Horizontal_Entry.Create()
+            
+            #Skew Vertical Label
+            Fixture = self.Frame.Locate(25, 5, 3, 86)
+            self.Skew_Vertical_Label = self.Global['Gluonix'].Label(self.Frame)
+            self.Skew_Vertical_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Skew_Vertical_Label.Config(Foreground='#000000', Value="Skew Vertical:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Skew_Vertical_Label.Create()
+            
+            #Skew Vertical Entry
+            Fixture = self.Frame.Locate(40, 5, 28, 86)
+            self.Skew_Vertical_Entry = self.Global['Gluonix'].Entry(self.Frame)
+            self.Skew_Vertical_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Skew_Vertical_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Skew_Vertical_Entry.Bind(On_Key_Release=lambda E: self.Update_Skew_Vertical())
+            self.Skew_Vertical_Entry.Create()
+            
             #Update Scroll
-            self.Frame.Update(self.Fill_Check)
+            self.Frame.Update(self.Skew_Vertical_Entry)
             
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
@@ -255,6 +285,8 @@ class Configure_Canvas_RectangleR:
                     self.Height_Entry.Config(Border_Color='#000000', Border_Size=1)
                     self.Left_Entry.Config(Border_Color='#000000', Border_Size=1)
                     self.Top_Entry.Config(Border_Color='#000000', Border_Size=1)
+                    self.Skew_Horizontal_Entry.Config(Border_Color='#000000', Border_Size=1)
+                    self.Skew_Vertical_Entry.Config(Border_Color='#000000', Border_Size=1)
                     self.Name_Label.Set(Widget_Data['Type'])
                     self.Name_Entry.Set(Widget_Data['Name'])
                     self.Outline_Color.Config(Background=Widget_Data['Outline'])
@@ -275,6 +307,8 @@ class Configure_Canvas_RectangleR:
                     self.Angle_Entry.Set(Widget_Data['Angle'])
                     self.Resize_Check.Set(bool(Widget_Data['Resize']))
                     self.Move_Check.Set(bool(Widget_Data['Move']))
+                    self.Skew_Horizontal_Entry.Set(Widget_Data['Skew_Horizontal'])
+                    self.Skew_Vertical_Entry.Set(Widget_Data['Skew_Vertical'])
                     self.Configure.Hide_All()
                     self.Configure.Current = self
                     self.Frame.Show()
@@ -504,5 +538,33 @@ class Configure_Canvas_RectangleR:
             self.Configure.Design.Database.Post(f"UPDATE `Item` SET `Fill`='{Fill}' WHERE `ID`='{self.ID}'")
             if self.Element:
                 self.Element.Config(Fill=Fill)
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Update_Skew_Horizontal(self):
+        try:
+            Skew_Horizontal = self.Skew_Horizontal_Entry.Get()
+            if self.Global['Custom'].Is_Float(Skew_Horizontal):
+                Skew_Horizontal = float(Skew_Horizontal)
+                self.Configure.Design.Database.Post(f"UPDATE `Item` SET `Skew_Horizontal`='{Skew_Horizontal}' WHERE `ID`='{self.ID}'")
+                self.Skew_Horizontal_Entry.Config(Border_Color='#000000', Border_Size=1)
+                if self.Element:
+                    self.Element.Config(Skew_Horizontal=Skew_Horizontal)
+            else:
+                self.Skew_Horizontal_Entry.Config(Border_Color='red', Border_Size=1)
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Update_Skew_Vertical(self):
+        try:
+            Skew_Vertical = self.Skew_Vertical_Entry.Get()
+            if self.Global['Custom'].Is_Float(Skew_Vertical):
+                Skew_Vertical = float(Skew_Vertical)
+                self.Configure.Design.Database.Post(f"UPDATE `Item` SET `Skew_Vertical`='{Skew_Vertical}' WHERE `ID`='{self.ID}'")
+                self.Skew_Vertical_Entry.Config(Border_Color='#000000', Border_Size=1)
+                if self.Element:
+                    self.Element.Config(Skew_Vertical=Skew_Vertical)
+            else:
+                self.Skew_Vertical_Entry.Config(Border_Color='red', Border_Size=1)
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))

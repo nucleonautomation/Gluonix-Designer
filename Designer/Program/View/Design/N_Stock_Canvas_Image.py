@@ -140,6 +140,7 @@ class Stock_Canvas_Image:
                     Widget.Config(Thickness=Widget_Data['Thickness'], Fill=Widget_Data['Fill'], Outline=Widget_Data['Outline'])
                     Widget.Config(Justify=Widget_Data['Justify'], Anchor=Widget_Data['Anchor'])
                     Widget.Config(Resize=bool(Widget_Data['Resize']), Move=bool(Widget_Data['Move']))
+                    Widget.Config(Skew_Horizontal=Widget_Data['Skew_Horizontal'], Skew_Vertical=Widget_Data['Skew_Vertical'])
                     Widget.Config(Url=bool(Widget_Data['Url']), Array=bool(Widget_Data['Array']), Pil=bool(Widget_Data['Pil']), Transparent=bool(Widget_Data['Transparent']), Rotate=Widget_Data['Rotate'], Aspect_Ratio=bool(Widget_Data['Aspect_Ratio']))
                     Widget.Config(Path=f"{self.Stock.Design.Project_Path}/Data/File/{ID}")
                     Widget.Lock = bool(Widget_Data['Lock'])

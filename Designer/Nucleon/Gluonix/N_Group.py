@@ -140,18 +140,6 @@ class Group:
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Move -> {E}")
             
-    def Position(self, Left=None, Top=None):
-        try:
-            return None
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Position -> {E}")
-            
-    def Size(self, Width=False, Height=False):
-        try:
-            return None
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Size -> {E}")
-            
     def Create(self):
         try:
             if not self._Background:

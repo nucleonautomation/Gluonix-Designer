@@ -120,7 +120,7 @@ class Label:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Grab -> {E}")
             
-    def Animate(self):
+    def Animate(self, Hide=False):
         try:
             self._Frame.Animate(Widget=self._Widget)
             self.Show()
@@ -249,6 +249,18 @@ class Label:
             return True
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Move -> {E}")
+            
+    def Center(self, Left=None, Top=None):
+        try:
+            if Left is not None:
+                self._Left = Left-self._Width/2
+            if Top is not None:
+                self._Top = Top-self._Height/2
+            if Left is not None or Top is not None:
+                self.Position(Left=self._Left, Top=self._Top)
+            return [self._Left+self._Width/2, self._Top+self._Height/2]
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Center -> {E}")
             
     def Position(self, Left=None, Top=None):
         try:
@@ -470,6 +482,7 @@ class Label_Lite:
                 self._Auto_Dark = True
                 self._On_Show = False
                 self._On_Hide = False
+                self._On_Animate = False
                 self._On_Hover_In = False
                 self._On_Hover_Out = False
             except Exception as E:
@@ -546,7 +559,7 @@ class Label_Lite:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Grab -> {E}")
             
-    def Animate(self):
+    def Animate(self, Hide=False):
         try:
             self.Animate_Cancel()
             if not hasattr(self, "_Width_Current") or not hasattr(self, "_Height_Current"):
@@ -612,6 +625,10 @@ class Label_Lite:
                                 return
                             self._Widget.place(x=int(round(Final_Left)), y=int(round(Final_Top)), width=int(round(Final_Width)), height=int(round(Final_Height)))
                             self._Animating = False
+                            if Hide:
+                                self.Hide()
+                            if self._On_Animate:
+                                self._On_Animate()
                         self._GUI._Frame.after(0, Snap_Final)
                         return
                     K = Ease(max(0.0, min(1.0, T)))
@@ -680,6 +697,8 @@ class Label_Lite:
                 self._On_Show = Input['On_Show']
             if 'On_Hide' in Input:
                 self._On_Hide = Input['On_Hide']
+            if 'On_Animate' in Input:
+                self._On_Animate = Input['On_Animate']
             if 'On_Change' in Input:
                 self._On_Change = Input['On_Change']
             if 'On_Hover_In' in Input:
@@ -762,6 +781,18 @@ class Label_Lite:
             return True
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Move -> {E}")
+            
+    def Center(self, Left=None, Top=None):
+        try:
+            if Left is not None:
+                self._Left = Left-self._Width/2
+            if Top is not None:
+                self._Top = Top-self._Height/2
+            if Left is not None or Top is not None:
+                self.Position(Left=self._Left, Top=self._Top)
+            return [self._Left+self._Width/2, self._Top+self._Height/2]
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Center -> {E}")
             
     def Position(self, Left=None, Top=None):
         try:

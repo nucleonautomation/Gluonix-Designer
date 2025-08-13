@@ -9,7 +9,7 @@ from .N_Custom import Event_Bind_Canvas
 class Canvas_Image:
     def __init__(self, Main):
         self._Canvas = Main
-        self._Config = ['Name', 'Width', 'Height', 'Left', 'Top', 'Animate_Left', 'Animate_Top', 'Animate_Width', 'Animate_Height', 'Animate_Time', 'Anchor', 'Url', 'Array', 'Pil', 'Photo', 'Resize', 'Rotate', 'Path', 'Path_Initial', 'Transparent']
+        self._Config = ['Name', 'Width', 'Height', 'Left', 'Top', 'Animate_Left', 'Animate_Top', 'Animate_Width', 'Animate_Height', 'Animate_Time', 'Anchor', 'Url', 'Array', 'Pil', 'Photo', 'Resize', 'Rotate', 'Path', 'Path_Initial', 'Transparent', 'Skew_Horizontal', 'Skew_Vertical']
         self._Display = True
         self._Resize_Index = 0
         self._Resize = True
@@ -39,12 +39,15 @@ class Canvas_Image:
         self._Transparent = True
         self._Rotate = 0
         self._Angle = 0
+        self._Skew_Horizontal = 0
+        self._Skew_Vertical = 0
         self._Width, self._Height, self._Width_Old, self._Height_Old, self._Left, self._Top = 0, 0, 0, 0, 0, 0
         self._Widget = self._Canvas._Frame.create_image(0, 0, anchor=self._Anchor, image=None)
         self._Canvas._Widget.append(self)
         self._Resizable = self._Canvas._Resizable
         self._On_Show = False
         self._On_Hide = False
+        self._On_Animate = False
 
     def __str__(self):
         return "Nucleon_Glunoix_Canvas_Image[]"
@@ -108,7 +111,7 @@ class Canvas_Image:
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Display -> {E}")
             
-    def Animate(self):
+    def Animate(self, Hide=False):
         try:
             self.Animate_Cancel()
             Final_Left = float(self._Left)
@@ -168,6 +171,10 @@ class Canvas_Image:
                                 return
                             self.Config(Left=int(round(Final_Left)), Top=int(round(Final_Top)), Width=int(round(Final_Width)), Height=int(round(Final_Height)))
                             self._Animating = False
+                            if Hide:
+                                self.Hide()
+                            if self._On_Animate:
+                                self._On_Animate()
                         self._Canvas._Frame.after(0, Snap_Final)
                         return
                     K = Ease(max(0.0, min(1.0, T)))
@@ -252,6 +259,8 @@ class Canvas_Image:
                 self._On_Show = Input['On_Show']
             if 'On_Hide' in Input:
                 self._On_Hide = Input['On_Hide']
+            if 'On_Animate' in Input:
+                self._On_Animate = Input['On_Animate']
             Event_Bind_Canvas(self._Canvas._Frame, self._Widget, **Input)
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Bind -> {E}")
@@ -282,11 +291,27 @@ class Canvas_Image:
             
     def Move(self, Left=None, Top=None):
         try:
+            if Left is not None:
+                self._Left += Left
+            if Top is not None:
+                self._Top += Top
             if Left is not None or Top is not None:
-                self.Position(Left=Left, Top=Top)
+                self.Position(Left=self._Left, Top=self._Top)
             return True
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Move -> {E}")
+            
+    def Center(self, Left=None, Top=None):
+        try:
+            if Left is not None:
+                self._Left = Left-self._Width/2
+            if Top is not None:
+                self._Top = Top-self._Height/2
+            if Left is not None or Top is not None:
+                self.Position(Left=self._Left, Top=self._Top)
+            return [self._Left+self._Width/2, self._Top+self._Height/2]
+        except Exception as E:
+            self._Canvas._GUI.Error(f"{self._Type} -> Center -> {E}")
         
     def Position(self, Left=None, Top=None):
         try:
@@ -341,25 +366,76 @@ class Canvas_Image:
         
     def Convert(self):
         try:
-            Temp_Image = self._Image.rotate(self._Rotate+self._Angle, PIL_Image.NEAREST, expand=0)
+            Temp_Image = self._Image.rotate(self._Rotate + self._Angle, PIL_Image.NEAREST, expand=1)
             if self._Transparent:
-                Temp_Image_Convert = Temp_Image.convert('RGBA')
+                Temp_Image = Temp_Image.convert('RGBA')
             else:
-                Temp_Image_Convert = Temp_Image.convert("HSV")
-            Width, Height = Temp_Image.size
-            if self._Width_Current>0 and self._Height_Current>0:
-                Temp_Image = Temp_Image.resize((int(self._Width_Current), int(self._Height_Current)), PIL_Image.NEAREST)
-            elif self._Width_Current and self._Height_Current<1:
-                Ratio = Height/Width
-                Temp_Image = Temp_Image.resize((int(self._Width_Current), int(self._Width_Current*Ratio)), PIL_Image.NEAREST)
-            elif self._Width_Current<1 and self._Height_Current:
-                Ratio = Width/Height
-                Temp_Image = Temp_Image.resize((int(self._Height_Current*Ratio), int(self._Height_Current)), PIL_Image.NEAREST)
-            else:
-                Temp_Image = Temp_Image.copy()
+                Temp_Image = Temp_Image.convert('HSV')
+            W_Tgt = int(max(1, round(self._Width_Current))) if self._Width_Current else Temp_Image.size[0]
+            H_Tgt = int(max(1, round(self._Height_Current))) if self._Height_Current else Temp_Image.size[1]
+            if W_Tgt > 0 and H_Tgt > 0:
+                Temp_Image = Temp_Image.resize((W_Tgt, H_Tgt), PIL_Image.NEAREST)
+            W, H = Temp_Image.size
+            Skew_X = max(-100.0, min(100.0, float(self._Skew_Horizontal or 0.0)))
+            Skew_Y = max(-100.0, min(100.0, float(self._Skew_Vertical or 0.0)))
+            Delta_X = min((W - 1) * 0.5, (abs(Skew_X) / 100.0) * (W * 0.5))
+            Delta_Y = min((H - 1) * 0.5, (abs(Skew_Y) / 100.0) * (H * 0.5))
+            TL_X, TL_Y = 0.0, 0.0
+            TR_X, TR_Y = float(W), 0.0
+            BR_X, BR_Y = float(W), float(H)
+            BL_X, BL_Y = 0.0, float(H)
+            if Skew_X > 0:
+                TL_X = Delta_X; TR_X = W - Delta_X
+            elif Skew_X < 0:
+                BL_X = Delta_X; BR_X = W - Delta_X
+            if Skew_Y > 0:
+                TR_Y = Delta_Y; BR_Y = H - Delta_Y
+            elif Skew_Y < 0:
+                TL_Y = Delta_Y; BL_Y = H - Delta_Y
+            if Delta_X == 0 and Delta_Y == 0:
+                self._Width_Old, self._Height_Old = self._Width_Current, self._Height_Current
+                return PIL_ImageTk.PhotoImage(Temp_Image)
+            Src_Points = [(0.0, 0.0), (float(W), 0.0), (float(W), float(H)), (0.0, float(H))]
+            Dst_Points = [(TL_X, TL_Y), (TR_X, TR_Y), (BR_X, BR_Y), (BL_X, BL_Y)]
+            A = []; B_Vals = []
+            for (X, Y), (U, V) in zip(Dst_Points, Src_Points):
+                A.append([X, Y, 1, 0, 0, 0, -U * X, -U * Y]); B_Vals.append(U)
+                A.append([0, 0, 0, X, Y, 1, -V * X, -V * Y]); B_Vals.append(V)
+            N = 8
+            for I in range(N):
+                A[I].append(B_Vals[I])
+            for Col in range(N):
+                Pivot = max(range(Col, N), key=lambda R: abs(A[R][Col]))
+                if abs(A[Pivot][Col]) < 1e-12:
+                    continue
+                if Pivot != Col:
+                    A[Col], A[Pivot] = A[Pivot], A[Col]
+                Pivot_Val = A[Col][Col]
+                Inv_Pivot = 1.0 / Pivot_Val
+                for J in range(Col, N + 1):
+                    A[Col][J] *= Inv_Pivot
+                for R in range(Col + 1, N):
+                    Factor = A[R][Col]
+                    if Factor != 0.0:
+                        for J in range(Col, N + 1):
+                            A[R][J] -= Factor * A[Col][J]
+            Coeffs = [0.0] * N
+            for I in reversed(range(N)):
+                S = A[I][N]
+                for J in range(I + 1, N):
+                    S -= A[I][J] * Coeffs[J]
+                Coeffs[I] = S
+            try:
+                Warped_Image = Temp_Image.transform((W, H), PIL_Image.PERSPECTIVE, Coeffs, resample=PIL_Image.BICUBIC, fillcolor=(0, 0, 0, 0) if self._Transparent else None)
+            except TypeError:
+                Background_Image = PIL_Image.new('RGBA' if self._Transparent else Temp_Image.mode, (W, H), (0, 0, 0, 0) if self._Transparent else 0)
+                Warped_Image = Temp_Image.transform((W, H), PIL_Image.PERSPECTIVE, Coeffs, resample=PIL_Image.BICUBIC)
+                if self._Transparent and Warped_Image.mode != 'RGBA':
+                    Warped_Image = Warped_Image.convert('RGBA')
+                Background_Image.paste(Warped_Image, (0, 0), Warped_Image.split()[3] if self._Transparent and Warped_Image.mode == 'RGBA' else None)
+                Warped_Image = Background_Image
             self._Width_Old, self._Height_Old = self._Width_Current, self._Height_Current
-            Temp_Image_TK = PIL_ImageTk.PhotoImage(Temp_Image)
-            return Temp_Image_TK
+            return PIL_ImageTk.PhotoImage(Warped_Image)
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Convert -> {E}")
         
@@ -416,6 +492,19 @@ class Canvas_Image:
                 self._Y_Current = self._Top
                 self._Width_Current = self._Width
                 self._Height_Current = self._Height
+            Angle_Total = (self._Rotate + self._Angle) % 360
+            if Angle_Total:
+                Angle_Rad = math.radians(Angle_Total if Angle_Total <= 180 else 360 - Angle_Total)
+                C = abs(math.cos(Angle_Rad))
+                S = abs(math.sin(Angle_Rad))
+                New_W = self._Width_Current * C + self._Height_Current * S
+                New_H = self._Width_Current * S + self._Height_Current * C
+                Dx = (New_W - self._Width_Current) * 0.5
+                Dy = (New_H - self._Height_Current) * 0.5
+                self._X_Current -= Dx
+                self._Y_Current -= Dy
+                self._Width_Current = New_W
+                self._Height_Current = New_H
             self.Create()
             if self._Display:
                 self.Display()

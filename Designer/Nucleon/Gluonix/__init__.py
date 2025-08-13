@@ -49,6 +49,7 @@ from .N_Spinner import Spinner
 from .N_Scale import Scale
 from .N_Select import Select
 from .N_List import List
+from .N_Video import Video
 from .N_Image import Image
 from .N_Image import Image_Open
 from .N_Image import Image_Lite
