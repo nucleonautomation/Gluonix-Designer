@@ -1,10 +1,14 @@
 # Change Log
 
+## V(5.4)
+- Gluonix Library Optimized
+- New Interactive Login Example Added Using Animations
+
 ## V(5.3)
 - Canvas Item Image & RectangleR Has Skew Options For Horizontal & Vertical Skew
 - On_Animate Bind Function Added To Widgets, As Animate() Triggers Inside A Thread
-- Center() Method Added To All The Widgets, Which Changes He Position By Giving Center Coords & Return Values Of Current Center
-- Video Player Directly Added TO Frame & Canvas
+- Center() Method Added To All The Widgets, Which Changes The Position By Giving Center Coords & Return Values Of Current Center
+- Video Player Directly Added To Frame & Canvas
 - Group Widget Bug Fixes
 - Canvas Item Move Bug Fixes
 - New Example For Video Player

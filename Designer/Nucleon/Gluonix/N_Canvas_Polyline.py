@@ -129,36 +129,29 @@ class Canvas_Polyline:
             
     def Move(self, Left=None, Top=None):
         try:
-            if Left is not None:
-                self._Left += Left
-            if Top is not None:
-                self._Top += Top
-            if Left is not None or Top is not None:
-                self.Position(Left=self._Left, Top=self._Top)
+            if Left is None and Top is None:
+                return False
+            Left = 0 if Left is None else Left
+            Top = 0 if Top is None else Top
+            self._Points = [[X + Left, Y + Top] for X, Y in self._Points]
+            if Left != 0 or Top != 0:
+                self.Relocate()
             return True
-        except Exception as E:
-            self._Canvas._GUI.Error(f"{self._Type} -> Move -> {E}")
+        except Exception as Error:
+            self._Canvas._GUI.Error(f"{self._Type} -> Move -> {Error}")
             
     def Center(self, Left=None, Top=None):
         try:
-            if Left is not None:
-                self._Left = Left-self._Width/2
-            if Top is not None:
-                self._Top = Top-self._Height/2
-            if Left is not None or Top is not None:
-                self.Position(Left=self._Left, Top=self._Top)
-            return [self._Left+self._Width/2, self._Top+self._Height/2]
+            Box = self._Canvas._Frame.bbox(self._Widget)
+            X1, Y1, X2, Y2 = Box
+            X = (X1+X2)/2
+            Y = (Y1+Y2)/2
+            return [X, Y]
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Center -> {E}")
         
     def Position(self, Left=None, Top=None):
         try:
-            if Left is not None:
-                self._Left = Left
-            if Top is not None:
-                self._Top = Top
-            if Left is not None or Top is not None:
-                self.Relocate()
             Box = self._Canvas._Frame.bbox(self._Widget)
             X1, Y1, X2, Y2 = Box
             return [X1, Y1]
@@ -167,12 +160,6 @@ class Canvas_Polyline:
             
     def Size(self, Width=False, Height=False):
         try:
-            if Width:
-                self._Width = Width
-            if Height:
-                self._Height = Height
-            if Width or Height:
-                self.Relocate()
             Box = self._Canvas._Frame.bbox(self._Widget)
             X1, Y1, X2, Y2 = Box
             Width = X2 - X1

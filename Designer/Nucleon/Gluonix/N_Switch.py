@@ -3,7 +3,7 @@ import io
 import base64
 from PIL import Image as PIL_Image
 from .N_GUI import GUI
-from .N_Image import Image_Lite
+from .N_Image_Lite import Image_Lite
 from .N_Custom import Event_Bind
 
 def Create_Image(Image_Data):

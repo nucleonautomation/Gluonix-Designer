@@ -1,67 +1,80 @@
 # IMPORT LIBRARIES
-import math
+import os
+from io import BytesIO
+from requests import get as requests_get
+from PIL import Image as PIL_Image, ImageTk as PIL_ImageTk
 import tkinter as TK
 import threading, math, time
 from .N_GUI import GUI
 from .N_Frame import Frame
+from .N_Canvas import Canvas
 from .N_Custom import Event_Bind
 
-class Button:
+PIL_Image.MAX_IMAGE_PIXELS = None       
+            
+class Image_Zoom:
 
     def __init__(self, Main, *args, **kwargs):
         self._GUI = GUI._Instance
         if self._GUI is not None:
-            self._Type = "Button"
+            self._Type = "Image_Zoom"
             try:
-                self._Config = ['Name', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Foreground', 'Light_Foreground', 'Dark_Foreground', 'Border_Color', 'Light_Border_Color', 'Dark_Border_Color', 'Border_Size', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Font_Size', 'Font_Weight', 'Font_Family', 'Value', 'Ridge', 'Disable', 'Disable_Foreground', 'Active_Background', 'Active_Foreground', 'Hover_Background', 'Light_Hover_Background', 'Dark_Hover_Background', 'Hover_Foreground', 'Light_Hover_Foreground', 'Dark_Hover_Foreground', 'Hover_Border_Color', 'Light_Hover_Border_Color', 'Dark_Hover_Border_Color']
+                self._Config = ['Name', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Border_Color', 'Light_Border_Color', 'Dark_Border_Color', 'Border_Size', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Path', 'Path_Initial', 'Url', 'Array', 'Pil', 'Rotate', 'Transparent', 'Hover_Background', 'Light_Hover_Background', 'Dark_Hover_Background', 'Hover_Foreground', 'Light_Hover_Foreground', 'Dark_Hover_Foreground', 'Hover_Border_Color', 'Light_Hover_Border_Color', 'Dark_Hover_Border_Color']
                 self._Initialized = False
                 self._Name = False
                 self._Last_Name = False
-                self._Widget = []
-                self._Resize_Font, self._Resize, self._Resize_Width, self._Resize_Height, self._Move, self._Move_Left, self._Move_Top = True, True, True, True, True, True, True
+                self._Resize_Font, self._Resize, self._Resize_Width, self._Resize_Height, self._Move, self._Move_Left, self._Move_Top = False, True, True, True, True, True, True
                 self._Popup = False
                 self._Display = True
                 self._Size_Update = False
                 self._Resize_Index = 0
                 self._Main = Main
-                self._Frame = Frame(self._Main)
-                self._Widget = TK.Button(self._Frame._Frame)
+                self._Frame = Canvas(self._Main)
+                self._Frame.Bind(On_Click = self.Drag_Start)
+                self._Frame.Bind(On_Drag = self.Drag)
+                self._Frame.Bind(On_Mouse_Wheel = self.Zoom)
+                self._Frame.Bind(On_Right_Click = self.Reset)
                 self._Border_Color = '#000000'
                 self._Border_Size = 0
                 self._Background = self._Main._Background
                 self._Background_Main = True
-                self._Foreground = '#000000'
                 self._Hover_Background = False
-                self._Hover_Foreground = False
                 self._Hover_Border_Color = False
                 self._Last_Background = False
-                self._Last_Foreground = False
                 self._Last_Border_Color = False
-                self._Disable_Foreground = self._Foreground
-                self._Active_Foreground = self._Background
-                self._Active_Background = self._Foreground
-                self._Font_Size = 12
-                self._Font_Weight = 'normal'
-                self._Font_Family = 'Helvetica'
-                self._Value = ''
-                self._Disable = False
-                self._Ridge = False
+                self._Image = False
+                self._Image_Window = False
+                self._Path = False
+                self._Path_Memory = False
+                self._Path_Initial = False
+                self._Url = False
+                self._Array = False
+                self._Pil = False
+                self._Rotate = 0
+                self._Angle = 0
+                self._Transparent = True
+                self._Zoom_Scale = 1.0
+                self._Zoom_Center = None
                 self._Resizable = self._Main._Resizable
                 self._Auto_Dark = True
                 self._On_Show = False
                 self._On_Hide = False
                 self._On_Hover_In = False
                 self._On_Hover_Out = False
+                self._On_Click = False
+                self._On_Drag = False
+                self._On_Mouse_Wheel = False
+                self._On_Right_Click = False
             except Exception as E:
                 self._GUI.Error(f"{self._Type} -> Init -> {E}")
         else:
             print("Error: Gluonix -> GUI Instance Has Not Been Created")
 
     def __str__(self):
-        return "Nucleon_Glunoix_Button[]"
+        return "Nucleon_Glunoix_Image_Zoom[]"
 
     def __repr__(self):
-        return "Nucleon_Glunoix_Button[]"
+        return "Nucleon_Glunoix_Image_Zoom[]"
     
     def Copy(self, Name=False, Main=False):
         try:
@@ -71,8 +84,7 @@ class Button:
             for Key in self._Config:
                 if hasattr(self, "_"+Key):
                     setattr(Instance, "_"+Key, getattr(self, "_"+Key))
-            if Name:
-                setattr(Instance, "_Name", Name)
+            setattr(Instance, "_Name", Name)
             Instance.Create()
             return Instance
         except Exception as E:
@@ -81,7 +93,6 @@ class Button:
     def Delete(self):
         try:
             self._Main._Widget.remove(self)
-            self._Widget.destroy()
             self._Frame.Delete()
             if self:
                 del self
@@ -112,16 +123,10 @@ class Button:
     def Display(self):
         try:
             self._Frame.Show()
-            self._Widget.place(x=0, y=0, width=self._Width_Current-(self._Border_Size*2), height=self._Height_Current-(self._Border_Size*2))
+            self._Frame._Frame.tag_raise(self._Image_Window)
             self._Display = True
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Display -> {E}")
-            
-    def Focus(self):
-        try:
-            self._Widget.focus_set()
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Focus -> {E}")
     
     def Grab(self, Path=False):
         try:
@@ -143,25 +148,40 @@ class Button:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Animate_Cancel -> {E}")
             
-    def Set(self, Value=''):
+    def Set(self, Path):
         try:
-            if Value!=self._Value:
-                self._Value = Value
-                self._Widget.config(text=self._Value)
+            self._Path = Path
+            self._Path_Memory = self._Path
+            self.Open()
+            if not self._Image_Window:
+                self.Relocate()
+            else:
+                self.Load()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Set -> {E}")
             
-    def Get(self):
+    def Initial(self):
         try:
-            return self._Value
+            if self._Path_Initial:
+                Load_Setup = [self._Array, self._Url, self._Pil]
+                self._Array, self._Url, self._Pil = False, False, False
+                self.Set(self._Path_Initial)
+                self._Array, self._Url, self._Pil = Load_Setup
         except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Get -> {E}")
+            self._GUI.Error(f"{self._Type} -> Initial -> {E}")
+            
+    def Refresh(self):
+        try:
+            self.Open()
+            self.Relocate()
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Refresh -> {E}")
             
     def Widget(self):
         try:
-            return self._Widget
+            return self._Frame
         except Exception as E:
-            self._GUI.Error(f"{self._Type} ->  Widget -> {E}")
+            self._GUI.Error(f"{self._Type} -> Widget -> {E}")
             
     def Bind(self, **Input):
         try:
@@ -169,14 +189,25 @@ class Button:
                 self._On_Show = Input['On_Show']
             if 'On_Hide' in Input:
                 self._On_Hide = Input['On_Hide']
-            self._Frame.Bind(**Input)
             if 'On_Hover_In' in Input:
                 self._On_Hover_In = Input['On_Hover_In']
             Input['On_Hover_In'] = lambda E: self.On_Hover_In(E)
             if 'On_Hover_Out' in Input:
                 self._On_Hover_Out = Input['On_Hover_Out']
             Input['On_Hover_Out'] = lambda E: self.On_Hover_Out(E)
-            Event_Bind(self._Widget, **Input)
+            if 'On_Click' in Input:
+                self._On_Click = Input['On_Click']
+                del Input['On_Click']
+            if 'On_Drag' in Input:
+                self._On_Drag = Input['On_Drag']
+                del Input['On_Drag']
+            if 'On_Mouse_Wheel' in Input:
+                self._On_Mouse_Wheel = Input['On_Mouse_Wheel']
+                del Input['On_Mouse_Wheel']
+            if 'On_Right_Click' in Input:
+                self._On_Right_Click = Input['On_Right_Click']
+                del Input['On_Right_Click']
+            self._Frame.Bind(**Input)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Bind -> {E}")
             
@@ -186,9 +217,6 @@ class Button:
             if self._Hover_Background:
                 self._Last_Background = self._Background
                 Config['Background'] = self._Hover_Background
-            if self._Hover_Foreground:
-                self._Last_Foreground = self._Foreground
-                Config['Foreground'] = self._Hover_Foreground
             if self._Hover_Border_Color:
                 self._Last_Border_Color = self._Border_Color
                 Config['Border_Color'] = self._Hover_Border_Color
@@ -204,8 +232,6 @@ class Button:
             Config = {}
             if self._Hover_Background and self._Last_Background:
                 Config['Background'] = self._Last_Background if self._Background==self._Hover_Background else self._Background
-            if self._Hover_Foreground and self._Last_Foreground:
-                Config['Foreground'] = self._Last_Foreground if self._Foreground==self._Hover_Foreground else self._Foreground
             if self._Hover_Border_Color and self._Last_Border_Color:
                 Config['Border_Color'] = self._Last_Border_Color if self._Border_Color==self._Hover_Border_Color else self._Border_Color
             if len(Config)>0:
@@ -242,8 +268,6 @@ class Button:
                 self._Background_Main = not bool(Input["Background"])
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Config -> {E}")
-            
-
             
     def Move(self, Left=None, Top=None):
         try:
@@ -327,27 +351,26 @@ class Button:
                 self.Update_Color()
             if not self._Initialized:
                 self.Update_Color()
-                self._Width_Current, self._Height_Current, self._Left_Current, self._Top_Current, self._Font_Size_Current = self._Width, self._Height, self._Left, self._Top, self._Font_Size
+                self._Width_Current, self._Height_Current, self._Left_Current, self._Top_Current, = self._Width, self._Height, self._Left, self._Top
                 self._Frame.Config(Width=self._Width_Current, Height=self._Height_Current, Left=self._Left_Current, Top=self._Top_Current)
                 self._Frame.Config(Background=self._Background, Border_Size=self._Border_Size, Border_Color=self._Border_Color)
                 self._Frame.Create()
-                Event_Bind(self._Widget, On_Hover_In=lambda E: self.On_Hover_In(E), On_Hover_Out=lambda E: self.On_Hover_Out(E))
+                self._Frame.Bind(On_Hover_In=lambda E: self.On_Hover_In(E), On_Hover_Out=lambda E: self.On_Hover_Out(E))
                 if not self._Display:
                     self.Hide()
                 self._Main._Widget.append(self)
                 self._Initialized = True
-            if self._Disable:
-                State = TK.DISABLED
-            else:
-                State = TK.NORMAL
-            if self._Ridge:
-                Relief = TK.RIDGE
-            else:
-                Relief = TK.FLAT
-            self.Font()
-            self._Font = TK.font.Font(family=self._Font_Family, size=self._Font_Size_Current, weight=self._Font_Weight)
-            self._Widget.config(background=self._Background, foreground=self._Foreground, font=self._Font, text=self._Value, wraplength=self._Width_Current-(self._Border_Size*2), state=State, relief=Relief)
-            self._Widget.config(disabledforeground=self._Disable_Foreground, activebackground=self._Active_Background, activeforeground=self._Active_Foreground)
+            if isinstance(self._Path, str) and isinstance(self._Path_Memory, str):
+                if self._Path != self._Path_Memory:
+                    self._Path_Memory = self._Path
+                    self.Open()
+            elif isinstance(self._Path, list) and isinstance(self._Path_Memory, list):
+                if not all(a == b for a, b in zip(self._Path, self._Path_Memory)):
+                    self._Path_Memory = self._Path
+                    self.Open()
+            elif type(self._Path) != type(self._Path_Memory):
+                self._Path_Memory = self._Path
+                self.Open()
             self.Resize()
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
@@ -365,19 +388,174 @@ class Button:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Update_Color -> {E}")
             
-    def Font(self):
+    def Open(self):
         try:
-            if self._Resize_Font:
-                Width_Ratio = self._Frame._Width_Current / self._Frame._Width
-                Height_Ratio = self._Frame._Height_Current / self._Frame._Height
-                if Width_Ratio < Height_Ratio:
-                    self._Font_Size_Current = math.floor(self._Font_Size * Width_Ratio)
-                else:
-                    self._Font_Size_Current = math.floor(self._Font_Size * Height_Ratio)
+            if self._Image:
+                self._Image.close()
+            if self._Url and self._Path:
+                Image_Data = requests_get(self._Path)
+                self._Image = PIL_Image.open(BytesIO(Image_Data.content))
+            elif self._Array and self._Path is not None:
+                self._Image = PIL_Image.fromarray(self._Path)
+            elif self._Pil and self._Path:
+                self._Image = self._Path.copy()
+            elif self._Path and os.path.exists(self._Path):
+                self._Image = PIL_Image.open(self._Path)
+                if not self._Path_Initial:
+                    self._Path_Initial = self._Path
             else:
-                self._Font_Size_Current = self._Font_Size
+                self._Image = None
+            if self._Image:
+                self._Image_Width, self._Image_Height = self._Image.size
+                if self._Zoom_Center is None:
+                    self._Zoom_Center = (self._Image_Width // 2, self._Image_Height // 2)
+                CX, CY = self._Zoom_Center
+                CX = max(0, min(CX, self._Image_Width))
+                CY = max(0, min(CY, self._Image_Height))
+                self._Zoom_Center = (CX, CY)
+                if not hasattr(self, "_Zoom_Scale"):
+                    self._Zoom_Scale = 1.0
         except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Font -> {E}")
+            self._GUI.Error(f"{self._Type} -> Open -> {E}")
+            
+    def Convert(self, Frame_Width, Frame_Height):
+        try:
+            if not self._Image:
+                return {"Image": None, "Top": 0, "Left": 0}
+            Zoom_W = self._Image_Width / self._Zoom_Scale
+            Zoom_H = self._Image_Height / self._Zoom_Scale
+            CX, CY = self._Zoom_Center
+            CX = max(Zoom_W // 2, min(self._Image_Width - Zoom_W // 2, CX))
+            CY = max(Zoom_H // 2, min(self._Image_Height - Zoom_H // 2, CY))
+            self._Zoom_Center = (CX, CY)
+            Left = CX - Zoom_W // 2
+            Top = CY - Zoom_H // 2
+            Right = Left + Zoom_W
+            Bottom = Top + Zoom_H
+            Crop = self._Image.crop((int(Left), int(Top), int(Right), int(Bottom)))
+            if self._Transparent:
+                Crop = Crop.convert("RGBA")
+            Image_Width, Image_Height = Crop.size
+            Image_Aspect = Image_Width / Image_Height
+            Frame_Aspect = Frame_Width / Frame_Height
+            if Image_Aspect > Frame_Aspect:
+                New_Width = int(Frame_Width)
+                New_Height = int(Frame_Width / Image_Aspect)
+            else:
+                New_Height = int(Frame_Height)
+                New_Width = int(Frame_Height * Image_Aspect)
+            Crop = Crop.resize((New_Width, New_Height), PIL_Image.NEAREST)
+            Left = (Frame_Width - New_Width) // 2
+            Top = (Frame_Height - New_Height) // 2
+            Crop_TK = PIL_ImageTk.PhotoImage(Crop)
+            return {"Image": Crop_TK, "Top": Top, "Left": Left}
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Convert -> {E}")
+            return {"Image": None, "Top": 0, "Left": 0}
+            
+    def Load(self):
+        try:
+            if self._Height_Current > 0 and self._Width_Current > 0:
+                Image = self.Convert(self._Width_Current, self._Height_Current)
+                if Image["Image"] is None:
+                    return
+                if not self._Image_Window:
+                    self._Image_Window = self._Frame._Frame.create_image(Image['Left'], Image['Top'], image=Image['Image'], anchor='nw')
+                    self._Frame._Frame.Temp_Image = Image['Image']
+                else:
+                    self._Frame._Frame.itemconfig(self._Image_Window, image=Image['Image'])
+                    self._Frame._Frame.coords(self._Image_Window, Image['Left'], Image['Top'])
+                    self._Frame._Frame.Temp_Image = Image['Image']
+                self._Frame._Frame.itemconfigure(self._Image_Window, state='normal')
+                self._Frame._Frame.tag_raise(self._Image_Window)
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Load -> {E}")
+                
+    def Drag_Start(self, Event):
+        try:
+            self._Drag_Last_X = self._Frame._Frame.canvasx(Event.x)
+            self._Drag_Last_Y = self._Frame._Frame.canvasy(Event.y)
+            if self._On_Click:
+                self._On_Click(Event)
+        except Exception:
+            self._Drag_Last_X, self._Drag_Last_Y = 0, 0
+            
+    def Drag(self, Event):
+        try:
+            if not self._Image:
+                return
+            Curr_X = self._Frame._Frame.canvasx(Event.x)
+            Curr_Y = self._Frame._Frame.canvasy(Event.y)
+            Delta_X = Curr_X - self._Drag_Last_X
+            Delta_Y = Curr_Y - self._Drag_Last_Y
+            self._Drag_Last_X = Curr_X
+            self._Drag_Last_Y = Curr_Y
+            View_W = self._Image_Width / self._Zoom_Scale
+            View_H = self._Image_Height / self._Zoom_Scale
+            Move_X_Img = -Delta_X * (View_W / self._Width_Current)
+            Move_Y_Img = -Delta_Y * (View_H / self._Height_Current)
+            New_CX = self._Zoom_Center[0] + Move_X_Img
+            New_CY = self._Zoom_Center[1] + Move_Y_Img
+            Half_W = View_W / 2
+            Half_H = View_H / 2
+            New_CX = max(Half_W, min(self._Image_Width - Half_W, New_CX))
+            New_CY = max(Half_H, min(self._Image_Height - Half_H, New_CY))
+            self._Zoom_Center = (New_CX, New_CY)
+            self.Load()
+            if self._On_Drag:
+                self._On_Drag(Event)
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Drag -> {E}")
+            
+    def Zoom(self, Event):
+        try:
+            if not self._Image:
+                return
+            Zoom_Factor = 1.1 if Event.delta > 0 else 0.9
+            New_Zoom_Scale = self._Zoom_Scale * Zoom_Factor
+            New_Zoom_Scale = max(1.0, New_Zoom_Scale)
+            if New_Zoom_Scale == self._Zoom_Scale:
+                return
+            CanvasX = self._Frame._Frame.canvasx(Event.x)
+            CanvasY = self._Frame._Frame.canvasy(Event.y)
+            Img_X, Img_Y = self._Frame._Frame.coords(self._Image_Window)
+            Mouse_Rel_X = (CanvasX - Img_X) / self._Width_Current
+            Mouse_Rel_Y = (CanvasY - Img_Y) / self._Height_Current
+            View_W = self._Image_Width / self._Zoom_Scale
+            View_H = self._Image_Height / self._Zoom_Scale
+            View_Left = self._Zoom_Center[0] - View_W / 2
+            View_Top = self._Zoom_Center[1] - View_H / 2
+            Mouse_Abs_X = View_Left + Mouse_Rel_X * View_W
+            Mouse_Abs_Y = View_Top + Mouse_Rel_Y * View_H
+            New_View_W = self._Image_Width / New_Zoom_Scale
+            New_View_H = self._Image_Height / New_Zoom_Scale
+            New_View_Left = Mouse_Abs_X - Mouse_Rel_X * New_View_W
+            New_View_Top = Mouse_Abs_Y - Mouse_Rel_Y * New_View_H
+            New_Center_X = New_View_Left + New_View_W / 2
+            New_Center_Y = New_View_Top + New_View_H / 2
+            Half_W = New_View_W / 2
+            Half_H = New_View_H / 2
+            New_Center_X = max(Half_W, min(self._Image_Width - Half_W, New_Center_X))
+            New_Center_Y = max(Half_H, min(self._Image_Height - Half_H, New_Center_Y))
+            self._Zoom_Scale = New_Zoom_Scale
+            self._Zoom_Center = (New_Center_X, New_Center_Y)
+            self.Load()
+            if self._On_Mouse_Wheel:
+                self._On_Mouse_Wheel(Event)
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Zoom -> {E}")
+
+    def Reset(self, Event=False):
+        try:
+            self._Angle = 0
+            self._Zoom_Scale = 1.0
+            if self._Image:
+                self._Zoom_Center = (self._Image_Width // 2, self._Image_Height // 2)
+            self.Relocate()
+            if self._On_Right_Click:
+                self._On_Right_Click(Event)
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Reset -> {E}")
             
     def Adjustment(self):
         try:
@@ -437,9 +615,9 @@ class Button:
                 self._Height_Current = self._Height
                 self._Left_Current = self._Left
                 self._Top_Current = self._Top
+            if self._Image:
+                self.Load()
             if self._Display:
-                self._Font = TK.font.Font(family=self._Font_Family, size=self._Font_Size_Current, weight=self._Font_Weight)
-                self._Widget.config(wraplength=self._Width_Current-(self._Border_Size*2), font=self._Font)
                 self.Display()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Relocate -> {E}")
@@ -447,7 +625,6 @@ class Button:
     def Resize(self):
         try:
             self._Resize_Index = self._GUI._Resize_Index
-            self.Font()
             self.Relocate()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Resize -> {E}")
