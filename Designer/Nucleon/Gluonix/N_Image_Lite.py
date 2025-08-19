@@ -11,7 +11,7 @@ from .N_Custom import Event_Bind
 PIL_Image.MAX_IMAGE_PIXELS = None
 
 class Image_Lite:
-
+    
     def __init__(self, Main, *args, **kwargs):
         self._GUI = GUI._Instance
         if self._GUI is not None:
@@ -66,14 +66,22 @@ class Image_Lite:
                 self._On_Animate = False
                 self._On_Hover_In = False
                 self._On_Hover_Out = False
+                self._Is_Gif = False
+                self._Gif_Frames = []
+                self._Gif_Durations = []
+                self._Gif_Loop = 1
+                self._Gif_Index = 0
+                self._Gif_Stop = threading.Event()
+                self._Gif_Thread = None
+                self._Gif_Running = False
             except Exception as E:
                 self._GUI.Error(f"{self._Type} -> Init -> {E}")
         else:
             print("Error: Gluonix -> GUI Instance Has Not Been Created")
-
+    
     def __str__(self):
         return "Nucleon_Glunoix_Image_Lite[]"
-
+    
     def __repr__(self):
         return "Nucleon_Glunoix_Image_Lite[]"
     
@@ -90,27 +98,29 @@ class Image_Lite:
             return Instance
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Copy -> {E}")
-        
+    
     def Delete(self):
         try:
             self.Animate_Cancel()
+            self.Stop()
             self._Main._Widget.remove(self)
             self._Widget.destroy()
             if self:
                 del self
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Delete -> {E}")
-
+    
     def Hide(self):
         try:
             self.Animate_Cancel()
+            self.Stop()
             self._Widget.place_forget()
             self._Display = False
             if self._On_Hide:
                 self._On_Hide()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Hide -> {E}")
-            
+    
     def Show(self):
         try:
             self._Display = True
@@ -120,9 +130,10 @@ class Image_Lite:
                 self.Display()
             if self._On_Show:
                 self._On_Show()
+            self.Run()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Show -> {E}")
-            
+    
     def Display(self):
         try:
             if self._Animating:
@@ -138,7 +149,7 @@ class Image_Lite:
             return self._GUI.Grab_Widget(Path=Path, Widget=self)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Grab -> {E}")
-            
+    
     def Animate(self, Hide=False):
         try:
             self.Animate_Cancel()
@@ -239,7 +250,7 @@ class Image_Lite:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Animate -> {E}")
             self.Animate_Cancel()
-
+    
     def Animate_Cancel(self):
         try:
             self._Animating = False
@@ -250,26 +261,29 @@ class Image_Lite:
             self._Anim_Thread = None
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Animate_Cancel -> {E}")
-            
+    
     def Set(self, Path):
         try:
+            self.Stop()
             self._Path = Path
             self._Path_Memory = self._Path
             self.Open()
             self.Relocate()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Set -> {E}")
-            
+    
     def Initial(self):
         try:
             if self._Path_Initial:
+                if hasattr(self,'Stop'):
+                    self.Stop()
                 Load_Setup = [self._Array, self._Url, self._Pil]
                 self._Array, self._Url, self._Pil = False, False, False
                 self.Set(self._Path_Initial)
                 self._Array, self._Url, self._Pil = Load_Setup
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Initial -> {E}")
-            
+    
     def Reset(self):
         try:
             self._Angle = 0
@@ -277,20 +291,20 @@ class Image_Lite:
             self.Relocate()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Reset -> {E}")
-            
+    
     def Refresh(self):
         try:
             self.Open()
             self.Relocate()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Refresh -> {E}")
-            
+    
     def Widget(self):
         try:
             return self._Widget
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Widget -> {E}")
-            
+    
     def Bind(self, **Input):
         try:
             if 'On_Show' in Input:
@@ -308,7 +322,7 @@ class Image_Lite:
             Event_Bind(self._Widget, **Input)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Bind -> {E}")
-            
+    
     def On_Hover_In(self, E):
         try:
             Config = {}
@@ -324,7 +338,7 @@ class Image_Lite:
                 self._On_Hover_In(E)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> On_Hover_In -> {E}")
-            
+    
     def On_Hover_Out(self, E):
         try:
             Config = {}
@@ -338,7 +352,7 @@ class Image_Lite:
                 self._On_Hover_Out(E)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> On_Hover_Out -> {E}")
-            
+    
     def Config_Get(self, *Input):
         try:
             Return = {}
@@ -348,7 +362,7 @@ class Image_Lite:
             return Return
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Config_Get -> {E}")
-                
+    
     def Config(self, **Input):
         try:
             Run = False
@@ -365,7 +379,7 @@ class Image_Lite:
                 self._Background_Main = not bool(Input["Background"])
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Config -> {E}")
-            
+    
     def Move(self, Left=None, Top=None):
         try:
             if Left is not None:
@@ -377,7 +391,7 @@ class Image_Lite:
             return True
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Move -> {E}")
-            
+    
     def Center(self, Left=None, Top=None):
         try:
             if Left is not None:
@@ -389,7 +403,7 @@ class Image_Lite:
             return [self._Left+self._Width/2, self._Top+self._Height/2]
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Center -> {E}")
-            
+    
     def Position(self, Left=None, Top=None):
         try:
             if Left is not None:
@@ -401,7 +415,7 @@ class Image_Lite:
             return [self._Left, self._Top]
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Position -> {E}")
-            
+    
     def Size(self, Width=False, Height=False):
         try:
             if Width:
@@ -413,7 +427,7 @@ class Image_Lite:
             return [self._Width, self._Height]
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Size -> {E}")
-        
+    
     def Locate(self, Width, Height, Left, Top):
         try:
             Width = self._Width*(Width/100)
@@ -423,7 +437,7 @@ class Image_Lite:
             return [Width, Height, Left, Top]
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Locate -> {E}")
-        
+    
     def Locate_Reverse(self, Width, Height, Left, Top):
         try:
             Width = round((Width/self._Width)*100, 3)
@@ -433,7 +447,7 @@ class Image_Lite:
             return [Width, Height, Left, Top]
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Locate_Reverse -> {E}")
-            
+    
     def Create(self):
         try:
             if not self._Background:
@@ -474,7 +488,7 @@ class Image_Lite:
                 self._Last_Name = self._Name
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Create -> {E}")
-            
+    
     def Update_Color(self):
         try:
             self._GUI.Initiate_Colors(self)
@@ -491,35 +505,96 @@ class Image_Lite:
             return (R, G, B)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> RGB -> {E}")
-            
+    
     def Open(self):
         try:
+            self.Stop()
+            self._Is_Gif=False
+            self._Gif_Frames=[]
+            self._Gif_Durations=[]
+            self._Gif_Loop=1
+            self._Gif_Index=0
             if self._Image:
-                self._Image.close()
-            if self._Url:
-                if self._Path:
-                    Image_Data = requests_get(self._Path)
-                    self._Image = PIL_Image.open(BytesIO(Image_Data.content))
-            elif self._Array:
-                if self._Path is not None:
-                    self._Image = PIL_Image.fromarray(self._Path)
-            elif self._Pil:
-                if self._Path:
-                    self._Image = self._Path.copy()
-            else:
-                if self._Path and os.path.exists(self._Path):
-                    self._Image = PIL_Image.open(self._Path)
-                    if not self._Path_Initial:
-                        self._Path_Initial = self._Path
+                try:self._Image.close()
+                except:pass
+            self._Image=False
+            if self._Array and self._Path is not None:
+                self._Image=PIL_Image.fromarray(self._Path)
+                self._Image_Width,self._Image_Height=self._Image.size
+                return
+            if self._Pil and self._Path:
+                T=self._Path
+                if getattr(T,"is_animated",False):
+                    self._Is_Gif=True
+                    try:self._Gif_Loop=int(getattr(T,"info",{}).get("loop",1))
+                    except:self._Gif_Loop=1
+                    C=getattr(T,"n_frames",0) or 0
+                    I=0
+                    while True:
+                        try:
+                            T.seek(I)
+                            F=T.convert("RGBA").copy()
+                            D=int(getattr(T,"info",{}).get("duration",100))
+                            self._Gif_Frames.append(F)
+                            self._Gif_Durations.append(max(1,D))
+                            I+=1
+                            if C and I>=C:break
+                        except EOFError:
+                            break
+                    if self._Gif_Frames:
+                        self._Image=self._Gif_Frames[0]
+                        self._Image_Width,self._Image_Height=self._Image.size
+                    else:
+                        self._Is_Gif=False
+                        self._Image=T.copy()
+                        self._Image_Width,self._Image_Height=self._Image.size
                 else:
-                    self._Image = False
-                    self._Widget.configure(image = None)
-                    self._Widget.image = None
-            if self._Image:
-                self._Image_Width, self._Image_Height = self._Image.size
+                    self._Image=T.copy()
+                    self._Image_Width,self._Image_Height=self._Image.size
+                return
+            Data=None
+            if self._Url and self._Path:
+                Data=requests_get(self._Path).content
+            elif self._Path and os.path.exists(self._Path):
+                with open(self._Path,"rb") as F:
+                    Data=F.read()
+                if not self._Path_Initial:
+                    self._Path_Initial=self._Path
+            else:
+                self._Widget.configure(image=None)
+                self._Widget.image=None
+                return
+            with PIL_Image.open(BytesIO(Data)) as T:
+                if getattr(T,"is_animated",False):
+                    self._Is_Gif=True
+                    try:self._Gif_Loop=int(T.info.get("loop",1))
+                    except:self._Gif_Loop=1
+                    C=getattr(T,"n_frames",0) or 0
+                    I=0
+                    while True:
+                        try:
+                            T.seek(I)
+                            F=T.convert("RGBA").copy()
+                            D=int(T.info.get("duration",100))
+                            self._Gif_Frames.append(F)
+                            self._Gif_Durations.append(max(1,D))
+                            I+=1
+                            if C and I>=C:break
+                        except EOFError:
+                            break
+                    if self._Gif_Frames:
+                        self._Image=self._Gif_Frames[0]
+                        self._Image_Width,self._Image_Height=self._Image.size
+                    else:
+                        self._Is_Gif=False
+                        self._Image=T.copy()
+                        self._Image_Width,self._Image_Height=self._Image.size
+                else:
+                    self._Image=T.copy()
+                    self._Image_Width,self._Image_Height=self._Image.size
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Open -> {E}")
-            
+
     def Convert(self, Frame_Width, Frame_Height):
         try:
             Temp_Image = self._Image.rotate(self._Rotate+self._Angle, PIL_Image.NEAREST, expand=0)
@@ -556,23 +631,23 @@ class Image_Lite:
             return {"Image": Temp_Image_TK, "Top": Top, "Left": Left}
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Convert -> {E}")
-            
+    
     def Load(self):
         try:
             if self._Height_Current>0 and self._Width_Current>0:
                 Image = self.Convert(self._Width_Current, self._Height_Current)
-                self._Widget.configure(image = Image['Image'])
+                self._Widget.configure(image=Image['Image'])
                 self._Widget.image = Image['Image']
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Load -> {E}")
-            
+    
     def Rotate(self, Value=0):
         try:
             self._Angle+=Value
             self.Load()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Rotate -> {E}")
-            
+    
     def Adjustment(self):
         try:
             Width_Difference = self._Main._Width_Current - self._Main._Width
@@ -605,7 +680,7 @@ class Image_Lite:
                 self._Top_Adjustment += self._Height_Adjustment
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Adjustment -> {E}")
-            
+    
     def Relocate(self, Direct=False):
         try:
             if self._Animating and not Direct:
@@ -637,12 +712,64 @@ class Image_Lite:
                 self.Load()
             if self._Display:
                 self.Display()
+                self.Run()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Relocate -> {E}")
-            
+    
     def Resize(self):
         try:
             self._Resize_Index = self._GUI._Resize_Index
             self.Relocate()
         except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Resize -> {E}")    
+            self._GUI.Error(f"{self._Type} -> Resize -> {E}")
+    
+    def Run(self):
+        try:
+            if not self._Is_Gif or len(self._Gif_Frames)==0:
+                return
+            if self._Gif_Running:
+                return
+            self._Gif_Stop.clear()
+            self._Gif_Running = True
+            def Worker():
+                Loops = 0
+                while self._Gif_Running and not self._Gif_Stop.is_set():
+                    if not self._Widget.winfo_exists():
+                        break
+                    Frame = self._Gif_Frames[self._Gif_Index]
+                    Dur = self._Gif_Durations[self._Gif_Index]
+                    def Post(F=Frame):
+                        if not self._Widget.winfo_exists():
+                            return
+                        self._Image = F
+                        self._Image_Width, self._Image_Height = F.size
+                        self.Load()
+                    self._GUI._Frame.after(0, Post)
+                    if self._Gif_Stop.wait(Dur/1000.0):
+                        break
+                    self._Gif_Index = (self._Gif_Index+1) % len(self._Gif_Frames)
+                    if self._Gif_Index==0:
+                        Loops += 1
+                        if self._Gif_Loop!=0 and Loops>=self._Gif_Loop:
+                            break
+                self._Gif_Running = False
+            self._Gif_Thread = threading.Thread(target=Worker, daemon=True)
+            self._Gif_Thread.start()
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Run -> {E}")
+    
+    def Stop(self):
+        try:
+            if self._Gif_Thread and self._Gif_Thread.is_alive():
+                self._Gif_Running = False
+                self._Gif_Stop.set()
+                self._Gif_Thread.join(timeout=0.2)
+            self._Gif_Stop.clear()
+            self._Gif_Thread = None
+            self._Gif_Index = 0
+            if self._Is_Gif and len(self._Gif_Frames)>0:
+                self._Image = self._Gif_Frames[0]
+                self._Image_Width, self._Image_Height = self._Image.size
+                self.Load()
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Stop -> {E}")

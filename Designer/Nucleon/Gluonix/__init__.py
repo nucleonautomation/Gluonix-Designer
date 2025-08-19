@@ -32,6 +32,7 @@ from .N_Canvas_RectangleR import Canvas_RectangleR
 from .N_Canvas_Polygon import Canvas_Polygon
 from .N_Canvas_Image import Canvas_Image
 from .N_Canvas_Text import Canvas_Text
+from .N_Canvas_Text_Old import Canvas_Text_Old
 from .N_Scroll import Scroll
 from .N_Separator import Separator
 from .N_Label import Label

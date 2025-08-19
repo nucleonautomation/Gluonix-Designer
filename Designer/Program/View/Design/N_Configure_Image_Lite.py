@@ -657,8 +657,9 @@ class Configure_Image_Lite:
             
     def Update_Image(self):
         try:
-            Icon_File_Path = self.Global['GUI'].File(Initial=os.path.join(os.path.expanduser('~'), 'Documents'), Title='Select Image', Default='.png', Type=[["PNG (*.png)", "*.png"], ["JPG (*.jpg)", "*.jpg"], ["JPEG (*.jpeg)", "*.jpeg"]])
+            Icon_File_Path = self.Global['GUI'].File(Initial=os.path.join(os.path.expanduser('~'), 'Documents'), Title='Select Image', Default='.png', Type=[["PNG (*.png)", "*.png"], ["JPG (*.jpg)", "*.jpg"], ["JPEG (*.jpeg)", "*.jpeg"], ["GIF (*.gif)", "*.gif"]])
             if Icon_File_Path:
+                self.Element.Stop()
                 if os.path.exists(f"{self.Configure.Design.Project_Path}/Data/File/{self.ID}"):
                     os.remove(f"{self.Configure.Design.Project_Path}/Data/File/{self.ID}")
                 shutil.copy(Icon_File_Path, f"{self.Configure.Design.Project_Path}/Data/File/{self.ID}")

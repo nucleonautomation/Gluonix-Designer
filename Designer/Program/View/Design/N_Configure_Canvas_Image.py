@@ -123,7 +123,7 @@ class Configure_Canvas_Image:
             Fixture = self.Frame.Locate(25, 5, 3, 37)
             self.Resize_Label = self.Global['Gluonix'].Label(self.Frame)
             self.Resize_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
-            self.Resize_Label.Config(Foreground='#000000', Value="Resize Width:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Resize_Label.Config(Foreground='#000000', Value="Resize:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
             self.Resize_Label.Create()
             
             #Resize Check
@@ -138,7 +138,7 @@ class Configure_Canvas_Image:
             Fixture = self.Frame.Locate(25, 5, 3, 44)
             self.Move_Label = self.Global['Gluonix'].Label(self.Frame)
             self.Move_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
-            self.Move_Label.Config(Foreground='#000000', Value="Move Left:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Move_Label.Config(Foreground='#000000', Value="Move:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
             self.Move_Label.Create()
             
             #Move Check
@@ -473,7 +473,7 @@ class Configure_Canvas_Image:
             
     def Update_Image(self):
         try:
-            Icon_File_Path = self.Global['GUI'].File(Initial=os.path.join(os.path.expanduser('~'), 'Documents'), Title='Select Image', Default='.png', Type=[["PNG (*.png)", "*.png"], ["JPG (*.jpg)", "*.jpg"], ["JPEG (*.jpeg)", "*.jpeg"]])
+            Icon_File_Path = self.Global['GUI'].File(Initial=os.path.join(os.path.expanduser('~'), 'Documents'), Title='Select Image', Default='.png', Type=[["PNG (*.png)", "*.png"], ["JPG (*.jpg)", "*.jpg"], ["JPEG (*.jpeg)", "*.jpeg"], ["GIF (*.gif)", "*.gif"]])
             if Icon_File_Path:
                 if os.path.exists(f"{self.Configure.Design.Project_Path}/Data/File/{self.ID}"):
                     os.remove(f"{self.Configure.Design.Project_Path}/Data/File/{self.ID}")

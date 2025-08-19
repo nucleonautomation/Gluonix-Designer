@@ -3,6 +3,8 @@
 ################################################################################################################################
 import inspect
 from tkinter import colorchooser
+import os, sys
+from pathlib import Path
 
 class Configure_Canvas_Text:
     def __init__(self, Global, Configure):
@@ -48,15 +50,39 @@ class Configure_Canvas_Text:
             self.Visibilty.Bind(On_Click=lambda E: self.Update_Visibilty())
             self.Visibilty.Create()
             
-            #Color Label
+            #Background Label
             Fixture = self.Frame.Locate(25, 5, 3, 9)
+            self.Background_Label = self.Global['Gluonix'].Label(self.Frame)
+            self.Background_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Background_Label.Config(Foreground='#000000', Value="Background:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Background_Label.Create()
+            
+            #Background Color
+            Fixture = self.Frame.Locate(7, 5, 28, 9)
+            self.Background_Color = self.Global['Gluonix'].Label(self.Frame)
+            self.Background_Color.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Background_Color.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='w', Border_Size=1)
+            self.Background_Color.Bind(On_Click=lambda E: self.Select_Color(self.Background_Color))
+            self.Background_Color.Bind(On_Change=lambda : self.Update_Background())
+            self.Background_Color.Create()
+            
+            #Background Check
+            Fixture = self.Frame.Locate(7, 5, 37, 9)
+            self.Background_Check = self.Global['Gluonix'].Check(self.Frame)
+            self.Background_Check.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Background_Check.Config(Border_Size=0)
+            self.Background_Check.Bind(On_Change=lambda : self.Update_Background())
+            self.Background_Check.Create()
+            
+            #Color Label
+            Fixture = self.Frame.Locate(25, 5, 3, 16)
             self.Color_Label = self.Global['Gluonix'].Label(self.Frame)
             self.Color_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Color_Label.Config(Foreground='#000000', Value="Color:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
             self.Color_Label.Create()
             
             #Color Color
-            Fixture = self.Frame.Locate(7, 5, 28, 9)
+            Fixture = self.Frame.Locate(7, 5, 28, 16)
             self.Color_Color = self.Global['Gluonix'].Label(self.Frame)
             self.Color_Color.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Color_Color.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='w', Border_Size=1)
@@ -65,7 +91,7 @@ class Configure_Canvas_Text:
             self.Color_Color.Create()
             
             #Alignment Lock
-            Fixture = self.Frame.Locate(7, 5, 37, 9)
+            Fixture = self.Frame.Locate(7, 5, 37, 16)
             self.Lock = False
             self.Lock_Image = {True: 'Lock_Closed', False: 'Lock_Open'}
             self.Alignment_Lock = self.Global['Gluonix'].Image(self.Frame)
@@ -73,21 +99,6 @@ class Configure_Canvas_Text:
             self.Alignment_Lock.Config(Border_Size=0)
             self.Alignment_Lock.Bind(On_Click=lambda E: self.Update_Lock())
             self.Alignment_Lock.Create()
-            
-            #Thickness Label
-            Fixture = self.Frame.Locate(25, 5, 3, 16)
-            self.Thickness_Label = self.Global['Gluonix'].Label(self.Frame)
-            self.Thickness_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
-            self.Thickness_Label.Config(Foreground='#000000', Value="Thickness:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
-            self.Thickness_Label.Create()
-            
-            #Thickness Entry
-            Fixture = self.Frame.Locate(40, 5, 28, 16)
-            self.Thickness_Entry = self.Global['Gluonix'].Entry(self.Frame)
-            self.Thickness_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
-            self.Thickness_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='center', Border_Size=1)
-            self.Thickness_Entry.Bind(On_Key_Release=lambda E: self.Update_Thickness())
-            self.Thickness_Entry.Create()
             
             #Width Label
             Fixture = self.Frame.Locate(25, 5, 3, 23)
@@ -153,7 +164,7 @@ class Configure_Canvas_Text:
             Fixture = self.Frame.Locate(25, 5, 3, 51)
             self.Resize_Label = self.Global['Gluonix'].Label(self.Frame)
             self.Resize_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
-            self.Resize_Label.Config(Foreground='#000000', Value="Resize Width:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Resize_Label.Config(Foreground='#000000', Value="Resize:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
             self.Resize_Label.Create()
             
             #Resize Check
@@ -168,7 +179,7 @@ class Configure_Canvas_Text:
             Fixture = self.Frame.Locate(25, 5, 3, 58)
             self.Move_Label = self.Global['Gluonix'].Label(self.Frame)
             self.Move_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
-            self.Move_Label.Config(Foreground='#000000', Value="Move Left:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Move_Label.Config(Foreground='#000000', Value="Move:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
             self.Move_Label.Create()
             
             #Move Check
@@ -179,15 +190,30 @@ class Configure_Canvas_Text:
             self.Move_Check.Bind(On_Change=lambda : self.Update_Move())
             self.Move_Check.Create()
             
-            #Value Label
+            #Vertical Label
             Fixture = self.Frame.Locate(25, 5, 3, 65)
+            self.Vertical_Label = self.Global['Gluonix'].Label(self.Frame)
+            self.Vertical_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Vertical_Label.Config(Foreground='#000000', Value="Vertical:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Vertical_Label.Create()
+            
+            #Vertical Check
+            Fixture = self.Frame.Locate(7, 5, 27.7, 65)
+            self.Vertical_Check = self.Global['Gluonix'].Check(self.Frame)
+            self.Vertical_Check.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Vertical_Check.Config(Border_Size=0)
+            self.Vertical_Check.Bind(On_Change=lambda : self.Update_Vertical())
+            self.Vertical_Check.Create()
+            
+            #Value Label
+            Fixture = self.Frame.Locate(25, 5, 3, 72)
             self.Value_Label = self.Global['Gluonix'].Label(self.Frame)
             self.Value_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Value_Label.Config(Foreground='#000000', Value="Value:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
             self.Value_Label.Create()
             
             #Value Entry
-            Fixture = self.Frame.Locate(60, 5, 28, 65)
+            Fixture = self.Frame.Locate(60, 5, 28, 72)
             self.Value_Entry = self.Global['Gluonix'].Entry(self.Frame)
             self.Value_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Value_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='left', Border_Size=1)
@@ -195,14 +221,14 @@ class Configure_Canvas_Text:
             self.Value_Entry.Create()
             
             #Size Label
-            Fixture = self.Frame.Locate(25, 5, 3, 72)
+            Fixture = self.Frame.Locate(25, 5, 3, 79)
             self.Size_Label = self.Global['Gluonix'].Label(self.Frame)
             self.Size_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Size_Label.Config(Foreground='#000000', Value="Size:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
             self.Size_Label.Create()
             
             #Size Entry
-            Fixture = self.Frame.Locate(40, 5, 28, 72)
+            Fixture = self.Frame.Locate(40, 5, 28, 79)
             self.Size_Entry = self.Global['Gluonix'].Entry(self.Frame)
             self.Size_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Size_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='center', Border_Size=1)
@@ -210,14 +236,14 @@ class Configure_Canvas_Text:
             self.Size_Entry.Create()
             
             #Weight Label
-            Fixture = self.Frame.Locate(25, 5, 3, 79)
+            Fixture = self.Frame.Locate(25, 5, 3, 86)
             self.Weight_Label = self.Global['Gluonix'].Label(self.Frame)
             self.Weight_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Weight_Label.Config(Foreground='#000000', Value="Weight:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
             self.Weight_Label.Create()
             
             #Weight Select
-            Fixture = self.Frame.Locate(40, 5, 28, 79)
+            Fixture = self.Frame.Locate(40, 5, 28, 86)
             self.Weight_Select = self.Global['Gluonix'].Select(self.Frame)
             self.Weight_Select.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Weight_Select.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='center', Border_Size=1)
@@ -227,32 +253,87 @@ class Configure_Canvas_Text:
             self.Weight_Select.Create()
             
             #Font Label
-            Fixture = self.Frame.Locate(25, 5, 3, 86)
+            Fixture = self.Frame.Locate(25, 5, 3, 93)
             self.Font_Label = self.Global['Gluonix'].Label(self.Frame)
             self.Font_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Font_Label.Config(Foreground='#000000', Value="Font:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
             self.Font_Label.Create()
             
             #Font Select
-            Fixture = self.Frame.Locate(40, 5, 28, 86)
+            Fixture = self.Frame.Locate(40, 5, 28, 93)
             self.Font_Select = self.Global['Gluonix'].Select(self.Frame)
             self.Font_Select.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Font_Select.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='center', Border_Size=1)
-            self.Font_Select.Add('Arial')
-            self.Font_Select.Add('Courier')
-            self.Font_Select.Add('Courier New')
-            self.Font_Select.Add('Georgia')
-            self.Font_Select.Add('Lucida Console')
-            self.Font_Select.Add('Symbol')
-            self.Font_Select.Add('Times New Roman')
-            self.Font_Select.Add('Verdana')
-            self.Font_Select.Add('Comic Sans MS')
-            self.Font_Select.Add('Helvetica')
+            for Font in self.Find_Font():
+                self.Font_Select.Add(Font)
             self.Font_Select.Bind(On_Change=lambda E: self.Update_Font())
             self.Font_Select.Create()
             
+            #Anchor Label
+            Fixture = self.Frame.Locate(25, 5, 3, 100)
+            self.Anchor_Label = self.Global['Gluonix'].Label(self.Frame)
+            self.Anchor_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Anchor_Label.Config(Foreground='#000000', Value="Anchor:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Anchor_Label.Create()
+            
+            #Anchor Select
+            Fixture = self.Frame.Locate(40, 5, 28, 100)
+            self.Anchor_Select = self.Global['Gluonix'].Select(self.Frame)
+            self.Anchor_Select.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Anchor_Select.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Anchor_Select.Add('center')
+            self.Anchor_Select.Add('left')
+            self.Anchor_Select.Add('right')
+            self.Anchor_Select.Bind(On_Change=lambda E: self.Update_Anchor())
+            self.Anchor_Select.Create()
+            
+            #Rotate Label
+            Fixture = self.Frame.Locate(25, 5, 3, 107)
+            self.Rotate_Label = self.Global['Gluonix'].Label(self.Frame)
+            self.Rotate_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Rotate_Label.Config(Foreground='#000000', Value="Rotate:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Rotate_Label.Create()
+            
+            #Rotate Entry
+            Fixture = self.Frame.Locate(40, 5, 28, 107)
+            self.Rotate_Entry = self.Global['Gluonix'].Entry(self.Frame)
+            self.Rotate_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Rotate_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Rotate_Entry.Bind(On_Key_Release=lambda E: self.Update_Rotate())
+            self.Rotate_Entry.Create()
+            
+            #Skew Horizontal Label
+            Fixture = self.Frame.Locate(25, 5, 3, 114)
+            self.Skew_Horizontal_Label = self.Global['Gluonix'].Label(self.Frame)
+            self.Skew_Horizontal_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Skew_Horizontal_Label.Config(Foreground='#000000', Value="Skew Horizontal:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Skew_Horizontal_Label.Create()
+            
+            #Skew Horizontal Entry
+            Fixture = self.Frame.Locate(40, 5, 28, 114)
+            self.Skew_Horizontal_Entry = self.Global['Gluonix'].Entry(self.Frame)
+            self.Skew_Horizontal_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Skew_Horizontal_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Skew_Horizontal_Entry.Bind(On_Key_Release=lambda E: self.Update_Skew_Horizontal())
+            self.Skew_Horizontal_Entry.Create()
+            
+            #Skew Vertical Label
+            Fixture = self.Frame.Locate(25, 5, 3, 121)
+            self.Skew_Vertical_Label = self.Global['Gluonix'].Label(self.Frame)
+            self.Skew_Vertical_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Skew_Vertical_Label.Config(Foreground='#000000', Value="Skew Vertical:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Skew_Vertical_Label.Create()
+            
+            #Skew Vertical Entry
+            Fixture = self.Frame.Locate(40, 5, 28, 121)
+            self.Skew_Vertical_Entry = self.Global['Gluonix'].Entry(self.Frame)
+            self.Skew_Vertical_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Skew_Vertical_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Skew_Vertical_Entry.Bind(On_Key_Release=lambda E: self.Update_Skew_Vertical())
+            self.Skew_Vertical_Entry.Create()
+            
             #Update Scroll
-            self.Frame.Update(self.Font_Select)
+            self.Frame.Update(self.Skew_Vertical_Entry)
             
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
@@ -274,22 +355,33 @@ class Configure_Canvas_Text:
                     self.Left_Entry.Config(Border_Color='#000000', Border_Size=1)
                     self.Top_Entry.Config(Border_Color='#000000', Border_Size=1)
                     self.Size_Entry.Config(Border_Color='#000000', Border_Size=1)
+                    self.Skew_Horizontal_Entry.Config(Border_Color='#000000', Border_Size=1)
+                    self.Skew_Vertical_Entry.Config(Border_Color='#000000', Border_Size=1)
                     self.Name_Label.Set(Widget_Data['Type'])
                     self.Name_Entry.Set(Widget_Data['Name'])
+                    if Widget_Data['Background']=='False':
+                        self.Background_Check.Set(False)
+                    else:
+                        self.Background_Check.Set(True)
+                        self.Background_Color.Config(Background=Widget_Data['Background'])
                     self.Color_Color.Config(Background=Widget_Data['Color'])
                     self.Lock = bool(Widget_Data['Lock'])
                     self.Alignment_Lock.Set(self.Global['Image'](self.Lock_Image[self.Lock]))
-                    self.Thickness_Entry.Set(Widget_Data['Thickness'])
                     self.Width_Entry.Set(Widget_Data['Width'])
                     self.Height_Entry.Set(Widget_Data['Height'])
                     self.Left_Entry.Set(Widget_Data['Left'])
                     self.Top_Entry.Set(Widget_Data['Top'])
                     self.Resize_Check.Set(bool(Widget_Data['Resize']))
                     self.Move_Check.Set(bool(Widget_Data['Move']))
+                    self.Vertical_Check.Set(bool(Widget_Data['Vertical']))
                     self.Value_Entry.Set(Widget_Data['Value'])
                     self.Weight_Select.Set(Widget_Data['Weight'])
                     self.Size_Entry.Set(Widget_Data['Size'])
                     self.Font_Select.Set(Widget_Data['Font'])
+                    self.Anchor_Select.Set(Widget_Data['Justify'])
+                    self.Rotate_Entry.Set(Widget_Data['Rotate'])
+                    self.Skew_Horizontal_Entry.Set(Widget_Data['Skew_Horizontal'])
+                    self.Skew_Vertical_Entry.Set(Widget_Data['Skew_Vertical'])
                     self.Configure.Hide_All()
                     self.Configure.Current = self
                     self.Frame.Show()
@@ -326,6 +418,38 @@ class Configure_Canvas_Text:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
         self.Global['Loading'].Hide()
             
+    def Find_Font(self):
+        try:
+            Font_Paths = []
+            Font_Extensions = ("ttf",)
+            Font_Set = set()
+            def Add_Path(Path_Obj):
+                try:
+                    if Path_Obj.is_file() and Path_Obj.suffix.lower().lstrip(".") in Font_Extensions:
+                        Font_Name = Path_Obj.stem.capitalize()
+                        Font_Set.add(Font_Name)
+                except:
+                    pass
+            if not Font_Paths:
+                Font_Paths = [Path.cwd()]
+                if sys.platform.startswith("win"):
+                    Windows_Dir = os.environ.get("WINDIR", r"C:\Windows")
+                    Font_Paths += [Path(Windows_Dir) / "Fonts", Path(os.environ.get("LOCALAPPDATA", "")) / "Microsoft/Windows/Fonts"]
+                elif sys.platform == "darwin":
+                    Font_Paths += [Path("/System/Library/Fonts"), Path("/Library/Fonts"), Path.home() / "Library/Fonts"]
+                else:
+                    Font_Paths += [Path("/usr/share/fonts"), Path("/usr/local/share/fonts"), Path.home() / ".fonts", Path.home() / ".local/share/fonts"]
+            for Root in Font_Paths:
+                try:
+                    Iterator = Root.rglob("*")
+                    for Path_Obj in Iterator:
+                        Add_Path(Path_Obj)
+                except:
+                    pass
+            return sorted(Font_Set)
+        except Exception as Error:
+            self.Global['Error'](__class__.__name__ + " -> " + inspect.currentframe().f_code.co_name + " -> " + str(Error))
+
     def Movement_Update(self):
         try:
             if self.ID:
@@ -370,6 +494,20 @@ class Configure_Canvas_Text:
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             
+    def Update_Background(self):
+        try:
+            if self.Background_Check.Get():
+                Background = self.Background_Color.Config_Get('Background')['Background']
+                self.Configure.Design.Database.Post(f"UPDATE `Item` SET `Background`='{Background}' WHERE `ID`='{self.ID}'")
+                if self.Element:
+                    self.Element.Config(Background=Background)
+            else:
+                self.Configure.Design.Database.Post(f"UPDATE `Item` SET `Background`='False' WHERE `ID`='{self.ID}'")
+                if self.Element:
+                    self.Element.Config(Background=False)
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
     def Update_Color(self):
         try:
             Color = self.Color_Color.Config_Get('Background')['Background']
@@ -386,20 +524,6 @@ class Configure_Canvas_Text:
             self.Configure.Design.Database.Post(f"UPDATE `Item` SET `Lock`='{int(self.Lock)}' WHERE `ID`='{self.ID}'")
             if self.Element:
                 self.Element.Lock = self.Lock
-        except Exception as E:
-            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
-            
-    def Update_Thickness(self):
-        try:
-            Thickness = self.Thickness_Entry.Get()
-            if self.Global['Custom'].Is_Float(Thickness):
-                Thickness = float(Thickness)
-                self.Configure.Design.Database.Post(f"UPDATE `Item` SET `Thickness`='{Thickness}' WHERE `ID`='{self.ID}'")
-                self.Thickness_Entry.Config(Border_Color='#000000', Border_Size=1)
-                if self.Element:
-                    self.Element.Config(Thickness=Thickness)
-            else:
-                self.Thickness_Entry.Config(Border_Color='red', Border_Size=1)
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             
@@ -481,6 +605,15 @@ class Configure_Canvas_Text:
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             
+    def Update_Vertical(self):
+        try:
+            Vertical = self.Vertical_Check.Get()
+            self.Configure.Design.Database.Post(f"UPDATE `Item` SET `Vertical`='{int(Vertical)}' WHERE `ID`='{self.ID}'")
+            if self.Element:
+                self.Element.Config(Vertical=Vertical)
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
     def Update_Value(self):
         try:
             Value = self.Value_Entry.Get()
@@ -516,5 +649,55 @@ class Configure_Canvas_Text:
             Font = self.Font_Select.Get()
             self.Configure.Design.Database.Post(f"UPDATE `Item` SET `Font`='{Font}' WHERE `ID`='{self.ID}'")
             self.Element.Config(Font=Font)
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Update_Anchor(self):
+        try:
+            Anchor = self.Anchor_Select.Get()
+            self.Configure.Design.Database.Post(f"UPDATE `Item` SET `Justify`='{Anchor}' WHERE `ID`='{self.ID}'")
+            self.Element.Config(Justify=Anchor)
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Update_Rotate(self):
+        try:
+            Rotate = self.Rotate_Entry.Get()
+            if self.Global['Custom'].Is_Float(Rotate):
+                Rotate = float(Rotate)
+                self.Configure.Design.Database.Post(f"UPDATE `Item` SET `Rotate`='{Rotate}' WHERE `ID`='{self.ID}'")
+                self.Rotate_Entry.Config(Border_Color='#000000', Border_Size=1)
+                if self.Element:
+                    self.Element.Config(Rotate=Rotate)
+            else:
+                self.Rotate_Entry.Config(Border_Color='red', Border_Size=1)
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Update_Skew_Horizontal(self):
+        try:
+            Skew_Horizontal = self.Skew_Horizontal_Entry.Get()
+            if self.Global['Custom'].Is_Float(Skew_Horizontal):
+                Skew_Horizontal = float(Skew_Horizontal)
+                self.Configure.Design.Database.Post(f"UPDATE `Item` SET `Skew_Horizontal`='{Skew_Horizontal}' WHERE `ID`='{self.ID}'")
+                self.Skew_Horizontal_Entry.Config(Border_Color='#000000', Border_Size=1)
+                if self.Element:
+                    self.Element.Config(Skew_Horizontal=Skew_Horizontal)
+            else:
+                self.Skew_Horizontal_Entry.Config(Border_Color='red', Border_Size=1)
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Update_Skew_Vertical(self):
+        try:
+            Skew_Vertical = self.Skew_Vertical_Entry.Get()
+            if self.Global['Custom'].Is_Float(Skew_Vertical):
+                Skew_Vertical = float(Skew_Vertical)
+                self.Configure.Design.Database.Post(f"UPDATE `Item` SET `Skew_Vertical`='{Skew_Vertical}' WHERE `ID`='{self.ID}'")
+                self.Skew_Vertical_Entry.Config(Border_Color='#000000', Border_Size=1)
+                if self.Element:
+                    self.Element.Config(Skew_Vertical=Skew_Vertical)
+            else:
+                self.Skew_Vertical_Entry.Config(Border_Color='red', Border_Size=1)
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))

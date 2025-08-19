@@ -46,7 +46,7 @@ class Select:
                 self._Font_Size = 12
                 self._Font_Weight = 'normal'
                 self._Font_Family = 'Helvetica'
-                self._Height_List = 700
+                self._Height_List = 10
                 self._Disable = False
                 self._On_Change = False
                 self._Resizable = self._Main._Resizable
@@ -157,7 +157,8 @@ class Select:
             if isinstance(Value, int):
                 self._Widget.current(Value)
             else:
-                self._Widget.current(self._Values.index(Value))
+                if Value in self._Values:
+                    self._Widget.current(self._Values.index(Value))
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Set -> {E}")
             

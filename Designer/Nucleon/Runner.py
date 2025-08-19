@@ -166,11 +166,15 @@ def Load_Child(Parent, Root, Global):
             Fixture = [Item['Width'], Item['Height'], Item['Left'], Item['Top']]
             Temp_Item.Config(Name=Item['Name'])
             Temp_Item.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Radius=Item['Radius'])
+            if Item['Background']=='False':
+                Temp_Item.Config(Background=False)
+            else:
+                Temp_Item.Config(Background=Item['Background'])
             Temp_Item.Config(Start=Item['Start'], Extent=Item['Extent'])
             Temp_Item.Config(Size=Item['Size'], Weight=Item['Weight'], Font=Item['Font'], Value=Item['Value'])
-            Temp_Item.Config(Thickness=Item['Thickness'], Fill=Item['Fill'], Outline=Item['Outline'])
+            Temp_Item.Config(Thickness=Item['Thickness'], Fill=Item['Fill'], Outline=Item['Outline'], Color=Item['Color'])
             Temp_Item.Config(Justify=Item['Justify'], Anchor=Item['Anchor'])
-            Temp_Item.Config(Resize=bool(Item['Resize']), Move=bool(Item['Move']))
+            Temp_Item.Config(Resize=bool(Item['Resize']), Move=bool(Item['Move']), Vertical=bool(Item['Vertical']))
             Temp_Item.Config(Skew_Horizontal=Item['Skew_Horizontal'], Skew_Vertical=Item['Skew_Vertical'])
             Temp_Item.Config(Angle=Item['Angle'])
             Temp_Item.Config(Url=bool(Item['Url']), Array=bool(Item['Array']), Pil=bool(Item['Pil']), Transparent=bool(Item['Transparent']), Rotate=Item['Rotate'], Aspect_Ratio=bool(Item['Aspect_Ratio']))

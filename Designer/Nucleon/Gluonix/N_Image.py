@@ -61,11 +61,19 @@ class Image:
                 self._On_Hide = False
                 self._On_Hover_In = False
                 self._On_Hover_Out = False
+                self._Is_Gif = False
+                self._Gif_Frames = []
+                self._Gif_Durations = []
+                self._Gif_Loop = 1
+                self._Gif_Index = 0
+                self._Gif_Stop = threading.Event()
+                self._Gif_Thread = None
+                self._Gif_Running = False
             except Exception as E:
                 self._GUI.Error(f"{self._Type} -> Init -> {E}")
         else:
             print("Error: Gluonix -> GUI Instance Has Not Been Created")
-
+        
     def __str__(self):
         return "Nucleon_Glunoix_Image[]"
 
@@ -88,6 +96,7 @@ class Image:
         
     def Delete(self):
         try:
+            self.Stop()
             self._Main._Widget.remove(self)
             self._Widget.destroy()
             self._Frame.Delete()
@@ -95,16 +104,17 @@ class Image:
                 del self
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Delete -> {E}")
-            
+
     def Hide(self):
         try:
+            self.Stop()
             self._Frame.Hide()
             self._Display = False
             if self._On_Hide:
                 self._On_Hide()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Hide -> {E}")
-            
+
     def Show(self):
         try:
             self._Display = True
@@ -114,9 +124,10 @@ class Image:
                 self.Display()
             if self._On_Show:
                 self._On_Show()
+            self.Run()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Show -> {E}")
-            
+
     def Display(self):
         try:
             self._Frame.Show()
@@ -147,16 +158,19 @@ class Image:
             
     def Set(self, Path):
         try:
+            self.Stop()
             self._Path = Path
             self._Path_Memory = self._Path
             self.Open()
             self.Relocate()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Set -> {E}")
-            
+
     def Initial(self):
         try:
             if self._Path_Initial:
+                if hasattr(self,'Stop'):
+                    self.Stop()
                 Load_Setup = [self._Array, self._Url, self._Pil]
                 self._Array, self._Url, self._Pil = False, False, False
                 self.Set(self._Path_Initial)
@@ -398,32 +412,95 @@ class Image:
             
     def Open(self):
         try:
+            self.Stop()
+            self._Is_Gif=False
+            self._Gif_Frames=[]
+            self._Gif_Durations=[]
+            self._Gif_Loop=1
+            self._Gif_Index=0
             if self._Image:
-                self._Image.close()
-            if self._Url:
-                if self._Path:
-                    Image_Data = requests_get(self._Path)
-                    self._Image = PIL_Image.open(BytesIO(Image_Data.content))
-            elif self._Array:
-                if self._Path is not None:
-                    self._Image = PIL_Image.fromarray(self._Path)
-            elif self._Pil:
-                if self._Path:
-                    self._Image = self._Path.copy()
-            else:
-                if self._Path and os.path.exists(self._Path):
-                    self._Image = PIL_Image.open(self._Path)
-                    if not self._Path_Initial:
-                        self._Path_Initial = self._Path
+                try:self._Image.close()
+                except:pass
+            self._Image=False
+            if self._Array and self._Path is not None:
+                self._Image=PIL_Image.fromarray(self._Path)
+                self._Image_Width,self._Image_Height=self._Image.size
+                return
+            if self._Pil and self._Path:
+                T=self._Path
+                if getattr(T,"is_animated",False):
+                    self._Is_Gif=True
+                    try:self._Gif_Loop=int(getattr(T,"info",{}).get("loop",1))
+                    except:self._Gif_Loop=1
+                    C=getattr(T,"n_frames",0) or 0
+                    I=0
+                    while True:
+                        try:
+                            T.seek(I)
+                            F=T.convert("RGBA").copy()
+                            D=int(getattr(T,"info",{}).get("duration",100))
+                            self._Gif_Frames.append(F)
+                            self._Gif_Durations.append(max(1,D))
+                            I+=1
+                            if C and I>=C:break
+                        except EOFError:
+                            break
+                    if self._Gif_Frames:
+                        self._Image=self._Gif_Frames[0]
+                        self._Image_Width,self._Image_Height=self._Image.size
+                    else:
+                        self._Is_Gif=False
+                        self._Image=T.copy()
+                        self._Image_Width,self._Image_Height=self._Image.size
                 else:
-                    self._Image = False
-                    self._Widget.configure(image = None)
-                    self._Widget.image = None
-            if self._Image:
-                self._Image_Width, self._Image_Height = self._Image.size
+                    self._Image=T.copy()
+                    self._Image_Width,self._Image_Height=self._Image.size
+                return
+            Data=None
+            if self._Url and self._Path:
+                Data=requests_get(self._Path).content
+            elif self._Path and os.path.exists(self._Path):
+                with open(self._Path,"rb") as F:
+                    Data=F.read()
+                if not self._Path_Initial:
+                    self._Path_Initial=self._Path
+            else:
+                self._Image=False
+                self._Widget.configure(image=None)
+                self._Widget.image=None
+                return
+            from_io=BytesIO(Data)
+            with PIL_Image.open(from_io) as T:
+                if getattr(T,"is_animated",False):
+                    self._Is_Gif=True
+                    try:self._Gif_Loop=int(T.info.get("loop",1))
+                    except:self._Gif_Loop=1
+                    C=getattr(T,"n_frames",0) or 0
+                    I=0
+                    while True:
+                        try:
+                            T.seek(I)
+                            F=T.convert("RGBA").copy()
+                            D=int(T.info.get("duration",100))
+                            self._Gif_Frames.append(F)
+                            self._Gif_Durations.append(max(1,D))
+                            I+=1
+                            if C and I>=C:break
+                        except EOFError:
+                            break
+                    if self._Gif_Frames:
+                        self._Image=self._Gif_Frames[0]
+                        self._Image_Width,self._Image_Height=self._Image.size
+                    else:
+                        self._Is_Gif=False
+                        self._Image=T.copy()
+                        self._Image_Width,self._Image_Height=self._Image.size
+                else:
+                    self._Image=T.copy()
+                    self._Image_Width,self._Image_Height=self._Image.size
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Open -> {E}")
-            
+
     def Convert(self, Frame_Width, Frame_Height):
         try:
             Temp_Image = self._Image.rotate(self._Rotate+self._Angle, PIL_Image.NEAREST, expand=0)
@@ -539,6 +616,7 @@ class Image:
                 self.Load()
             if self._Display:
                 self.Display()
+                self.Run()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Relocate -> {E}")
             
@@ -548,3 +626,54 @@ class Image:
             self.Relocate()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Resize -> {E}")
+            
+    def Run(self):
+        try:
+            if not self._Is_Gif or len(self._Gif_Frames)==0:
+                return
+            if self._Gif_Running:
+                return
+            self._Gif_Stop.clear()
+            self._Gif_Running=True
+            def Worker():
+                Loops=0
+                while self._Gif_Running and not self._Gif_Stop.is_set():
+                    if not self._Widget.winfo_exists():
+                        break
+                    Frame=self._Gif_Frames[self._Gif_Index]
+                    Dur=self._Gif_Durations[self._Gif_Index]
+                    def Post(F=Frame):
+                        if not self._Widget.winfo_exists():
+                            return
+                        self._Image=F
+                        self._Image_Width,self._Image_Height=F.size
+                        self.Load()
+                    self._GUI._Frame.after(0,Post)
+                    if self._Gif_Stop.wait(Dur/1000.0):
+                        break
+                    self._Gif_Index=(self._Gif_Index+1)%len(self._Gif_Frames)
+                    if self._Gif_Index==0:
+                        Loops+=1
+                        if self._Gif_Loop!=0 and Loops>=self._Gif_Loop:
+                            break
+                self._Gif_Running=False
+            self._Gif_Thread=threading.Thread(target=Worker,daemon=True)
+            self._Gif_Thread.start()
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Run -> {E}")
+            
+    def Stop(self):
+        try:
+            if self._Gif_Thread and self._Gif_Thread.is_alive():
+                self._Gif_Running=False
+                self._Gif_Stop.set()
+                self._Gif_Thread.join(timeout=0.2)
+            self._Gif_Stop.clear()
+            self._Gif_Thread=None
+            self._Gif_Index=0
+            if self._Is_Gif and len(self._Gif_Frames)>0:
+                self._Image=self._Gif_Frames[0]
+                self._Image_Width,self._Image_Height=self._Image.size
+                self.Load()
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Stop -> {E}")

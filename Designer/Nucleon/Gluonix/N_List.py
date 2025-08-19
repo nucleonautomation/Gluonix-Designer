@@ -170,7 +170,8 @@ class List:
             if isinstance(Value, int):
                 self._Widget.selection_set(Value)
             else:
-                self._Widget.selection_set(self._Values.index(Value))
+                if Value in self._Values:
+                    self._Widget.selection_set(self._Values.index(Value))
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Set -> {E}")
             

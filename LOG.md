@@ -1,5 +1,11 @@
 # Change Log
 
+## V(5.5)
+- GIF Support Included In Image Widgets (Except Interactive Image). GIF Will Run Automatically In Thread With Widget.Show() and Stop with Widget.Hide()
+- Image Widgets, Two Separate Functions Added Widget.Run() & Widget.Stop() To Control GIF Images
+- Update Canvas Text Using Image Rendering For More Options, i.e. Skew Options For Horizontal & Vertical Skew, Rotation, Vertical Text, Extensive Font Choice
+- Legacy Canvas_Text Class Moves To Canvas_Text_Old
+
 ## V(5.4)
 - Gluonix Library Optimized
 - New Interactive Login Example Added Using Animations

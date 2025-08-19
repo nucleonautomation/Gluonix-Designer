@@ -15,6 +15,7 @@ from .N_Canvas_RectangleR import Canvas_RectangleR
 from .N_Canvas_Polygon import Canvas_Polygon
 from .N_Canvas_Image import Canvas_Image
 from .N_Canvas_Text import Canvas_Text
+from .N_Canvas_Text_Old import Canvas_Text_Old
 
 class Scroll:
 
@@ -662,3 +663,12 @@ class Scroll:
             return Item
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Text -> {E}")
+            
+    def Text_Old(self, Name=False):
+        try:
+            Item = Canvas_Text_Old(self)
+            if Name:
+                Item.Config(Name=Name)
+            return Item
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Text_Old -> {E}")

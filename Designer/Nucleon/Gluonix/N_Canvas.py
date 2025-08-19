@@ -15,6 +15,7 @@ from .N_Canvas_RectangleR import Canvas_RectangleR
 from .N_Canvas_Polygon import Canvas_Polygon
 from .N_Canvas_Image import Canvas_Image
 from .N_Canvas_Text import Canvas_Text
+from .N_Canvas_Text_Old import Canvas_Text_Old
 from .N_Video import Video
 
 class Canvas:
@@ -556,7 +557,8 @@ class Canvas:
                 Intensity = (self._Shadow_Size-i) / self._Shadow_Size
                 Shadow_Fill = self.Fade(self._Shadow_Color, Intensity)
                 self._Rounded.append(self.Round_Rectangle(X1-Offset+(Reducer/2), Y1-Offset+Reducer, X2+Offset-(Reducer/2), Y2+Offset, Radius, outline=Shadow_Fill, fill=Shadow_Fill, smooth=True))
-            self._Rounded.append(self.Round_Rectangle(X1, Y1, X2, Y2, Radius, outline=self._Border_Color, fill=self._Border_Color, smooth=True))
+            if self._Border_Size>0:
+                self._Rounded.append(self.Round_Rectangle(X1, Y1, X2, Y2, Radius, outline=self._Border_Color, fill=self._Border_Color, smooth=True))
             X1 = self._Border_Size+self._Shadow_Size
             Y1 = self._Border_Size+self._Shadow_Size
             X2 = self._Width_Current-self._Border_Size-self._Shadow_Size-1
@@ -841,6 +843,15 @@ class Canvas:
             return Item
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Text -> {E}")
+            
+    def Text_Old(self, Name=False):
+        try:
+            Item = Canvas_Text_Old(self)
+            if Name:
+                Item.Config(Name=Name)
+            return Item
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Text_Old -> {E}")
             
     def Video(self):
         try:

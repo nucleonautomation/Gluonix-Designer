@@ -7,6 +7,7 @@ from PIL import Image as PIL_Image, ImageTk as PIL_ImageTk
 from .N_Custom import Event_Bind_Canvas
         
 class Canvas_Image:
+    
     def __init__(self, Main):
         self._Canvas = Main
         self._Config = ['Name', 'Width', 'Height', 'Left', 'Top', 'Animate_Left', 'Animate_Top', 'Animate_Width', 'Animate_Height', 'Animate_Time', 'Anchor', 'Url', 'Array', 'Pil', 'Photo', 'Resize', 'Rotate', 'Path', 'Path_Initial', 'Transparent', 'Skew_Horizontal', 'Skew_Vertical']
@@ -48,6 +49,14 @@ class Canvas_Image:
         self._On_Show = False
         self._On_Hide = False
         self._On_Animate = False
+        self._Is_Gif = False
+        self._Gif_Frames = []
+        self._Gif_Durations = []
+        self._Gif_Loop = 1
+        self._Gif_Index = 0
+        self._Gif_Stop = threading.Event()
+        self._Gif_Thread = None
+        self._Gif_Running = False
 
     def __str__(self):
         return "Nucleon_Glunoix_Canvas_Image[]"
@@ -80,17 +89,31 @@ class Canvas_Image:
                 raise Exception('Widget can only copy to Canvas/Scroll')
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Copy -> {E}")
+            
+    def Delete(self):
+        try:
+            self.Animate_Cancel()
+            if hasattr(self,'Stop'):
+                self.Stop()
+            self._Canvas._Widget.remove(self)
+            self._Canvas._Frame.delete(self._Widget)
+            if self:
+                del self
+        except Exception as E:
+            self._Canvas._GUI.Error(f"{self._Type} -> Delete -> {E}")
 
     def Hide(self):
         try:
             self.Animate_Cancel()
+            if hasattr(self,'Stop'):
+                self.Stop()
             self._Canvas._Frame.itemconfigure(self._Widget, state='hidden')
             self._Display = False
             if self._On_Hide:
                 self._On_Hide()
         except Exception as E:
-            self._Canvas._GUI.Error(f"{self._Type}-> Hide -> {E}")
-            
+            self._Canvas._GUI.Error(f"{self._Type} -> Hide -> {E}")
+
     def Show(self):
         try:
             self._Display = True
@@ -100,6 +123,7 @@ class Canvas_Image:
                 self.Display()
             if self._On_Show:
                 self._On_Show()
+            self.Run()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Show -> {E}")
 
@@ -216,19 +240,11 @@ class Canvas_Image:
             self._Anim_Thread = None
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Animate_Cancel -> {E}")
-
-    def Delete(self):
-        try:
-            self.Animate_Cancel()
-            self._Canvas._Widget.remove(self)
-            self._Canvas._Frame.delete(self._Widget)
-            if self:
-                del self
-        except Exception as E:
-            self._Canvas._GUI.Error(f"{self._Type} -> Delete -> {E}")
-        
+            
     def Set(self, Path):
         try:
+            if hasattr(self,'Stop'):
+                self.Stop()
             self._Path = Path
             self._Path_Memory = self._Path
             self.Open()
@@ -239,10 +255,12 @@ class Canvas_Image:
     def Initial(self):
         try:
             if self._Path_Initial:
-                Load_Setup = [self._Array, self._Url, self._Pil, self._Photo]
-                self._Array, self._Url, self._Pil, self._Photo = False, False, False, False
+                if hasattr(self,'Stop'):
+                    self.Stop()
+                Load_Setup=[self._Array,self._Url,self._Pil,self._Photo]
+                self._Array,self._Url,self._Pil,self._Photo=False,False,False,False
                 self.Set(self._Path_Initial)
-                self._Array, self._Url, self._Pil, self._Photo = Load_Setup
+                self._Array,self._Url,self._Pil,self._Photo=Load_Setup
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Initial -> {E}")
             
@@ -339,31 +357,95 @@ class Canvas_Image:
         
     def Open(self):
         try:
+            if hasattr(self,'Stop'):
+                self.Stop()
+            self._Is_Gif=False
+            self._Gif_Frames=[]
+            self._Gif_Durations=[]
+            self._Gif_Loop=1
+            self._Gif_Index=0
             if self._Image:
-                self._Image.close()
-            if self._Url:
-                if self._Path:
-                    Image_Data = requests_get(self._Path)
-                    self._Image = PIL_Image.open(BytesIO(Image_Data.content))
-            elif self._Array:
-                if self._Path is not None:
-                    self._Image = PIL_Image.fromarray(self._Path)
-            elif self._Pil:
-                if self._Path:
-                    self._Image = self._Path.copy()
-            elif self._Photo:
-                if self._Path:
-                    self._Image = self._Path
+                try:self._Image.close()
+                except:pass
+            self._Image=False
+            if self._Photo and self._Path:
+                self._Image=self._Path
+                return
+            if self._Array and self._Path is not None:
+                self._Image=PIL_Image.fromarray(self._Path)
+                self._Image_Width,self._Image_Height=self._Image.size
+                return
+            if self._Pil and self._Path:
+                T=self._Path
+                if getattr(T,"is_animated",False):
+                    self._Is_Gif=True
+                    try:self._Gif_Loop=int(getattr(T,"info",{}).get("loop",1))
+                    except:self._Gif_Loop=1
+                    C=getattr(T,"n_frames",0) or 0
+                    I=0
+                    while True:
+                        try:
+                            T.seek(I)
+                            F=T.convert("RGBA").copy()
+                            D=int(getattr(T,"info",{}).get("duration",100))
+                            self._Gif_Frames.append(F)
+                            self._Gif_Durations.append(max(1,D))
+                            I+=1
+                            if C and I>=C:break
+                        except EOFError:
+                            break
+                    if self._Gif_Frames:
+                        self._Image=self._Gif_Frames[0]
+                        self._Image_Width,self._Image_Height=self._Image.size
+                    else:
+                        self._Is_Gif=False
+                        self._Image=T.copy()
+                        self._Image_Width,self._Image_Height=self._Image.size
+                else:
+                    self._Image=T.copy()
+                    self._Image_Width,self._Image_Height=self._Image.size
+                return
+            Data=None
+            if self._Url and self._Path:
+                Data=requests_get(self._Path).content
+            elif self._Path and os.path.exists(self._Path):
+                with open(self._Path,"rb") as F:
+                    Data=F.read()
+                if not self._Path_Initial:
+                    self._Path_Initial=self._Path
             else:
-                if self._Path and os.path.exists(self._Path):
-                    self._Image = PIL_Image.open(self._Path)
-                    if not self._Path_Initial:
-                        self._Path_Initial = self._Path
-            if self._Image and not self._Photo:
-                self._Image_Width, self._Image_Height = self._Image.size
+                return
+            with PIL_Image.open(BytesIO(Data)) as T:
+                if getattr(T,"is_animated",False):
+                    self._Is_Gif=True
+                    try:self._Gif_Loop=int(T.info.get("loop",1))
+                    except:self._Gif_Loop=1
+                    C=getattr(T,"n_frames",0) or 0
+                    I=0
+                    while True:
+                        try:
+                            T.seek(I)
+                            F=T.convert("RGBA").copy()
+                            D=int(T.info.get("duration",100))
+                            self._Gif_Frames.append(F)
+                            self._Gif_Durations.append(max(1,D))
+                            I+=1
+                            if C and I>=C:break
+                        except EOFError:
+                            break
+                    if self._Gif_Frames:
+                        self._Image=self._Gif_Frames[0]
+                        self._Image_Width,self._Image_Height=self._Image.size
+                    else:
+                        self._Is_Gif=False
+                        self._Image=T.copy()
+                        self._Image_Width,self._Image_Height=self._Image.size
+                else:
+                    self._Image=T.copy()
+                    self._Image_Width,self._Image_Height=self._Image.size
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Open -> {E}")
-        
+
     def Convert(self):
         try:
             Temp_Image = self._Image.rotate(self._Rotate + self._Angle, PIL_Image.NEAREST, expand=1)
@@ -508,6 +590,7 @@ class Canvas_Image:
             self.Create()
             if self._Display:
                 self.Display()
+                self.Run()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Relocate -> {E}")
             
@@ -518,3 +601,53 @@ class Canvas_Image:
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Resize -> {E}")
             
+    def Run(self):
+        try:
+            if not getattr(self,"_Is_Gif",False) or len(getattr(self,"_Gif_Frames",[]))==0:
+                return
+            if self._Gif_Running:
+                return
+            self._Gif_Stop.clear()
+            self._Gif_Running=True
+            def Worker():
+                Loops=0
+                while self._Gif_Running and not self._Gif_Stop.is_set():
+                    if not self._Canvas._Frame.winfo_exists():
+                        break
+                    Frame=self._Gif_Frames[self._Gif_Index]
+                    Dur=self._Gif_Durations[self._Gif_Index]
+                    def Post(F=Frame):
+                        if not self._Canvas._Frame.winfo_exists():
+                            return
+                        self._Image=F
+                        self._Image_Width,self._Image_Height=F.size
+                        self.Load()
+                    self._Canvas._Frame.after(0,Post)
+                    if self._Gif_Stop.wait(Dur/1000.0):
+                        break
+                    self._Gif_Index=(self._Gif_Index+1)%len(self._Gif_Frames)
+                    if self._Gif_Index==0:
+                        Loops+=1
+                        if self._Gif_Loop!=0 and Loops>=self._Gif_Loop:
+                            break
+                self._Gif_Running=False
+            self._Gif_Thread=threading.Thread(target=Worker,daemon=True)
+            self._Gif_Thread.start()
+        except Exception as E:
+            self._Canvas._GUI.Error(f"{self._Type} -> Run -> {E}")
+
+    def Stop(self):
+        try:
+            if self._Gif_Thread and self._Gif_Thread.is_alive():
+                self._Gif_Running=False
+                self._Gif_Stop.set()
+                self._Gif_Thread.join(timeout=0.2)
+            self._Gif_Stop.clear()
+            self._Gif_Thread=None
+            self._Gif_Index=0
+            if self._Is_Gif and len(self._Gif_Frames)>0:
+                self._Image=self._Gif_Frames[0]
+                self._Image_Width,self._Image_Height=self._Image.size
+                self.Load()
+        except Exception as E:
+            self._Canvas._GUI.Error(f"{self._Type} -> Stop -> {E}")
