@@ -144,6 +144,7 @@ class Stock_Canvas_Text:
                     Widget.Config(Thickness=Widget_Data['Thickness'], Fill=Widget_Data['Fill'], Outline=Widget_Data['Outline'], Color=Widget_Data['Color'])
                     Widget.Config(Resize=bool(Widget_Data['Resize']), Move=bool(Widget_Data['Move']), Vertical=bool(Widget_Data['Vertical']))
                     Widget.Config(Path=f"{self.Stock.Design.Project_Path}/Data/File/{ID}")
+                    Widget.Config(Justify=Widget_Data['Justify'], Anchor=Widget_Data['Anchor'])
                     Widget.Config(Skew_Horizontal=Widget_Data['Skew_Horizontal'], Skew_Vertical=Widget_Data['Skew_Vertical'])
                     Widget.Config(Url=bool(Widget_Data['Url']), Transparent=bool(Widget_Data['Transparent']), Rotate=Widget_Data['Rotate'], Aspect_Ratio=bool(Widget_Data['Aspect_Ratio']))
                     Widget.Lock = bool(Widget_Data['Lock'])

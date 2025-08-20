@@ -1,5 +1,10 @@
 # Change Log
 
+## V(5.6)
+- Root/Popup Icon Will Be Support In All OS (Windows, Linux, MacOS etc), & All Image File Are Accepted
+- New Canvas_Text Support Justification For center, left, right, n, nw, ne, s, sw, se
+- Designer Paste Action Can Be Performed On Non Container Widgets, Will Take The Parent As Copy ID
+
 ## V(5.5)
 - GIF Support Included In Image Widgets (Except Interactive Image). GIF Will Run Automatically In Thread With Widget.Show() and Stop with Widget.Hide()
 - Image Widgets, Two Separate Functions Added Widget.Run() & Widget.Stop() To Control GIF Images

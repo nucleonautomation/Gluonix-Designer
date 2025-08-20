@@ -109,7 +109,7 @@ class Element:
             self.Tree.Config(Background='#FFFFFF', Border_Size=0, Scroll_Width=Fixture[0]*3, Display=True)
             self.Tree.Config(Foreground='#000000', Font_Size=16, Font_Weight='normal')
             self.Tree.Config(Resize=True, Move=True)
-            self.Tree.Bind(On_Release=lambda E: self.Reset_All(), On_Double_Click=lambda E: self.Get_Current(), On_Right_Click=lambda E: self.Get_Current())
+            self.Tree.Bind(On_Release=lambda E: self.Get_Current())
             self.Tree.Create()
                    
         except Exception as E:
@@ -305,27 +305,32 @@ class Element:
             
     def Get_Current(self, Loading=True):
         try:
-            if Loading:
-                self.Hide_Delete()
-                self.Global['Loading'].Show()
-                self.Global['GUI'].After(10, lambda: self.Get_Current(Loading=False))
-            else:
-                Widget = self.Tree.Get()
-                self.Current = Widget[0]
-                if Widget:
-                    self.Design.Configure.Hide_All()
-                    self.Design.Configure.Reset_All()
-                    if Widget[0]!=self.Parent:
-                        Configure = getattr(self.Design.Configure, f'Configure_{Widget[1]}')
-                        Configure.Load(Widget[0])
-                    else:
-                        self.Delete_Image.Hide()
-                        self.Copy_Image.Hide()
-                        if not self.Copy_ID:
-                            self.Paste_Image.Hide()
-                        self.Global['Loading'].Hide()
+            Widget = self.Tree.Get()
+            if self.Current!=Widget[0]:
+                if Loading:
+                    self.Global['Loading'].Show()
+                    self.Global['GUI'].After(10, lambda: self.Get_Current(Loading=False))
                 else:
-                    self.Global['Loading'].Hide()
+                    Widget = self.Tree.Get()
+                    if len(Widget)>0:
+                        if self.Current!=Widget[0]:
+                            self.Current = Widget[0]
+                            self.Hide_Delete()
+                            self.Design.Configure.Hide_All()
+                            self.Design.Configure.Reset_All()
+                            if Widget[0]!=self.Parent:
+                                Configure = getattr(self.Design.Configure, f'Configure_{Widget[1]}')
+                                Configure.Load(Widget[0])
+                            else:
+                                self.Delete_Image.Hide()
+                                self.Copy_Image.Hide()
+                                if not self.Copy_ID:
+                                    self.Paste_Image.Hide()
+                                self.Global['Loading'].Hide()
+                        else:
+                            self.Global['Loading'].Hide()
+                    else:
+                        self.Global['Loading'].Hide()
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             
@@ -423,15 +428,21 @@ class Element:
         try:
             Root_ID = self.Tree.Current()
             if Root_ID:
-                Root_Type = self.Tree.Get(Root_ID)[1]
-                if Root_Type=='Frame' or Root_Type=='Canvas' or Root_Type=='Scroll' or Root_Type=='Group':
+                Root_Info = self.Tree.Get(Root_ID)
+                while Root_Info[1]!='Frame' and Root_Info[1]!='Canvas' and Root_Info[1]!='Scroll' and Root_Info[1]!='Group':
+                    Root_ID = self.Tree.Parent(Root_ID)
+                    Root_Info = self.Tree.Get(Root_ID)
+                if Root_Info[1]=='Frame' or Root_Info[1]=='Canvas' or Root_Info[1]=='Scroll' or Root_Info[1]=='Group':
                     Error = False
-                    Parent = Root_ID
-                    while self.Tree.Get(Parent)[0]!=self.Parent:
-                        if Parent==self.Copy_ID:
-                            Error = True
-                            break
-                        Parent = self.Tree.Parent(Parent)
+                    if Root_ID!=self.Copy_ID:
+                        Parent = Root_ID
+                        while self.Tree.Get(Parent)[0]!=self.Parent:
+                            if Parent==self.Copy_ID:
+                                Error = True
+                                break
+                            Parent = self.Tree.Parent(Parent)
+                    else:
+                        Root_ID = self.Tree.Parent(Root_ID)
                     if not Error:
                         self.Paste_All(self.Copy_ID, Root_ID)
                     else:

@@ -228,19 +228,28 @@ class Canvas_Text:
                 S = Text_Value.replace('\t', '    ')
                 S = ''.join('\u00A0' if ch == ' ' else ch for ch in S)
                 Text_Value = '\n'.join(list(S))
+            Font_Size = int(max(1, self._Size_Current if hasattr(self, '_Size_Current') else self._Size))
             try:
-                Font_Object = PIL_ImageFont.truetype(self._Font.lower() + '.ttf', int(max(1, self._Size_Current if hasattr(self, '_Size_Current') else self._Size)))
+                Font_Object = PIL_ImageFont.truetype(self._Font.lower() + '.ttf', Font_Size)
             except:
-                Font_Object = PIL_ImageFont.truetype('arial.ttf', int(max(1, self._Size_Current if hasattr(self, '_Size_Current') else self._Size)))
+                Font_Object = PIL_ImageFont.truetype('arial.ttf', Font_Size)
             Weight_Value = (self._Weight or 'normal').strip().lower()
             Is_Bold = Weight_Value in ('bold', 'b', '700', 'semibold', 'demibold', 'heavy', 'black')
-            Stroke_Width = 1 if Is_Bold else 0
+            if Is_Bold:
+                if Font_Size <= 30:
+                    Stroke_Width = 0.5
+                elif Font_Size <= 55:
+                    Stroke_Width = 1
+                else:
+                    Stroke_Width = 2
+            else:
+                Stroke_Width = 0
             Width_Target = int(self._Width if self._Width else 1)
             Height_Target = int(self._Height if self._Height else 1)
             Temp_Image = PIL_Image.new('RGBA', (1, 1), (0, 0, 0, 0))
             Draw = PIL_ImageDraw.Draw(Temp_Image)
             def Measure_Width(S):
-                B = Draw.textbbox((0, 0), S, font = Font_Object, stroke_width = Stroke_Width)
+                B = Draw.textbbox((0, 0), S, font=Font_Object, stroke_width=Stroke_Width)
                 return max(1, B[2] - B[0])
             Paragraphs = Text_Value.split('\n') if '\n' in Text_Value else [Text_Value]
             Lines = []
@@ -274,7 +283,8 @@ class Canvas_Text:
             if not Lines:
                 Lines = ['']
             Para_Text = '\n'.join(Lines)
-            B_All = Draw.multiline_textbbox((0, 0), Para_Text, font = Font_Object, align = (self._Justify or 'left'), spacing = 0, stroke_width = Stroke_Width)
+            Align_For_Measure, Pos_X, Pos_Y = self.Justify(self._Justify, Width_Target, Height_Target, Para_Text, Font_Object, Stroke_Width)
+            B_All = Draw.multiline_textbbox((0, 0), Para_Text, font=Font_Object, align=Align_For_Measure, spacing=0, stroke_width=Stroke_Width)
             Text_Width = max(1, B_All[2] - B_All[0])
             Text_Height = max(1, B_All[3] - B_All[1])
             if not self._Width:
@@ -285,10 +295,49 @@ class Canvas_Text:
             Image_Object = PIL_Image.new('RGBA', (max(1, Width_Target), max(1, Height_Target)), Background_Color)
             Draw = PIL_ImageDraw.Draw(Image_Object)
             Fill_Color = self._Color if self._Color else (0, 0, 0, 0)
-            Justify_Value = (self._Justify or 'left').strip().lower()
-            Draw.multiline_text((Width_Target / 2, Height_Target / 2), Para_Text, fill = Fill_Color, font = Font_Object, align = Justify_Value, spacing = 0, anchor = 'mm', stroke_width = Stroke_Width, stroke_fill = Fill_Color)
+            Align, Pos_X, Pos_Y = self.Justify(self._Justify, Width_Target, Height_Target, Para_Text, Font_Object, Stroke_Width)
+            Draw.multiline_text((Pos_X, Pos_Y), Para_Text, fill=Fill_Color, font=Font_Object, align=Align, spacing=0, stroke_width=Stroke_Width, stroke_fill=Fill_Color)
             self._Size_Rendered = int(max(1, self._Size_Current if hasattr(self, '_Size_Current') else self._Size))
             return Image_Object
         except Exception as Error:
             self._Canvas._GUI.Error(f"{self._Type} -> Render -> {Error}")
             return PIL_Image.new('RGBA', (max(1, int(self._Width or 1)), max(1, int(self._Height or 1))), (0, 0, 0, 0))
+
+    def Justify(self, Justify_Value, Width_Target, Height_Target, Para_Text, Font_Object, Stroke_Width):
+        try:
+            J = (Justify_Value or 'left').strip().lower()
+            Temp = PIL_Image.new('RGBA', (1, 1), (0, 0, 0, 0))
+            D = PIL_ImageDraw.Draw(Temp)
+            def Bbox_For(Align_Mode):
+                B = D.multiline_textbbox((0, 0), Para_Text, font=Font_Object, align=Align_Mode, spacing=0, stroke_width=Stroke_Width)
+                return B, max(1, B[2] - B[0]), max(1, B[3] - B[1])
+            if J in ('left', 'l'):
+                B, Tw, Th = Bbox_For('left')
+                return 'left', -B[0], (Height_Target - Th) / 2 - B[1]
+            if J in ('center', 'centre', 'c'):
+                B, Tw, Th = Bbox_For('center')
+                return 'center', (Width_Target - Tw) / 2 - B[0], (Height_Target - Th) / 2 - B[1]
+            if J in ('right', 'r'):
+                B, Tw, Th = Bbox_For('right')
+                return 'right', Width_Target - Tw - B[0], (Height_Target - Th) / 2 - B[1]
+            B, Tw, Th = Bbox_For('left')
+            if J == 'n':
+                return 'left', (Width_Target - Tw) / 2 - B[0], -B[1]
+            if J == 's':
+                return 'left', (Width_Target - Tw) / 2 - B[0], Height_Target - Th - B[1]
+            if J == 'w':
+                return 'left', -B[0], (Height_Target - Th) / 2 - B[1]
+            if J == 'e':
+                return 'left', Width_Target - Tw - B[0], (Height_Target - Th) / 2 - B[1]
+            if J == 'nw':
+                return 'left', -B[0], -B[1]
+            if J == 'ne':
+                return 'left', Width_Target - Tw - B[0], -B[1]
+            if J == 'sw':
+                return 'left', -B[0], Height_Target - Th - B[1]
+            if J == 'se':
+                return 'left', Width_Target - Tw - B[0], Height_Target - Th - B[1]
+            return 'left', -B[0], (Height_Target - Th) / 2 - B[1]
+        except Exception as Error:
+            self._Canvas._GUI.Error(f"{self._Type} -> Justify -> {Error}")
+            return 'left', 0, 0

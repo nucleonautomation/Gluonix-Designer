@@ -19,15 +19,16 @@ class Loading:
             self.Global['Widget'].append(self.Frame)
                 #Image
             Fixture = self.Frame.Locate(20, 96, 7, 2)
-            self.Image = self.Global['Gluonix'].Image(self.Frame)
+            self.Image = self.Global['Gluonix'].Image_Lite(self.Frame)
             self.Image.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
-            self.Image.Config(Path=self.Global['Image']('Loading'), Border_Size=0)
+            self.Image.Config(Path=self.Global['Image']('Loading', 'gif'))
             self.Image.Create()
+            self.Image.Hide()
                 #Label
             Fixture = self.Frame.Locate(67, 96, 31, 2)
-            self.Label = self.Global['Gluonix'].Label(self.Frame)
+            self.Label = self.Global['Gluonix'].Label_Lite(self.Frame)
             self.Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
-            self.Label.Config(Foreground='black', Value="Loading Please Wait...", Font_Size=10, Font_Weight='normal', Align='center', Border_Size=0)
+            self.Label.Config(Foreground='black', Value="Haunting In Progress...", Font_Size=10, Font_Weight='normal', Align='center')
             self.Label.Create()
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
@@ -35,7 +36,7 @@ class Loading:
     def Show(self):
         try:
             self.Enabled = True
-            _thread.start_new_thread(self.Load, ())
+            self.Image.Show()
             self.Frame.Show()
             self.Global['GUI'].Bind(Cursor_Loading=True)
         except Exception as E:
@@ -47,23 +48,8 @@ class Loading:
                 self.Global['GUI'].After(Delay*1000, lambda: self.Hide(Delay=False))
             else:
                 self.Enabled = False
+                self.Image.Hide()
                 self.Frame.Hide()
             self.Global['GUI'].Bind(Cursor_Arrow=True)
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
-                    
-    def Load(self):
-        while True:
-            try:
-                if self.Enabled:
-                    try:
-                        self.Image.Rotate(-5)
-                        time.sleep(0.05)
-                    except Exception as E:
-                        time.sleep(1)
-                        self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
-                else:
-                    break
-            except Exception:
-                break
-                        

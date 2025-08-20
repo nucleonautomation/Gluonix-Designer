@@ -1,6 +1,6 @@
 # IMPORT LIBRARIES
 import os
-from PIL import ImageGrab as PIL_ImageGrab
+from PIL import Image as PIL_Image, ImageTk as PIL_ImageTk, ImageGrab as PIL_ImageGrab
 import tkinter as TK
 from .N_GUI import GUI
 from .N_Custom import Event_Bind
@@ -481,8 +481,14 @@ class Popup():
                 else:
                     self._Title = 'Nucleon Glunoix'
             self._Frame.title(self._Title)
-            if os.path.exists(self._Icon) and self._Window:
-                self._Frame.iconbitmap(self._Icon)
+            if not self._Icon:
+                if self._GUI._Icon:
+                    self._Icon = self._GUI._Icon
+            if os.path.exists(self._Icon):
+                Temp_Image = PIL_Image.open(self._Icon)
+                Temp_Icon = PIL_ImageTk.PhotoImage(Temp_Image)
+                self._Frame.iconphoto(False, Temp_Icon)
+                self._Frame._icon_ref = Temp_Icon
             if self._Persistent:
                 self._Frame.protocol("WM_DELETE_WINDOW", self.Nothing)
             else:
