@@ -1,5 +1,8 @@
 # Change Log
 
+## V(5.7)
+- Switch Widget Colors Fixed.
+
 ## V(5.6)
 - Root/Popup Icon Will Be Support In All OS (Windows, Linux, MacOS etc), & All Image File Are Accepted
 - New Canvas_Text Support Justification For center, left, right, n, nw, ne, s, sw, se
