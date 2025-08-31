@@ -7,8 +7,8 @@ import datetime
 import PIL
 import io
 import base64
-import requests
 import sqlite3
+import urllib.request
 import tkinter as TK
 from tkinter import font
 from tkinter import filedialog

@@ -1,7 +1,7 @@
 # IMPORT LIBRARIES
 import os
 from io import BytesIO
-from requests import get as requests_get
+import urllib.request
 from PIL import Image as PIL_Image, ImageTk as PIL_ImageTk
 import tkinter as TK
 import threading, math, time
@@ -485,8 +485,9 @@ class Compound_Lite:
         try:
             if self._Url:
                 if self._Path:
-                    Image_Data = requests_get(self._Path)
-                    self._Image = PIL_Image.open(BytesIO(Image_Data.content))
+                    with urllib.request.urlopen(self._Path) as response:
+                        Data = response.read()
+                    self._Image = PIL_Image.open(BytesIO(Data))
             elif self._Array:
                 if self._Path is not None:
                     self._Image = PIL_Image.fromarray(self._Path)

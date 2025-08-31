@@ -14,9 +14,10 @@ import os
 import time
 import datetime
 import _thread
-import requests
+import json
 import inspect
 import warnings
+import urllib.request
 
 # Program
 from Program import Initial
@@ -32,7 +33,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 # -------------------------------------------------------------------------------------------------------------------------------
 Title = "Gluonix Designer - Nucleon Automation"
 Version = 5
-Revision = 7
+Revision = 8
 Error_List = []
 Error_Display = True
 Error_Log = True
@@ -163,9 +164,11 @@ def StartUp():
         try:
             Current_Version = float(f"{Version}.{Revision}")
             Latest_Version = Current_Version
-            Response = requests.get(f"https://pypi.org/pypi/GluonixDesigner/json", timeout=2)
-            if Response.status_code == 200:
-                Latest_Version = float(Response.json()["info"]["version"])
+            with urllib.request.urlopen("https://pypi.org/pypi/GluonixDesigner/json", timeout=2) as resp:
+                if resp.status == 200:
+                    Data = resp.read()
+                    Parsed = json.loads(Data.decode("utf-8"))
+                    Latest_Version = float(Parsed["info"]["version"])
             if Latest_Version>Current_Version:
                 Main.Home.Project.New_Label.Set(f"Update Available V({Latest_Version})")
                 Main.Home.Project.New_Label.Show()

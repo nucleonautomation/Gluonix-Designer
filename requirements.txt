@@ -1,7 +1,6 @@
 # Requirements file
 
 pillow>=6.0.0
-requests>=2.22.0
 
 # tkinter is part of the standard library, no need to include it here
 # tkinter>=8.6

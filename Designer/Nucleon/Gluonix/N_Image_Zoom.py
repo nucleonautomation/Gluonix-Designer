@@ -1,7 +1,7 @@
 # IMPORT LIBRARIES
 import os
 from io import BytesIO
-from requests import get as requests_get
+import urllib.request
 from PIL import Image as PIL_Image, ImageTk as PIL_ImageTk
 import tkinter as TK
 import threading, math, time
@@ -393,8 +393,9 @@ class Image_Zoom:
             if self._Image:
                 self._Image.close()
             if self._Url and self._Path:
-                Image_Data = requests_get(self._Path)
-                self._Image = PIL_Image.open(BytesIO(Image_Data.content))
+                with urllib.request.urlopen(self._Path) as response:
+                    Data = response.read()
+                self._Image = PIL_Image.open(BytesIO(Data))
             elif self._Array and self._Path is not None:
                 self._Image = PIL_Image.fromarray(self._Path)
             elif self._Pil and self._Path:
@@ -437,22 +438,24 @@ class Image_Zoom:
                 Crop = Crop.convert("RGBA")
             Image_Width, Image_Height = Crop.size
             Image_Aspect = Image_Width / Image_Height
-            Frame_Aspect = Frame_Width / Frame_Height
+            Inner_W = max(1, int(Frame_Width - 2 * self._Border_Size))
+            Inner_H = max(1, int(Frame_Height - 2 * self._Border_Size))
+            Frame_Aspect = Inner_W / Inner_H
             if Image_Aspect > Frame_Aspect:
-                New_Width = int(Frame_Width)
-                New_Height = int(Frame_Width / Image_Aspect)
+                New_Width = int(Inner_W)
+                New_Height = int(Inner_W / Image_Aspect)
             else:
-                New_Height = int(Frame_Height)
-                New_Width = int(Frame_Height * Image_Aspect)
+                New_Height = int(Inner_H)
+                New_Width = int(Inner_H * Image_Aspect)
             Crop = Crop.resize((New_Width, New_Height), PIL_Image.NEAREST)
-            Left = (Frame_Width - New_Width) // 2
-            Top = (Frame_Height - New_Height) // 2
+            Left = self._Border_Size + (Inner_W - New_Width) // 2
+            Top = self._Border_Size + (Inner_H - New_Height) // 2
             Crop_TK = PIL_ImageTk.PhotoImage(Crop)
             return {"Image": Crop_TK, "Top": Top, "Left": Left}
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Convert -> {E}")
             return {"Image": None, "Top": 0, "Left": 0}
-            
+
     def Load(self):
         try:
             if self._Height_Current > 0 and self._Width_Current > 0:
@@ -492,8 +495,10 @@ class Image_Zoom:
             self._Drag_Last_Y = Curr_Y
             View_W = self._Image_Width / self._Zoom_Scale
             View_H = self._Image_Height / self._Zoom_Scale
-            Move_X_Img = -Delta_X * (View_W / self._Width_Current)
-            Move_Y_Img = -Delta_Y * (View_H / self._Height_Current)
+            Inner_W = max(1, self._Width_Current - 2 * self._Border_Size)
+            Inner_H = max(1, self._Height_Current - 2 * self._Border_Size)
+            Move_X_Img = -Delta_X * (View_W / Inner_W)
+            Move_Y_Img = -Delta_Y * (View_H / Inner_H)
             New_CX = self._Zoom_Center[0] + Move_X_Img
             New_CY = self._Zoom_Center[1] + Move_Y_Img
             Half_W = View_W / 2
@@ -506,7 +511,7 @@ class Image_Zoom:
                 self._On_Drag(Event)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Drag -> {E}")
-            
+
     def Zoom(self, Event):
         try:
             if not self._Image:
@@ -519,8 +524,10 @@ class Image_Zoom:
             CanvasX = self._Frame._Frame.canvasx(Event.x)
             CanvasY = self._Frame._Frame.canvasy(Event.y)
             Img_X, Img_Y = self._Frame._Frame.coords(self._Image_Window)
-            Mouse_Rel_X = (CanvasX - Img_X) / self._Width_Current
-            Mouse_Rel_Y = (CanvasY - Img_Y) / self._Height_Current
+            Inner_W = max(1, self._Width_Current - 2 * self._Border_Size)
+            Inner_H = max(1, self._Height_Current - 2 * self._Border_Size)
+            Mouse_Rel_X = (CanvasX - Img_X) / Inner_W
+            Mouse_Rel_Y = (CanvasY - Img_Y) / Inner_H
             View_W = self._Image_Width / self._Zoom_Scale
             View_H = self._Image_Height / self._Zoom_Scale
             View_Left = self._Zoom_Center[0] - View_W / 2

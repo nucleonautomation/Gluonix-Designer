@@ -2,7 +2,7 @@
 import os
 import threading, math, time
 from io import BytesIO
-from requests import get as requests_get
+import urllib.request
 from PIL import Image as PIL_Image, ImageTk as PIL_ImageTk
 from .N_Custom import Event_Bind_Canvas
         
@@ -407,7 +407,8 @@ class Canvas_Image:
                 return
             Data=None
             if self._Url and self._Path:
-                Data=requests_get(self._Path).content
+                with urllib.request.urlopen(self._Path) as response:
+                    Data = response.read()
             elif self._Path and os.path.exists(self._Path):
                 with open(self._Path,"rb") as F:
                     Data=F.read()
