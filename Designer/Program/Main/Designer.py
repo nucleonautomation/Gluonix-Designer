@@ -33,7 +33,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 # -------------------------------------------------------------------------------------------------------------------------------
 Title = "Gluonix Designer - Nucleon Automation"
 Version = 5
-Revision = 8
+Revision = 9
 Error_List = []
 Error_Display = True
 Error_Log = True
@@ -161,25 +161,28 @@ def StartUp():
             Main.Home.Panel.Overview.Project_Path = Project_Path
             Main.Home.Panel.Overview.Runtime = True if Autoload=='Runtime' else False
             Main.Home.Panel.Overview.Update()
-        try:
-            Current_Version = float(f"{Version}.{Revision}")
-            Latest_Version = Current_Version
-            with urllib.request.urlopen("https://pypi.org/pypi/GluonixDesigner/json", timeout=2) as resp:
-                if resp.status == 200:
-                    Data = resp.read()
-                    Parsed = json.loads(Data.decode("utf-8"))
-                    Latest_Version = float(Parsed["info"]["version"])
-            if Latest_Version>Current_Version:
-                Main.Home.Project.New_Label.Set(f"Update Available V({Latest_Version})")
-                Main.Home.Project.New_Label.Show()
-                GUI.Config(Title=f"{Title} - Update Available V({Latest_Version})")
-            else:
-                Main.Home.Project.New_Label.Hide()
-        except:
-            pass
         Loading.Hide()
+        _thread.start_new_thread(Version_Check, ())
     except Exception as E:
         Error("StartUp -> " + str(E))
+        
+def Version_Check():
+    try:
+        Current_Version = float(f"{Version}.{Revision}")
+        Latest_Version = Current_Version
+        with urllib.request.urlopen("https://pypi.org/pypi/GluonixDesigner/json", timeout=2) as resp:
+            if resp.status == 200:
+                Data = resp.read()
+                Parsed = json.loads(Data.decode("utf-8"))
+                Latest_Version = float(Parsed["info"]["version"])
+        if Latest_Version>Current_Version:
+            Main.Home.Project.New_Label.Set(f"Update Available V({Latest_Version})")
+            Main.Home.Project.New_Label.Show()
+            GUI.Config(Title=f"{Title} - Update Available V({Latest_Version})")
+        else:
+            Main.Home.Project.New_Label.Hide()
+    except:
+        pass
         
 def On_Close():
     try:

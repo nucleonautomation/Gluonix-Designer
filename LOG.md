@@ -1,5 +1,8 @@
 # Change Log
 
+## V(5.9)
+- Start-Up Version Check Bug Fixes
+
 ## V(5.8)
 - requests Dependency Removes, Switched To urllib
 
