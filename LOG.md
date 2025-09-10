@@ -1,5 +1,9 @@
 # Change Log
 
+## V(6.0)
+- Start-Up Version Check Bug Fixed, Bud Was In Find Fonts In Canvas_Test_Config
+- Check Empty Folder Function Optimization
+
 ## V(5.9)
 - Start-Up Version Check Bug Fixes
 

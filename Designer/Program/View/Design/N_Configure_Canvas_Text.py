@@ -3,7 +3,7 @@
 ################################################################################################################################
 import inspect
 from tkinter import colorchooser
-import os, sys
+import os, sys, time
 from pathlib import Path
 
 class Configure_Canvas_Text:
@@ -56,7 +56,7 @@ class Configure_Canvas_Text:
             self.Background_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Background_Label.Config(Foreground='#000000', Value="Background:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
             self.Background_Label.Create()
-            
+                    
             #Background Color
             Fixture = self.Frame.Locate(7, 5, 28, 9)
             self.Background_Color = self.Global['Gluonix'].Label(self.Frame)
@@ -428,8 +428,7 @@ class Configure_Canvas_Text:
             
     def Find_Font(self):
         try:
-            Font_Paths = []
-            Font_Extensions = ("ttf",)
+            Font_Extensions = ("ttf", "otf", "ttc", "otc")
             Font_Set = set()
             def Add_Path(Path_Obj):
                 try:
@@ -438,20 +437,25 @@ class Configure_Canvas_Text:
                         Font_Set.add(Font_Name)
                 except:
                     pass
-            if not Font_Paths:
-                Font_Paths = [Path.cwd()]
-                if sys.platform.startswith("win"):
-                    Windows_Dir = os.environ.get("WINDIR", r"C:\Windows")
-                    Font_Paths += [Path(Windows_Dir) / "Fonts", Path(os.environ.get("LOCALAPPDATA", "")) / "Microsoft/Windows/Fonts"]
-                elif sys.platform == "darwin":
-                    Font_Paths += [Path("/System/Library/Fonts"), Path("/Library/Fonts"), Path.home() / "Library/Fonts"]
-                else:
-                    Font_Paths += [Path("/usr/share/fonts"), Path("/usr/local/share/fonts"), Path.home() / ".fonts", Path.home() / ".local/share/fonts"]
+            Font_Paths = []
+            if sys.platform.startswith("win"):
+                Windows_Dir = os.environ.get("WINDIR", r"C:\Windows")
+                Font_Paths += [Path(Windows_Dir) / "Fonts", Path(os.environ.get("LOCALAPPDATA", "")) / "Microsoft/Windows/Fonts"]
+            elif sys.platform == "darwin":
+                Font_Paths += [Path("/System/Library/Fonts"), Path("/Library/Fonts"), Path.home() / "Library/Fonts"]
+            else:
+                Font_Paths += [Path("/usr/share/fonts"), Path("/usr/local/share/fonts"), Path.home() / ".fonts", Path.home() / ".local/share/fonts"]
+            Start_Time = time.monotonic()
+            Timeout_Sec = 3.0
             for Root in Font_Paths:
                 try:
-                    Iterator = Root.rglob("*")
-                    for Path_Obj in Iterator:
-                        Add_Path(Path_Obj)
+                    for Dir_Path, Dir_Names, File_Names in os.walk(Root, followlinks=False):
+                        if time.monotonic() - Start_Time > Timeout_Sec:
+                            return sorted(Font_Set)
+                        for File_Name in File_Names:
+                            if time.monotonic() - Start_Time > Timeout_Sec:
+                                return sorted(Font_Set)
+                            Add_Path(Path(Dir_Path) / File_Name)
                 except:
                     pass
             return sorted(Font_Set)

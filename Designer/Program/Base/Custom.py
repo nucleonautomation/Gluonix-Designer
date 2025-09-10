@@ -15,7 +15,20 @@ def UUID():
     
     #Check Empty Folder
 def Is_Empty(Path):
-    return len(os.listdir(Path)) == 0
+    try:
+        with os.scandir(Path) as It:
+            for E in It:
+                N = E.name
+                if N in ('desktop.ini', 'Thumbs.db') or N.startswith('.'):
+                    continue
+                return False
+        return True
+    except FileNotFoundError:
+        return True
+    except NotADirectoryError:
+        return True
+    except PermissionError:
+        return False
     
     #MD5 Hash Generator
 def MD5(String):
