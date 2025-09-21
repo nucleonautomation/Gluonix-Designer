@@ -1,7 +1,7 @@
 # IMPORT LIBRARIES
 import os
 from io import BytesIO
-import urllib.request
+import urllib
 from PIL import Image as PIL_Image, ImageTk as PIL_ImageTk
 import tkinter as TK
 import threading, math, time
@@ -17,13 +17,10 @@ class Image_Open:
         if self._GUI is not None:
             self._Type = 'Image_Open'
             try:
-                self._Config = ['Path', 'Url', 'Array', 'Pil', 'Rotate', 'Transparent', 'Aspect_Ratio']
+                self._Config = ['Path', 'Rotate', 'Transparent', 'Aspect_Ratio']
                 self._Image = False
                 self._Path = False
                 self._Path_Memory = False
-                self._Url = False
-                self._Array = False
-                self._Pil = False
                 self._Rotate = 0
                 self._Transparent = True
                 self._Aspect_Ratio = True
@@ -59,30 +56,38 @@ class Image_Open:
                 
     def Open(self, Path=False):
         try:
-            if Path:
+            if Path is not False:
                 self._Path = Path
             if self._Image:
-                self._Image.close()
-            if self._Url:
-                if self._Path:
-                    with urllib.request.urlopen(self._Path) as response:
-                        Data = response.read()
+                try:
+                    self._Image.close()
+                except:
+                    pass
+            self._Image = False
+            Path_Obj = self._Path
+            if isinstance(Path_Obj, PIL_Image.Image):
+                self._Image = Path_Obj.copy()
+            elif hasattr(Path_Obj, "__array_interface__") or (hasattr(Path_Obj, "__class__") and getattr(type(Path_Obj), "__module__", "").startswith("numpy")):
+                self._Image = PIL_Image.fromarray(Path_Obj)
+            elif isinstance(Path_Obj, str):
+                Parsed = urllib.parse.urlparse(Path_Obj)
+                if Parsed.scheme in ("http", "https"):
+                    with urllib.request.urlopen(Path_Obj) as Response:
+                        Data = Response.read()
                     self._Image = PIL_Image.open(BytesIO(Data))
-            elif self._Array:
-                if self._Path is not None:
-                    self._Image = PIL_Image.fromarray(self._Path)
-            elif self._Pil:
-                if self._Path:
-                    self._Image = self._Path.copy()
-            else:
-                if self._Path and os.path.exists(self._Path):
-                    self._Image = PIL_Image.open(self._Path)
+                elif os.path.exists(Path_Obj):
+                    self._Image = PIL_Image.open(Path_Obj)
+                    if not getattr(self, "_Path_Initial", None):
+                        self._Path_Initial = Path_Obj
                 else:
                     self._Image = False
-                    self._Widget.configure(image = None)
-                    self._Widget.image = None
+            else:
+                self._Image = False
             if self._Image:
                 self._Image_Width, self._Image_Height = self._Image.size
+            else:
+                self._Widget.configure(image=None)
+                self._Widget.image=None
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Open -> {E}")
             

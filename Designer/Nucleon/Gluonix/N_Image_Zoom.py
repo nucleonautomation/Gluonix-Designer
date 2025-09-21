@@ -1,7 +1,7 @@
 # IMPORT LIBRARIES
 import os
 from io import BytesIO
-import urllib.request
+import urllib
 from PIL import Image as PIL_Image, ImageTk as PIL_ImageTk
 import tkinter as TK
 import threading, math, time
@@ -19,7 +19,7 @@ class Image_Zoom:
         if self._GUI is not None:
             self._Type = "Image_Zoom"
             try:
-                self._Config = ['Name', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Border_Color', 'Light_Border_Color', 'Dark_Border_Color', 'Border_Size', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Path', 'Path_Initial', 'Url', 'Array', 'Pil', 'Rotate', 'Transparent', 'Hover_Background', 'Light_Hover_Background', 'Dark_Hover_Background', 'Hover_Foreground', 'Light_Hover_Foreground', 'Dark_Hover_Foreground', 'Hover_Border_Color', 'Light_Hover_Border_Color', 'Dark_Hover_Border_Color']
+                self._Config = ['Name', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Border_Color', 'Light_Border_Color', 'Dark_Border_Color', 'Border_Size', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Path', 'Path_Initial', 'Rotate', 'Transparent', 'Hover_Background', 'Light_Hover_Background', 'Dark_Hover_Background', 'Hover_Foreground', 'Light_Hover_Foreground', 'Dark_Hover_Foreground', 'Hover_Border_Color', 'Light_Hover_Border_Color', 'Dark_Hover_Border_Color']
                 self._Initialized = False
                 self._Name = False
                 self._Last_Name = False
@@ -47,9 +47,6 @@ class Image_Zoom:
                 self._Path = False
                 self._Path_Memory = False
                 self._Path_Initial = False
-                self._Url = False
-                self._Array = False
-                self._Pil = False
                 self._Rotate = 0
                 self._Angle = 0
                 self._Transparent = True
@@ -163,10 +160,7 @@ class Image_Zoom:
     def Initial(self):
         try:
             if self._Path_Initial:
-                Load_Setup = [self._Array, self._Url, self._Pil]
-                self._Array, self._Url, self._Pil = False, False, False
                 self.Set(self._Path_Initial)
-                self._Array, self._Url, self._Pil = Load_Setup
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Initial -> {E}")
             
@@ -392,20 +386,25 @@ class Image_Zoom:
         try:
             if self._Image:
                 self._Image.close()
-            if self._Url and self._Path:
-                with urllib.request.urlopen(self._Path) as response:
-                    Data = response.read()
-                self._Image = PIL_Image.open(BytesIO(Data))
-            elif self._Array and self._Path is not None:
-                self._Image = PIL_Image.fromarray(self._Path)
-            elif self._Pil and self._Path:
-                self._Image = self._Path.copy()
-            elif self._Path and os.path.exists(self._Path):
-                self._Image = PIL_Image.open(self._Path)
-                if not self._Path_Initial:
-                    self._Path_Initial = self._Path
+            Path_Obj = self._Path
+            Image_Obj = None
+            if isinstance(Path_Obj, str):
+                Parsed = urllib.parse.urlparse(Path_Obj)
+                if Parsed.scheme in ("http", "https"):
+                    with urllib.request.urlopen(Path_Obj) as Response:
+                        Data = Response.read()
+                    Image_Obj = PIL_Image.open(BytesIO(Data))
+                elif os.path.exists(Path_Obj):
+                    Image_Obj = PIL_Image.open(Path_Obj)
+                    if not self._Path_Initial:
+                        self._Path_Initial = Path_Obj
+            elif isinstance(Path_Obj, PIL_Image.Image):
+                Image_Obj = Path_Obj.copy()
+            elif hasattr(Path_Obj, "__array_interface__") or type(Path_Obj).__module__.startswith("numpy"):
+                Image_Obj = PIL_Image.fromarray(Path_Obj)
             else:
-                self._Image = None
+                Image_Obj = None
+            self._Image = Image_Obj
             if self._Image:
                 self._Image_Width, self._Image_Height = self._Image.size
                 if self._Zoom_Center is None:

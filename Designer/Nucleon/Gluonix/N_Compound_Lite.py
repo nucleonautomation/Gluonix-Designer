@@ -1,7 +1,7 @@
 # IMPORT LIBRARIES
 import os
 from io import BytesIO
-import urllib.request
+import urllib
 from PIL import Image as PIL_Image, ImageTk as PIL_ImageTk
 import tkinter as TK
 import threading, math, time
@@ -15,7 +15,7 @@ class Compound_Lite:
         if self._GUI is not None:
             self._Type = "Compound_Lite"
             try:
-                self._Config = ['Name', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Foreground', 'Light_Foreground', 'Dark_Foreground', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Animate_Left', 'Animate_Top', 'Animate_Width', 'Animate_Height', 'Animate_Time', 'Font_Size', 'Font_Weight', 'Font_Family','Value', 'Path', 'Url', 'Array', 'Pil', 'Rotate', 'Transparent', 'Compound', 'Aspect_Ratio', 'Hover_Background', 'Light_Hover_Background', 'Dark_Hover_Background', 'Hover_Foreground']
+                self._Config = ['Name', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Foreground', 'Light_Foreground', 'Dark_Foreground', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Animate_Left', 'Animate_Top', 'Animate_Width', 'Animate_Height', 'Animate_Time', 'Font_Size', 'Font_Weight', 'Font_Family','Value', 'Path', 'Rotate', 'Transparent', 'Compound', 'Aspect_Ratio', 'Hover_Background', 'Light_Hover_Background', 'Dark_Hover_Background', 'Hover_Foreground']
                 self._Initialized = False
                 self._Name = False
                 self._Last_Name = False
@@ -50,9 +50,6 @@ class Compound_Lite:
                 self._Image = False
                 self._Path = False
                 self._Path_Memory = False
-                self._Url = False
-                self._Array = False
-                self._Pil = False
                 self._Rotate = 0
                 self._Transparent = True
                 self._Compound = 'center'
@@ -483,29 +480,45 @@ class Compound_Lite:
             
     def Open(self):
         try:
-            if self._Url:
-                if self._Path:
-                    with urllib.request.urlopen(self._Path) as response:
-                        Data = response.read()
-                    self._Image = PIL_Image.open(BytesIO(Data))
-            elif self._Array:
-                if self._Path is not None:
-                    self._Image = PIL_Image.fromarray(self._Path)
-            elif self._Pil:
-                if self._Path:
-                    self._Image = self._Path
-            else:
-                if self._Path and os.path.exists(self._Path):
-                    self._Image = PIL_Image.open(self._Path)
-                else:
-                    self._Image = False
-                    self._Widget.configure(image = None)
-                    self._Widget.image = None
+            if self._Image:
+                try:
+                    self._Image.close()
+                except:
+                    pass
+            self._Image = False
+            Path_Obj = self._Path
+            if isinstance(Path_Obj, PIL_Image.Image):
+                self._Image = Path_Obj.copy()
+            elif hasattr(Path_Obj, "__array_interface__") or (hasattr(Path_Obj, "__class__") and getattr(type(Path_Obj), "__module__", "").startswith("numpy")):
+                self._Image = PIL_Image.fromarray(Path_Obj)
+            elif isinstance(Path_Obj, str):
+                Parsed = urllib.parse.urlparse(Path_Obj)
+                Data = None
+                if Parsed.scheme in ("http", "https"):
+                    with urllib.request.urlopen(Path_Obj) as Response:
+                        Data = Response.read()
+                elif os.path.exists(Path_Obj):
+                    with open(Path_Obj, "rb") as File_Handle:
+                        Data = File_Handle.read()
+                    if not getattr(self, "_Path_Initial", None):
+                        self._Path_Initial = Path_Obj
+                if Data is not None:
+                    Img = PIL_Image.open(BytesIO(Data))
+                    try:
+                        self._Image = Img.copy()
+                    finally:
+                        try:
+                            Img.close()
+                        except:
+                            pass
             if self._Image:
                 self._Image_Width, self._Image_Height = self._Image.size
+            else:
+                self._Widget.configure(image=None)
+                self._Widget.image=None
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Open -> {E}")
-            
+
     def Convert(self, Frame_Width, Frame_Height):
         try:
             Temp_Image = self._Image.rotate(self._Rotate, PIL_Image.NEAREST, expand=0)

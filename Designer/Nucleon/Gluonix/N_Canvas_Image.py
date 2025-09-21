@@ -2,7 +2,7 @@
 import os
 import threading, math, time
 from io import BytesIO
-import urllib.request
+import urllib
 from PIL import Image as PIL_Image, ImageTk as PIL_ImageTk
 from .N_Custom import Event_Bind_Canvas
         
@@ -10,7 +10,7 @@ class Canvas_Image:
     
     def __init__(self, Main):
         self._Canvas = Main
-        self._Config = ['Name', 'Width', 'Height', 'Left', 'Top', 'Animate_Left', 'Animate_Top', 'Animate_Width', 'Animate_Height', 'Animate_Time', 'Anchor', 'Url', 'Array', 'Pil', 'Photo', 'Resize', 'Rotate', 'Path', 'Path_Initial', 'Transparent', 'Skew_Horizontal', 'Skew_Vertical']
+        self._Config = ['Name', 'Width', 'Height', 'Left', 'Top', 'Animate_Left', 'Animate_Top', 'Animate_Width', 'Animate_Height', 'Animate_Time', 'Anchor', 'Photo', 'Resize', 'Rotate', 'Path', 'Path_Initial', 'Transparent', 'Skew_Horizontal', 'Skew_Vertical']
         self._Display = True
         self._Resize_Index = 0
         self._Resize = True
@@ -33,9 +33,6 @@ class Canvas_Image:
         self._Path = False
         self._Path_Memory = False
         self._Path_Initial = False
-        self._Url = False
-        self._Array = False
-        self._Pil = False
         self._Photo = False
         self._Transparent = True
         self._Rotate = 0
@@ -257,10 +254,7 @@ class Canvas_Image:
             if self._Path_Initial:
                 if hasattr(self,'Stop'):
                     self.Stop()
-                Load_Setup=[self._Array,self._Url,self._Pil,self._Photo]
-                self._Array,self._Url,self._Pil,self._Photo=False,False,False,False
                 self.Set(self._Path_Initial)
-                self._Array,self._Url,self._Pil,self._Photo=Load_Setup
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Initial -> {E}")
             
@@ -357,93 +351,110 @@ class Canvas_Image:
         
     def Open(self):
         try:
-            if hasattr(self,'Stop'):
+            if hasattr(self, "Stop"):
                 self.Stop()
-            self._Is_Gif=False
-            self._Gif_Frames=[]
-            self._Gif_Durations=[]
-            self._Gif_Loop=1
-            self._Gif_Index=0
+            self._Is_Gif = False
+            self._Gif_Frames = []
+            self._Gif_Durations = []
+            self._Gif_Loop = 1
+            self._Gif_Index = 0
             if self._Image:
-                try:self._Image.close()
-                except:pass
-            self._Image=False
-            if self._Photo and self._Path:
-                self._Image=self._Path
+                try:
+                    self._Image.close()
+                except:
+                    pass
+            self._Image = False
+            Path_Obj = self._Path
+            Type_Module = getattr(type(Path_Obj), "__module__", "")
+            Type_Name = type(Path_Obj).__name__
+            if Type_Name.endswith("PhotoImage") or ("ImageTk" in Type_Module) or ("tkinter" in Type_Module):
+                if Path_Obj:
+                    self._Image = Path_Obj
                 return
-            if self._Array and self._Path is not None:
-                self._Image=PIL_Image.fromarray(self._Path)
-                self._Image_Width,self._Image_Height=self._Image.size
+            if hasattr(Path_Obj, "__array_interface__") or Type_Module.startswith("numpy"):
+                if Path_Obj is not None:
+                    self._Image = PIL_Image.fromarray(Path_Obj)
+                    self._Image_Width, self._Image_Height = self._Image.size
                 return
-            if self._Pil and self._Path:
-                T=self._Path
-                if getattr(T,"is_animated",False):
-                    self._Is_Gif=True
-                    try:self._Gif_Loop=int(getattr(T,"info",{}).get("loop",1))
-                    except:self._Gif_Loop=1
-                    C=getattr(T,"n_frames",0) or 0
-                    I=0
+            if isinstance(Path_Obj, PIL_Image.Image):
+                Pil_Obj = Path_Obj
+                if getattr(Pil_Obj, "is_animated", False):
+                    self._Is_Gif = True
+                    try:
+                        self._Gif_Loop = int(getattr(Pil_Obj, "info", {}).get("loop", 1))
+                    except:
+                        self._Gif_Loop = 1
+                    Frame_Count = getattr(Pil_Obj, "n_frames", 0) or 0
+                    Frame_Index = 0
                     while True:
                         try:
-                            T.seek(I)
-                            F=T.convert("RGBA").copy()
-                            D=int(getattr(T,"info",{}).get("duration",100))
-                            self._Gif_Frames.append(F)
-                            self._Gif_Durations.append(max(1,D))
-                            I+=1
-                            if C and I>=C:break
+                            Pil_Obj.seek(Frame_Index)
+                            Frame_Image = Pil_Obj.convert("RGBA").copy()
+                            Duration = int(getattr(Pil_Obj, "info", {}).get("duration", 100))
+                            self._Gif_Frames.append(Frame_Image)
+                            self._Gif_Durations.append(max(1, Duration))
+                            Frame_Index += 1
+                            if Frame_Count and Frame_Index >= Frame_Count:
+                                break
                         except EOFError:
                             break
                     if self._Gif_Frames:
-                        self._Image=self._Gif_Frames[0]
-                        self._Image_Width,self._Image_Height=self._Image.size
+                        self._Image = self._Gif_Frames[0]
+                        self._Image_Width, self._Image_Height = self._Image.size
                     else:
-                        self._Is_Gif=False
-                        self._Image=T.copy()
-                        self._Image_Width,self._Image_Height=self._Image.size
+                        self._Is_Gif = False
+                        self._Image = Pil_Obj.copy()
+                        self._Image_Width, self._Image_Height = self._Image.size
                 else:
-                    self._Image=T.copy()
-                    self._Image_Width,self._Image_Height=self._Image.size
+                    self._Image = Pil_Obj.copy()
+                    self._Image_Width, self._Image_Height = self._Image.size
                 return
-            Data=None
-            if self._Url and self._Path:
-                with urllib.request.urlopen(self._Path) as response:
-                    Data = response.read()
-            elif self._Path and os.path.exists(self._Path):
-                with open(self._Path,"rb") as F:
-                    Data=F.read()
-                if not self._Path_Initial:
-                    self._Path_Initial=self._Path
+            Data_Bytes = None
+            if isinstance(Path_Obj, str):
+                Url_Parsed = urllib.parse.urlparse(Path_Obj)
+                if Url_Parsed.scheme in ("http", "https"):
+                    with urllib.request.urlopen(Path_Obj) as Response:
+                        Data_Bytes = Response.read()
+                elif os.path.exists(Path_Obj):
+                    with open(Path_Obj, "rb") as File_Handle:
+                        Data_Bytes = File_Handle.read()
+                    if not self._Path_Initial:
+                        self._Path_Initial = Path_Obj
+                else:
+                    return
             else:
                 return
-            with PIL_Image.open(BytesIO(Data)) as T:
-                if getattr(T,"is_animated",False):
-                    self._Is_Gif=True
-                    try:self._Gif_Loop=int(T.info.get("loop",1))
-                    except:self._Gif_Loop=1
-                    C=getattr(T,"n_frames",0) or 0
-                    I=0
+            with PIL_Image.open(BytesIO(Data_Bytes)) as Pil_Obj:
+                if getattr(Pil_Obj, "is_animated", False):
+                    self._Is_Gif = True
+                    try:
+                        self._Gif_Loop = int(Pil_Obj.info.get("loop", 1))
+                    except:
+                        self._Gif_Loop = 1
+                    Frame_Count = getattr(Pil_Obj, "n_frames", 0) or 0
+                    Frame_Index = 0
                     while True:
                         try:
-                            T.seek(I)
-                            F=T.convert("RGBA").copy()
-                            D=int(T.info.get("duration",100))
-                            self._Gif_Frames.append(F)
-                            self._Gif_Durations.append(max(1,D))
-                            I+=1
-                            if C and I>=C:break
+                            Pil_Obj.seek(Frame_Index)
+                            Frame_Image = Pil_Obj.convert("RGBA").copy()
+                            Duration = int(Pil_Obj.info.get("duration", 100))
+                            self._Gif_Frames.append(Frame_Image)
+                            self._Gif_Durations.append(max(1, Duration))
+                            Frame_Index += 1
+                            if Frame_Count and Frame_Index >= Frame_Count:
+                                break
                         except EOFError:
                             break
                     if self._Gif_Frames:
-                        self._Image=self._Gif_Frames[0]
-                        self._Image_Width,self._Image_Height=self._Image.size
+                        self._Image = self._Gif_Frames[0]
+                        self._Image_Width, self._Image_Height = self._Image.size
                     else:
-                        self._Is_Gif=False
-                        self._Image=T.copy()
-                        self._Image_Width,self._Image_Height=self._Image.size
+                        self._Is_Gif = False
+                        self._Image = Pil_Obj.copy()
+                        self._Image_Width, self._Image_Height = self._Image.size
                 else:
-                    self._Image=T.copy()
-                    self._Image_Width,self._Image_Height=self._Image.size
+                    self._Image = Pil_Obj.copy()
+                    self._Image_Width, self._Image_Height = self._Image.size
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Open -> {E}")
 

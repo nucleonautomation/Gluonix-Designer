@@ -103,7 +103,7 @@ class Line:
             
     def Animate(self):
         try:
-            self._Frame.Animate(Widget=self._Widget)
+            self._Frame.Animate()
             self.Show()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Animate -> {E}")

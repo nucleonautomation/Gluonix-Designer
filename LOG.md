@@ -1,5 +1,9 @@
 # Change Log
 
+## V(6.1)
+- Url, Array & Pil Flags Removed From All Image Widgets (Image, Image_Lite, Image_Zoom, Compound, Compuond_Lite, Canvas_Image)
+- All Image Wigets Will Can Take Local Path, Url Path, CV2 Frame(NP Array) & PIL Image Directly To Set Function Without Using Any Flags/Args
+
 ## V(6.0)
 - Start-Up Version Check Bug Fixed, Bud Was In Find Fonts In Canvas_Test_Config
 - Check Empty Folder Function Optimization
