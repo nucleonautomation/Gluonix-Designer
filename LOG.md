@@ -1,5 +1,9 @@
 # Change Log
 
+## V(6.2)
+- Bux Fixes In ALL Image Widget Open, Error Out With Array
+- Removed rquests Dependency In PIP Install
+
 ## V(6.1)
 - Url, Array & Pil Flags Removed From All Image Widgets (Image, Image_Lite, Image_Zoom, Compound, Compuond_Lite, Canvas_Image)
 - All Image Wigets Will Can Take Local Path, Url Path, CV2 Frame(NP Array) & PIL Image Directly To Set Function Without Using Any Flags/Args

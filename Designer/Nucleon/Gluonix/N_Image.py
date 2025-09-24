@@ -419,7 +419,7 @@ class Image:
                     pass
             self._Image = False
             Path_Obj = self._Path
-            if hasattr(Path_Obj, "__array_interface__") or (hasattr(Path_Obj, "__class__") and getattr(type(Path_Obj), "__module__", "").startswith("numpy")):
+            if hasattr(Path_Obj, "__class__") and getattr(type(Path_Obj), "__module__", "").startswith("numpy"):
                 self._Image = PIL_Image.fromarray(Path_Obj)
                 self._Image_Width, self._Image_Height = self._Image.size
                 return

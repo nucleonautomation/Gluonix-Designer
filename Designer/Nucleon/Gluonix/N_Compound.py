@@ -393,7 +393,7 @@ class Compound:
             Path_Obj = self._Path
             if isinstance(Path_Obj, PIL_Image.Image):
                 self._Image = Path_Obj.copy()
-            elif hasattr(Path_Obj, "__array_interface__") or (hasattr(Path_Obj, "__class__") and getattr(type(Path_Obj), "__module__", "").startswith("numpy")):
+            elif hasattr(Path_Obj, "__class__") and getattr(type(Path_Obj), "__module__", "").startswith("numpy"):
                 self._Image = PIL_Image.fromarray(Path_Obj)
             elif isinstance(Path_Obj, str):
                 Parsed = urllib.parse.urlparse(Path_Obj)
