@@ -123,9 +123,7 @@ class Stock_Line:
                         Widget.Config(Background=Widget_Data['Background'])
                     Widget.Config(Foreground=Widget_Data['Foreground'], Border_Size=Widget_Data['Border_Size'], Border_Color=Widget_Data['Border_Color'], Display=True, Disable=bool(Widget_Data['Disabled']))
                     Widget.Config(Font_Size=Widget_Data['Font_Size'], Font_Weight=Widget_Data['Font_Weight'], Align=Widget_Data['Align'], Value=Widget_Data['Value'])
-                    Widget.Config(Resize=True, Move=True)
-                    Widget.Config(Resize_Width=bool(Widget_Data['Resize_Width']), Resize_Height=bool(Widget_Data['Resize_Height']))
-                    Widget.Config(Move_Left=bool(Widget_Data['Move_Left']), Move_Top=bool(Widget_Data['Move_Top']))
+                    Widget.Config(Resize=bool(Widget_Data['Resize']))
                     Widget.Config(Progress=Widget_Data['Progress'], Zero=Widget_Data['Zero'], Increment=Widget_Data['Increment'], Mimimum=Widget_Data['Minimum'], Maximum=Widget_Data['Maximum'])
                     Widget.Config(Path=f"{self.Stock.Design.Project_Path}/Data/File/{ID}")
                     Widget.Config(Url=bool(Widget_Data['Url']), Transparent=bool(Widget_Data['Transparent']), Rotate=Widget_Data['Rotate'], Compound=Widget_Data['Compound'], Aspect_Ratio=bool(Widget_Data['Aspect_Ratio']))
@@ -134,7 +132,6 @@ class Stock_Line:
                     Widget.Lock = bool(Widget_Data['Lock'])
                     Widget.Create()
                     if Latest:
-                        Widget.Hide()
                         Widget.Config(Animate_Left=-1*(Left+Width), Animate_Top=-1*(Top+Height), Animate_Time=0.5)
                         Widget.Animate()
                         Configure = getattr(self.Stock.Design.Configure, f'Configure_{self.Type}')

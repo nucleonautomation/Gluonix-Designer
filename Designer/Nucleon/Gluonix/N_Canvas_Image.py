@@ -10,9 +10,8 @@ class Canvas_Image:
     
     def __init__(self, Main):
         self._Canvas = Main
-        self._Config = ['Name', 'Width', 'Height', 'Left', 'Top', 'Animate_Left', 'Animate_Top', 'Animate_Width', 'Animate_Height', 'Animate_Time', 'Anchor', 'Photo', 'Resize', 'Rotate', 'Path', 'Path_Initial', 'Transparent', 'Skew_Horizontal', 'Skew_Vertical']
+        self._Config = ['Name', 'Width', 'Height', 'Left', 'Top', 'Animate_Left', 'Animate_Top', 'Animate_Width', 'Animate_Height', 'Animate_Time', 'Anchor', 'Photo', 'Resize', 'Rotate', 'Path', 'Path_Initial', 'Transparent', 'Skew_Horizontal', 'Skew_Vertical', 'Aspect_Ratio']
         self._Display = True
-        self._Resize_Index = 0
         self._Resize = True
         self._Name = False
         self._Last_Name = False
@@ -39,10 +38,11 @@ class Canvas_Image:
         self._Angle = 0
         self._Skew_Horizontal = 0
         self._Skew_Vertical = 0
-        self._Width, self._Height, self._Width_Old, self._Height_Old, self._Left, self._Top = 0, 0, 0, 0, 0, 0
+        self._Aspect_Ratio = True
+        self._Width, self._Height, self._Left, self._Top = 0, 0, 0, 0
         self._Widget = self._Canvas._Frame.create_image(0, 0, anchor=self._Anchor, image=None)
         self._Canvas._Widget.append(self)
-        self._Resizable = self._Canvas._Resizable
+        self._Canvas._Item.append(self)
         self._On_Show = False
         self._On_Hide = False
         self._On_Animate = False
@@ -54,6 +54,8 @@ class Canvas_Image:
         self._Gif_Stop = threading.Event()
         self._Gif_Thread = None
         self._Gif_Running = False
+        self._TK_Image = None
+        self._Configure_After_Id = None
 
     def __str__(self):
         return "Nucleon_Glunoix_Canvas_Image[]"
@@ -69,7 +71,7 @@ class Canvas_Image:
                 Temp_Main = Main
                 Temp_Type = Temp_Main._Type
                 while Temp_Type=='Group':
-                    Temp_Main = Main._Main
+                    Temp_Main = Temp_Main._Main
                     Temp_Type = Temp_Main._Type
                 if Temp_Type=='Canvas' or Temp_Type=='Scroll':
                     Instance = type(self)(Main)
@@ -78,7 +80,7 @@ class Canvas_Image:
                             setattr(Instance, "_"+Key, getattr(self, "_"+Key))
                     if Name:
                         setattr(Instance, "_Name", Name)
-                    Instance.Relocate()
+                    Instance.Create()
                     return Instance
                 else:
                     raise Exception('Widget can only copy to Canvas/Scroll')
@@ -113,26 +115,18 @@ class Canvas_Image:
 
     def Show(self):
         try:
+            if not self._Display and self._Resize and self._Canvas._Type!='Scroll':
+                self.Create()
+            self._Canvas._Frame.itemconfigure(self._Widget, state='normal')
+            self._Canvas._Frame.tag_raise(self._Widget)
             self._Display = True
-            if self._Resizable and self._Resize_Index<self._Canvas._GUI._Resize_Index:
-                self.Resize()
-            else:
-                self.Display()
             if self._On_Show:
                 self._On_Show()
             self.Run()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Show -> {E}")
-
-    def Display(self):
-        try:
-            self._Canvas._Frame.itemconfigure(self._Widget, state='normal')
-            self._Canvas._Frame.tag_raise(self._Widget)
-            self._Display = True
-        except Exception as E:
-            self._Canvas._GUI.Error(f"{self._Type} -> Display -> {E}")
             
-    def Animate(self, Hide=False):
+    def Animate(self, Hide=False, Thread=True):
         try:
             self.Animate_Cancel()
             Final_Left = float(self._Left)
@@ -220,9 +214,12 @@ class Canvas_Image:
                     if Sleep_For > 0:
                         time.sleep(Sleep_For)
             self.Show()
-            T = threading.Thread(target=Worker, daemon=True)
-            self._Anim_Thread = T
-            T.start()
+            if Thread:
+                T = threading.Thread(target=Worker, daemon=True)
+                self._Anim_Thread = T
+                T.start()
+            else:
+                Worker()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Animate -> {E}")
             self.Animate_Cancel()
@@ -238,17 +235,37 @@ class Canvas_Image:
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Animate_Cancel -> {E}")
             
+    def Clear(self):
+        try:
+            if self._Image:
+                try:
+                    self._Image.close()
+                except:
+                    pass
+            self._Image = False
+            self._Image_Width = 0
+            self._Image_Height = 0
+            self._Canvas._Frame.itemconfig(self._Widget, image=None)
+            self._TK_Image = None
+        except Exception as E:
+            self._Canvas._GUI.Error(f"{self._Type} -> Clear -> {E}")
+
     def Set(self, Path):
         try:
             if hasattr(self,'Stop'):
                 self.Stop()
             self._Path = Path
             self._Path_Memory = self._Path
+            if isinstance(Path, str):
+                Url_Parsed = urllib.parse.urlparse(Path)
+                if Url_Parsed.scheme in ("http", "https") or self.Is_Large_File(Path):
+                    self.Async_Open(Path)
+                    return
             self.Open()
             self.Load()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Set -> {E}")
-            
+
     def Initial(self):
         try:
             if self._Path_Initial:
@@ -260,10 +277,10 @@ class Canvas_Image:
             
     def Refresh(self):
         try:
-            self.Open()
-            self.Load()
+            if self._Path:
+                self.Set(self._Path)
         except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Refresh -> {E}")
+            self._Canvas._GUI.Error(f"{self._Type} -> Refresh -> {E}")
         
     def Bind(self, **Input):
         try:
@@ -297,7 +314,7 @@ class Canvas_Image:
                     setattr(self, "_"+Each+"_Current", Value)
                     Run = True
             if Run:
-                self.Relocate()
+                self.Create()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Config -> {E}")
             
@@ -332,7 +349,7 @@ class Canvas_Image:
             if Top is not None:
                 self._Top = Top
             if Left is not None or Top is not None:
-                self.Relocate()
+                self.Create()
             return [self._Left, self._Top]
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Position -> {E}")
@@ -344,11 +361,110 @@ class Canvas_Image:
             if Height:
                 self._Height = Height
             if Width or Height:
-                self.Relocate()
+                self.Create()
             return [self._Width, self._Height]
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Size -> {E}")
-        
+            
+    def Box(self):
+        try:
+            Box = self._Canvas._Frame.bbox(self._Widget)
+            X1, Y1, X2, Y2 = Box
+            Width = X2 - X1
+            Height = Y2 - Y1
+            return [X1, Y1, Width, Height]
+        except Exception as E:
+            self._Canvas._GUI.Error(f"{self._Type} -> Box -> {E}")
+
+    def Is_Large_File(self, Path):
+        try:
+            if isinstance(Path, str) and os.path.exists(Path):
+                Threshold_Bytes = 8*1024*1024
+                return os.path.getsize(Path) > Threshold_Bytes
+            return False
+        except Exception:
+            return False
+
+    def Async_Open(self, Path):
+        try:
+            Path_Obj = Path
+            def Worker():
+                try:
+                    Data_Bytes = None
+                    if isinstance(Path_Obj, str):
+                        Url_Parsed = urllib.parse.urlparse(Path_Obj)
+                        if Url_Parsed.scheme in ("http", "https"):
+                            with urllib.request.urlopen(Path_Obj) as Response:
+                                Data_Bytes = Response.read()
+                        elif os.path.exists(Path_Obj):
+                            with open(Path_Obj, "rb") as File_Handle:
+                                Data_Bytes = File_Handle.read()
+                                if not self._Path_Initial:
+                                    self._Path_Initial = Path_Obj
+                    if not Data_Bytes:
+                        def Post_Clear():
+                            self.Clear()
+                        self._Canvas._Frame.after(0, Post_Clear)
+                        return
+                    with PIL_Image.open(BytesIO(Data_Bytes)) as Pil_Obj:
+                        Is_Gif = False
+                        Gif_Frames = []
+                        Gif_Durations = []
+                        Gif_Loop = 1
+                        if getattr(Pil_Obj, "is_animated", False):
+                            Is_Gif = True
+                            try:
+                                Gif_Loop = int(Pil_Obj.info.get("loop", 1))
+                            except:
+                                Gif_Loop = 1
+                            Frame_Count = getattr(Pil_Obj, "n_frames", 0) or 0
+                            Frame_Index = 0
+                            while True:
+                                try:
+                                    Pil_Obj.seek(Frame_Index)
+                                    Frame_Image = Pil_Obj.convert("RGBA").copy()
+                                    Duration = int(Pil_Obj.info.get("duration", 100))
+                                    Gif_Frames.append(Frame_Image)
+                                    Gif_Durations.append(max(1, Duration))
+                                    Frame_Index += 1
+                                    if Frame_Count and Frame_Index >= Frame_Count:
+                                        break
+                                except EOFError:
+                                    break
+                            if Gif_Frames:
+                                Image_Obj = Gif_Frames[0]
+                            else:
+                                Is_Gif = False
+                                Image_Obj = Pil_Obj.copy()
+                        else:
+                            Image_Obj = Pil_Obj.copy()
+                        Image_Width, Image_Height = Image_Obj.size
+                    def Post():
+                        try:
+                            if Path_Obj != self._Path:
+                                return
+                            self._Is_Gif = Is_Gif
+                            self._Gif_Frames = Gif_Frames
+                            self._Gif_Durations = Gif_Durations
+                            self._Gif_Loop = Gif_Loop
+                            self._Gif_Index = 0
+                            self._Image = Image_Obj
+                            self._Image_Width = Image_Width
+                            self._Image_Height = Image_Height
+                            self.Load()
+                        except Exception as E2:
+                            self._Canvas._GUI.Error(f"{self._Type} -> Async_Open -> {E2}")
+                    self._Canvas._Frame.after(0, Post)
+                except Exception as E3:
+                    def Post_Error():
+                        self.Clear()
+                        self._Canvas._GUI.Error(f"{self._Type} -> Async_Open -> {E3}")
+                    self._Canvas._Frame.after(0, Post_Error)
+            Thread_Obj = threading.Thread(target=Worker, daemon=True)
+            Thread_Obj.start()
+        except Exception as E:
+            self._Canvas._GUI.Error(f"{self._Type} -> Async_Open -> {E}")
+   
     def Open(self):
         try:
             if hasattr(self, "Stop"):
@@ -421,8 +537,10 @@ class Canvas_Image:
                     if not self._Path_Initial:
                         self._Path_Initial = Path_Obj
                 else:
+                    self.Clear()
                     return
             else:
+                self.Clear()
                 return
             with PIL_Image.open(BytesIO(Data_Bytes)) as Pil_Obj:
                 if getattr(Pil_Obj, "is_animated", False):
@@ -456,45 +574,79 @@ class Canvas_Image:
                     self._Image = Pil_Obj.copy()
                     self._Image_Width, self._Image_Height = self._Image.size
         except Exception as E:
+            self.Clear()
             self._Canvas._GUI.Error(f"{self._Type} -> Open -> {E}")
 
     def Convert(self):
         try:
+            if not self._Image:
+                return False
+            if self._Resize and self._Canvas._Type!='Scroll':
+                Left, Right, Width, Height = self._Canvas.Box()
+                Width_Ratio = Width/self._Canvas._Width
+                Height_Ratio = Height/self._Canvas._Height
+            else:
+                Width_Ratio = 1
+                Height_Ratio = 1
             Temp_Image = self._Image.rotate(self._Rotate + self._Angle, PIL_Image.NEAREST, expand=1)
             if self._Transparent:
                 Temp_Image = Temp_Image.convert('RGBA')
             else:
                 Temp_Image = Temp_Image.convert('HSV')
-            W_Tgt = int(max(1, round(self._Width_Current))) if self._Width_Current else Temp_Image.size[0]
-            H_Tgt = int(max(1, round(self._Height_Current))) if self._Height_Current else Temp_Image.size[1]
-            if W_Tgt > 0 and H_Tgt > 0:
+            W_Orig, H_Orig = Temp_Image.size
+            W_Tgt = int(max(1, round(self._Width*Width_Ratio)))
+            H_Tgt = int(max(1, round(self._Height*Height_Ratio)))
+            if W_Tgt<=0 or H_Tgt<=0:
+                W_Tgt = max(1, W_Orig)
+                H_Tgt = max(1, H_Orig)
+            if getattr(self, "_Aspect_Ratio", True):
+                Image_Aspect = W_Orig/H_Orig if H_Orig!=0 else 1.0
+                Frame_Aspect = W_Tgt/H_Tgt if H_Tgt!=0 else 1.0
+                if Image_Aspect>Frame_Aspect:
+                    New_Width = W_Tgt
+                    New_Height = int(max(1, round(W_Tgt/Image_Aspect)))
+                else:
+                    New_Height = H_Tgt
+                    New_Width = int(max(1, round(H_Tgt*Image_Aspect)))
+                Temp_Image = Temp_Image.resize((New_Width, New_Height), PIL_Image.NEAREST)
+            else:
                 Temp_Image = Temp_Image.resize((W_Tgt, H_Tgt), PIL_Image.NEAREST)
             W, H = Temp_Image.size
             Skew_X = max(-100.0, min(100.0, float(self._Skew_Horizontal or 0.0)))
             Skew_Y = max(-100.0, min(100.0, float(self._Skew_Vertical or 0.0)))
             Delta_X = min((W - 1) * 0.5, (abs(Skew_X) / 100.0) * (W * 0.5))
             Delta_Y = min((H - 1) * 0.5, (abs(Skew_Y) / 100.0) * (H * 0.5))
-            TL_X, TL_Y = 0.0, 0.0
-            TR_X, TR_Y = float(W), 0.0
-            BR_X, BR_Y = float(W), float(H)
-            BL_X, BL_Y = 0.0, float(H)
+            TL_X = 0.0
+            TL_Y = 0.0
+            TR_X = float(W)
+            TR_Y = 0.0
+            BR_X = float(W)
+            BR_Y = float(H)
+            BL_X = 0.0
+            BL_Y = float(H)
             if Skew_X > 0:
-                TL_X = Delta_X; TR_X = W - Delta_X
+                TL_X = Delta_X
+                TR_X = W - Delta_X
             elif Skew_X < 0:
-                BL_X = Delta_X; BR_X = W - Delta_X
+                BL_X = Delta_X
+                BR_X = W - Delta_X
             if Skew_Y > 0:
-                TR_Y = Delta_Y; BR_Y = H - Delta_Y
+                TR_Y = Delta_Y
+                BR_Y = H - Delta_Y
             elif Skew_Y < 0:
-                TL_Y = Delta_Y; BL_Y = H - Delta_Y
+                TL_Y = Delta_Y
+                BL_Y = H - Delta_Y
             if Delta_X == 0 and Delta_Y == 0:
-                self._Width_Old, self._Height_Old = self._Width_Current, self._Height_Current
                 return PIL_ImageTk.PhotoImage(Temp_Image)
             Src_Points = [(0.0, 0.0), (float(W), 0.0), (float(W), float(H)), (0.0, float(H))]
             Dst_Points = [(TL_X, TL_Y), (TR_X, TR_Y), (BR_X, BR_Y), (BL_X, BL_Y)]
-            A = []; B_Vals = []
+            A = []
+            B_Vals = []
             for (X, Y), (U, V) in zip(Dst_Points, Src_Points):
-                A.append([X, Y, 1, 0, 0, 0, -U * X, -U * Y]); B_Vals.append(U)
-                A.append([0, 0, 0, X, Y, 1, -V * X, -V * Y]); B_Vals.append(V)
+                A.append([X, Y, 1, 0, 0, 0, -U * X, -U * Y])
+                B_Vals.append(U)
+                A.append([0, 0, 0, X, Y, 1, -V * X, -V * Y])
+                B_Vals.append(V)
             N = 8
             for I in range(N):
                 A[I].append(B_Vals[I])
@@ -528,24 +680,35 @@ class Canvas_Image:
                     Warped_Image = Warped_Image.convert('RGBA')
                 Background_Image.paste(Warped_Image, (0, 0), Warped_Image.split()[3] if self._Transparent and Warped_Image.mode == 'RGBA' else None)
                 Warped_Image = Background_Image
-            self._Width_Old, self._Height_Old = self._Width_Current, self._Height_Current
             return PIL_ImageTk.PhotoImage(Warped_Image)
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Convert -> {E}")
-        
+            return False
+
     def Load(self):
         try:
             if self._Image:
                 Image = self._Image if self._Photo else self.Convert()
-                self._Image_Garbage = Image
+                if not Image:
+                    return
                 self._Canvas._Frame.itemconfig(self._Widget, image=Image)
+                self._TK_Image = Image
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Load -> {E}")
-        
+
     def Create(self):
         try:
+            if self._Resize and self._Canvas._Type!='Scroll':
+                Left, Right, Width, Height = self._Canvas.Box()
+                Width_Ratio = Width/self._Canvas._Width
+                Height_Ratio = Height/self._Canvas._Height
+            else:
+                Width_Ratio = 1
+                Height_Ratio = 1
+            self._X = self._Left
+            self._Y = self._Top
             self._Canvas._Frame.itemconfig(self._Widget, anchor=self._Anchor)
-            self._Canvas._Frame.coords(self._Widget, self._X_Current, self._Y_Current)
+            self._Canvas._Frame.coords(self._Widget, self._X*Width_Ratio, self._Y*Height_Ratio)
             if not self._Image:
                 self.Open()
             self.Load()
@@ -559,59 +722,31 @@ class Canvas_Image:
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Create -> {E}")
             
+    def Resize(self, Event):
+        try:
+            self._Canvas._Frame.itemconfigure(self._Widget, state='normal')
+            self._Canvas._Frame.tag_raise(self._Widget)
+            if self._Configure_After_Id is not None:
+                self._Canvas._Frame.after_cancel(self._Configure_After_Id)
+            self._Configure_After_Id = self._Canvas._Frame.after(50, self.On_Resize_Debounced)
+        except Exception as E:
+            self._Canvas._GUI.Error(f"{self._Type} -> Resize -> {E}")
+
+    def On_Resize_Debounced(self):
+        try:
+            self._Configure_After_Id = None
+            if not self._Display:
+                return
+            self.Create()
+        except Exception as E:
+            self._Canvas._GUI.Error(f"{self._Type} -> On_Resize_Debounced -> {E}")
+
     def Rotate(self, Value=0):
         try:
             self._Angle+=Value
             self.Load()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Rotate -> {E}")
-
-    def Adjustment(self):
-        try:
-            self._Width_Ratio = self._Canvas._Width_Current / self._Canvas._Width
-            self._Height_Ratio = self._Canvas._Height_Current / self._Canvas._Height
-        except Exception as E:
-            self._Canvas._GUI.Error(f"{self._Type} -> Adjustment -> {E}")
-            
-    def Relocate(self, Direct=False):
-        try:
-            if Direct or (self._Resize and self._Resizable):
-                self.Adjustment()
-                self._X_Current = self._Left * self._Width_Ratio
-                self._Y_Current = self._Top * self._Height_Ratio
-                self._Width_Current = self._Width * self._Width_Ratio
-                self._Height_Current = self._Height * self._Height_Ratio
-            else:
-                self._X_Current = self._Left
-                self._Y_Current = self._Top
-                self._Width_Current = self._Width
-                self._Height_Current = self._Height
-            Angle_Total = (self._Rotate + self._Angle) % 360
-            if Angle_Total:
-                Angle_Rad = math.radians(Angle_Total if Angle_Total <= 180 else 360 - Angle_Total)
-                C = abs(math.cos(Angle_Rad))
-                S = abs(math.sin(Angle_Rad))
-                New_W = self._Width_Current * C + self._Height_Current * S
-                New_H = self._Width_Current * S + self._Height_Current * C
-                Dx = (New_W - self._Width_Current) * 0.5
-                Dy = (New_H - self._Height_Current) * 0.5
-                self._X_Current -= Dx
-                self._Y_Current -= Dy
-                self._Width_Current = New_W
-                self._Height_Current = New_H
-            self.Create()
-            if self._Display:
-                self.Display()
-                self.Run()
-        except Exception as E:
-            self._Canvas._GUI.Error(f"{self._Type} -> Relocate -> {E}")
-            
-    def Resize(self):
-        try:
-            self._Resize_Index = self._Canvas._GUI._Resize_Index
-            self.Relocate()
-        except Exception as E:
-            self._Canvas._GUI.Error(f"{self._Type} -> Resize -> {E}")
             
     def Run(self):
         try:

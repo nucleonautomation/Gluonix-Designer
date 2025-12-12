@@ -11,14 +11,13 @@ class Group:
                 self._Config = ['Name', 'Display']
                 self._Initialized = False
                 self._Widget = []
+                self._Item = []
                 self._Name = False
                 self._Last_Name = False
                 self._Display = True
-                self._Resize_Index = 0
                 self._Main = Main
                 self._Background = self._Main._Background
                 self._Background_Main = True
-                self._Resizable = self._Main._Resizable
                 self._Auto_Dark = True
                 self._On_Show = False
                 self._On_Hide = False
@@ -171,15 +170,14 @@ class Group:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Update_Color -> {E}")
             
-    def Resize(self, Trigger=True):
+    def Resize(self):
         try:
-            if self._Resizable:
-                for Each in self._Widget:
-                    try:
-                        if Each._Display:
-                            Each.Resize()
-                    except Exception:
-                        self.Nothing = False
+            for Each in self._Item:
+                try:
+                    if Each._Display:
+                        Each.Resize()
+                except Exception:
+                    self.Nothing = False
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Resize -> {E}")
             

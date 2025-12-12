@@ -3,6 +3,7 @@ import os
 import math
 from PIL import Image as PIL_Image, ImageTk as PIL_ImageTk
 import tkinter as TK
+import tkinter.font as TK_Font
 from .N_GUI import GUI
 from .N_Frame import Frame
 from .N_Custom import Event_Bind
@@ -14,28 +15,27 @@ class Tree:
         if self._GUI is not None:
             self._Type = "Tree"
             try:
-                self._Config = ['Name', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Foreground', 'Light_Foreground', 'Dark_Foreground', 'Border_Color', 'Light_Border_Color', 'Dark_Border_Color', 'Border_Size', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Font_Size', 'Font_Weight', 'Background_Selected', 'Foreground_Selected', 'Hover_Background', 'Light_Hover_Background', 'Dark_Hover_Background', 'Hover_Foreground', 'Light_Hover_Foreground', 'Dark_Hover_Foreground', 'Hover_Border_Color', 'Light_Hover_Border_Color', 'Dark_Hover_Border_Color']
+                self._Config = ['Name', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Foreground', 'Light_Foreground', 'Dark_Foreground', 'Border_Color', 'Light_Border_Color', 'Dark_Border_Color', 'Border_Size', 'Resize', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Font_Size', 'Font_Weight', 'Scrollbar_Size', 'Scrollbar_Active', 'Background_Selected', 'Foreground_Selected', 'Hover_Background', 'Light_Hover_Background', 'Dark_Hover_Background', 'Hover_Foreground', 'Light_Hover_Foreground', 'Dark_Hover_Foreground', 'Hover_Border_Color', 'Light_Hover_Border_Color', 'Dark_Hover_Border_Color']
                 self._Initialized = False
                 self._Name = False
                 self._Last_Name = False
                 self._Tag = []
                 self._Item = []
                 self._Image = {}
-                self._Resize_Font, self._Resize, self._Resize_Width, self._Resize_Height, self._Move, self._Move_Left, self._Move_Top = False, True, True, True, True, True, True
+                self._Resize = True
                 self._Popup = False
                 self._Display = True
                 self._Size_Update = False
-                self._Resize_Index = 0
                 self._Main = Main
-                self._Style = TK.ttk.Style()
-                self._Style.theme_use('clam')
-                self._Style_Name = "CustomStyle_" + str(id(self))
-                self._Style.layout(self._Style_Name, [])
+                self._Style_Name = "CustomStyle_" + str(id(self)) + ".Treeview"
+                self._GUI._Style.layout(self._Style_Name, [])
                 self._Frame = Frame(self._Main)
                 self._Widget = TK.ttk.Treeview(self._Frame._Frame, show="tree")
                 self._Widget.configure(style=self._Style_Name)
                 self._Scrollbar_Vertical = TK.Scrollbar(self._Frame._Frame)
                 self._Scrollbar_Horizontal = TK.Scrollbar(self._Frame._Frame)
+                self._Scrollbar_Size = 20
+                self._Scrollbar_Active = False
                 self._Border_Color = '#000000'
                 self._Border_Size = 0
                 self._Background = self._Main._Background
@@ -51,14 +51,11 @@ class Tree:
                 self._Foreground_Selected = "#000000"
                 self._Font_Size = 12
                 self._Font_Weight = 'normal'
-                self._Resizable = self._Main._Resizable
                 self._Auto_Dark = True
                 self._Width_Item = None
                 self._Width_Text = ''
                 self._On_Show = False
                 self._On_Hide = False
-                self._On_Hover_In = False
-                self._On_Hover_Out = False
             except Exception as E:
                 self._GUI.Error(f"{self._Type} -> Init -> {E}")
         else:
@@ -89,6 +86,8 @@ class Tree:
         try:
             self._Main._Widget.remove(self)
             self._Widget.destroy()
+            self._Scrollbar_Vertical.destroy()
+            self._Scrollbar_Horizontal.destroy()
             self._Frame.Delete()
             if self:
                 del self
@@ -106,23 +105,20 @@ class Tree:
             
     def Show(self):
         try:
-            self._Display = True
-            if self._Resizable and self._Resize_Index<self._GUI._Resize_Index:
-                self.Resize()
+            self._Frame.Show()
+            if self._Scrollbar_Active:
+                self._Scrollbar_Vertical.place(relx=(self._Width-self._Scrollbar_Size)/self._Width, rely=0, relwidth=self._Scrollbar_Size/self._Width, relheight=1)
+                self._Scrollbar_Horizontal.place(relx=0, rely=(self._Height-self._Scrollbar_Size)/self._Height, relwidth=1, relheight=self._Scrollbar_Size/self._Height)
+                self._Widget.place(relx=0, rely=0, relwidth=(self._Width-self._Scrollbar_Size)/self._Width, relheight=(self._Height-self._Scrollbar_Size)/self._Height)
             else:
-                self.Display()
+                self._Scrollbar_Vertical.place_forget()
+                self._Scrollbar_Horizontal.place_forget()
+                self._Widget.place(relx=0, rely=0, relwidth=1.0, relheight=1.0)
+            self._Display = True
             if self._On_Show:
                 self._On_Show()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Show -> {E}")
-            
-    def Display(self):
-        try:
-            self._Frame.Show()
-            self._Widget.place(x=0, y=0, width=self._Width_Current-(self._Border_Size*2), height=self._Height_Current-(self._Border_Size*2)-20)
-            self._Display = True
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Display -> {E}")
     
     def Grab(self, Path=False):
         try:
@@ -130,10 +126,9 @@ class Tree:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Grab -> {E}")
             
-    def Animate(self):
+    def Animate(self, Hide=False, Thread=True):
         try:
-            self._Frame.Animate(Widget=self._Widget)
-            self.Show()
+            self._Frame.Animate(Widget=self._Widget, Thread=Thread)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Animate -> {E}")
             self.Animate_Cancel()
@@ -223,7 +218,7 @@ class Tree:
                 ID = self._Widget.focus()
             if Name:
                 self._Widget.item(ID, text=Name)
-                self.Adjust_Width(Name, ID)
+                self.Update_Tree(Name, ID)
             if Value:
                 self._Widget.item(ID, value=Value)
             if Tag:
@@ -253,11 +248,26 @@ class Tree:
                 Insert_Args['image'] = Image
             Item = self._Widget.insert(**Insert_Args)
             self._Item.append(Item)
-            self.Adjust_Width(Name, Item)
+            self.Update_Tree(Name, Item)
             return Item
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Add -> {E}")
             
+    def Update_Tree(self, Name, Item):
+        try:
+            Font_Temp = TK_Font.Font(family='Times New Roman', size=self._Font_Size, weight=self._Font_Weight)
+            Level_Item = self.Level(Item)
+            Indent_Pixels = Level_Item * int(self._Font_Size*4)
+            Text_Column = f" {Name}"
+            Width_Text = Font_Temp.measure(Text_Column)
+            Width_New = Indent_Pixels + Width_Text
+            Width_Current = self._Widget.column("#0", "width")
+            Width_Current = int(Width_Current) if Width_Current else 0
+            if Width_New > Width_Current:
+                self._Widget.column("#0", width=Width_New, stretch=False)
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Update_Tree_Column_Width_For_Row -> {E}")
+
     def Index(self, Item):
         try:
             return self._Widget.index(Item)
@@ -274,19 +284,6 @@ class Tree:
             return Level
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Level -> {E}")
-            
-    def Adjust_Width(self, Text, Item):
-        try:
-            if Item is not None:
-                Font = TK.font.Font(family='Times New Roman', size=self._Font_Size, weight=self._Font_Weight)
-                Width = Font.measure(Text) + 45 + (20 * self.Level(Item))
-                Current_Width = self._Widget.column("#0", 'width')
-                if Width > Current_Width:
-                    self._Width_Text = Text
-                    self._Width_Item = Item
-                    self._Widget.column("#0", width=Width)
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Adjust_Width -> {E}")
             
     def Tag(self, Name, Foreground=False, Background=False):
         try:
@@ -357,13 +354,6 @@ class Tree:
                 self._On_Show = Input['On_Show']
             if 'On_Hide' in Input:
                 self._On_Hide = Input['On_Hide']
-            self._Frame.Bind(**Input)
-            if 'On_Hover_In' in Input:
-                self._On_Hover_In = Input['On_Hover_In']
-            Input['On_Hover_In'] = lambda E: self.On_Hover_In(E)
-            if 'On_Hover_Out' in Input:
-                self._On_Hover_Out = Input['On_Hover_Out']
-            Input['On_Hover_Out'] = lambda E: self.On_Hover_Out(E)
             Event_Bind(self._Widget, **Input)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Bind -> {E}")
@@ -382,8 +372,6 @@ class Tree:
                 Config['Border_Color'] = self._Hover_Border_Color
             if len(Config)>0:
                 self.Config(**Config)
-            if self._On_Hover_In:
-                self._On_Hover_In(E)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> On_Hover_In -> {E}")
             
@@ -398,8 +386,6 @@ class Tree:
                 Config['Border_Color'] = self._Last_Border_Color if self._Border_Color==self._Hover_Border_Color else self._Border_Color
             if len(Config)>0:
                 self.Config(**Config)
-            if self._On_Hover_Out:
-                self._On_Hover_Out(E)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> On_Hover_Out -> {E}")
             
@@ -463,7 +449,6 @@ class Tree:
                 self._Top = Top
             if Left is not None or Top is not None:
                 self._Frame.Position(Left=self._Left, Top=self._Top)
-                self.Relocate()
             return self._Frame.Position()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Position -> {E}")
@@ -476,10 +461,16 @@ class Tree:
                 self._Height = Height
             if Width or Height:
                 self._Frame.Size(Width=self._Width, Height=self._Height)
-                self.Relocate()
+                self.Create()
             return self._Frame.Size()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Size -> {E}")
+            
+    def Box(self):
+        try:
+            return self._Frame.Box()
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Box -> {E}")
         
     def Locate(self, Width, Height, Left, Top):
         try:
@@ -513,28 +504,27 @@ class Tree:
                 self.Update_Color()
             if not self._Initialized:
                 self.Update_Color()
-                self._Width_Current, self._Height_Current, self._Left_Current, self._Top_Current = self._Width, self._Height, self._Left, self._Top
-                self._Frame.Config(Width=self._Width_Current, Height=self._Height_Current, Left=self._Left_Current, Top=self._Top_Current)
+                self._Frame.Config(Width=self._Width, Height=self._Height, Left=self._Left, Top=self._Top)
                 self._Frame.Config(Background=self._Background, Border_Size=self._Border_Size, Border_Color=self._Border_Color)
                 self._Frame.Create()
                 Event_Bind(self._Widget, On_Hover_In=lambda E: self.On_Hover_In(E), On_Hover_Out=lambda E: self.On_Hover_Out(E))
                 self._Widget.bind("<MouseWheel>", self.Scroll)
-                self._Scrollbar_Vertical.config(orient="vertical", command=self._Widget.yview, width=20)
-                self._Scrollbar_Horizontal.config(orient="horizontal", command=self._Widget.xview, width=20)
-                self._Widget.configure(xscrollcommand=self._Scrollbar_Horizontal.set)
-                self._Widget.configure(yscrollcommand=self._Scrollbar_Vertical.set)
-                self._Scrollbar_Vertical.place(relx=1, rely=0, relheight=1, anchor="ne")
                 self.Tag(Name='Default', Foreground=self._Foreground)
                 if not self._Display:
                     self.Hide()
                 self._Main._Widget.append(self)
                 self._Initialized = True
             self._Widget.tag_configure('Default', font=('Times New Roman', self._Font_Size, self._Font_Weight), foreground=self._Foreground, background=self._Background)
-            self._Style.configure(self._Style_Name, rowheight=self._Font_Size*2, background=self._Background, highlightthickness=0, bd=0, borderwidth=0)
-            self._Style.map(self._Style_Name, background=[("selected", self._Background_Selected)], foreground=[("selected", self._Foreground_Selected)])
-            self._Scrollbar_Horizontal.place(relx=0, rely=1, relwidth=1, anchor="sw")
-            self.Adjust_Width(self._Width_Text, self._Width_Item)
-            self.Resize()
+            self._GUI._Style.configure(self._Style_Name, rowheight=self._Font_Size*2, background=self._Background, highlightthickness=0, bd=0, borderwidth=0)
+            self._GUI._Style.map(self._Style_Name, background=[("selected", self._Background_Selected)], foreground=[("selected", self._Foreground_Selected)])
+            self._Widget.configure(style=self._Style_Name)
+            self._Scrollbar_Vertical.config(orient="vertical", command=self._Widget.yview, width=self._Scrollbar_Size)
+            self._Scrollbar_Horizontal.config(orient="horizontal", command=self._Widget.xview, width=self._Scrollbar_Size)
+            self._Widget.configure(xscrollcommand=self._Scrollbar_Horizontal.set, yscrollcommand=self._Scrollbar_Vertical.set)
+            if self._Display:
+                self.Show()
+            else:
+                self.Hide()
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
                     if self._Last_Name in self._Main.__dict__:
@@ -550,73 +540,3 @@ class Tree:
             self._GUI.Initiate_Colors(self)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Update_Color -> {E}")
-            
-    def Adjustment(self):
-        try:
-            Width_Difference = self._Main._Width_Current - self._Main._Width
-            Height_Difference = self._Main._Height_Current - self._Main._Height
-            Width_Ratio = self._Width / (self._Main._Width - self._Main._Border_Size * 2)
-            Height_Ratio = self._Height / (self._Main._Height - self._Main._Border_Size * 2)
-            Center_X = self._Left + self._Width / 2
-            Center_Y = self._Top + self._Height / 2
-            Is_Right = Center_X > self._Main._Width / 2
-            Is_Bottom = Center_Y > self._Main._Height / 2
-            self._Width_Adjustment = Width_Difference * Width_Ratio
-            self._Height_Adjustment = Height_Difference * Height_Ratio
-            if Is_Right:
-                Distance_From_Right = self._Main._Width - (self._Left + self._Width)
-                Ratio = Distance_From_Right / self._Main._Width
-                self._Left_Adjustment = Width_Difference * (1 - Ratio) - self._Width_Adjustment
-            else:
-                Ratio = self._Left / self._Main._Width
-                self._Left_Adjustment = Width_Difference * Ratio
-            if Is_Bottom:
-                Distance_From_Bottom = self._Main._Height - (self._Top + self._Height)
-                Ratio = Distance_From_Bottom / self._Main._Height
-                self._Top_Adjustment = Height_Difference * (1 - Ratio) - self._Height_Adjustment
-            else:
-                Ratio = self._Top / self._Main._Height
-                self._Top_Adjustment = Height_Difference * Ratio
-            if not self._Resize_Width and self._Move_Left and Is_Right:
-                self._Left_Adjustment += self._Width_Adjustment
-            if not self._Resize_Height and self._Move_Top and Is_Bottom:
-                self._Top_Adjustment += self._Height_Adjustment
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Adjustment -> {E}")
-            
-    def Relocate(self, Direct=False):
-        try:
-            if Direct or self._Resizable:
-                self.Adjustment()
-                if Direct or (self._Resize and self._Resize_Width):
-                    self._Width_Current = self._Width + self._Width_Adjustment
-                else:
-                    self._Width_Current = self._Width
-                if Direct or (self._Resize and self._Resize_Height):
-                    self._Height_Current = self._Height + self._Height_Adjustment
-                else:
-                    self._Height_Current = self._Height
-                if Direct or (self._Move and self._Move_Left):
-                    self._Left_Current = self._Left + self._Left_Adjustment
-                else:
-                    self._Left_Current = self._Left
-                if Direct or (self._Move and self._Move_Top):
-                    self._Top_Current = self._Top + self._Top_Adjustment
-                else:
-                    self._Top_Current = self._Top
-            else:
-                self._Width_Current = self._Width
-                self._Height_Current = self._Height
-                self._Left_Current = self._Left
-                self._Top_Current = self._Top
-            if self._Display:
-                self.Display()
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Relocate -> {E}")
-            
-    def Resize(self):
-        try:
-            self._Resize_Index = self._GUI._Resize_Index
-            self.Relocate()
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Resize -> {E}")

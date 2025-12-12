@@ -122,13 +122,12 @@ class Stock_Scroll:
                     else:
                         Frame.Config(Background=Frame_Data['Background'])
                     Frame.Config(Border_Size=Frame_Data['Border_Size'], Border_Color=Frame_Data['Border_Color'], Display=True)
-                    Frame.Config(Resize=True, Move=True)
-                    Frame.Config(Resize_Width=bool(Frame_Data['Resize_Width']), Resize_Height=bool(Frame_Data['Resize_Height']))
-                    Frame.Config(Move_Left=bool(Frame_Data['Move_Left']), Move_Top=bool(Frame_Data['Move_Top']))
+                    Frame.Config(Resize=bool(Frame_Data['Resize']))
                     Frame.Lock = bool(Frame_Data['Lock'])
                     Frame.Create()
                     if Latest:
                         Frame.Hide()
+                        Frame._Display = True
                         Frame.Config(Animate_Left=-1*(Left+Width), Animate_Top=-1*(Top+Height), Animate_Time=0.5)
                         Frame.Animate()
                         Configure = getattr(self.Stock.Design.Configure, f'Configure_{self.Type}')

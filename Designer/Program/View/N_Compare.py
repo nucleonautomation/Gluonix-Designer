@@ -45,11 +45,12 @@ class Compare:
             self.Label_1.Config(Resize=True, Move=True)
             self.Label_1.Create()
             
-            #Display 2 Select
+            #Display 1 Select
             Fixture = self.Frame.Locate(8, 4, 16, 7)
             self.Display_1_Select = self.Global['Gluonix'].Select(self.Frame)
             self.Display_1_Select.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
-            self.Display_1_Select.Config(Foreground='black', Font_Size=11, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Display_1_Select.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=11, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Display_1_Select.Config(Hover_Background='#EEEEEE', Hover_Border_Color='#0078d7')
             self.Display_1_Select.Bind(On_Change=lambda E: self.Update(Partial=True))
             self.Display_1_Select.Create()
             
@@ -66,7 +67,8 @@ class Compare:
             Fixture = self.Frame.Locate(8, 4, 76, 7)
             self.Display_2_Select = self.Global['Gluonix'].Select(self.Frame)
             self.Display_2_Select.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
-            self.Display_2_Select.Config(Foreground='black', Font_Size=11, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Display_2_Select.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=11, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Display_2_Select.Config(Hover_Background='#EEEEEE', Hover_Border_Color='#0078d7')
             self.Display_2_Select.Bind(On_Change=lambda E: self.Update(Partial=True))
             self.Display_2_Select.Create()
             
@@ -76,8 +78,7 @@ class Compare:
             self.Copy12.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Copy12.Config(Background='#e1e1e1', Foreground='black', Value='COPY       ', Font_Size=10, Font_Weight='bold', Border_Size=1, Border_Color='#adadad')
             self.Copy12.Config(Compound='right', Path=self.Global['Image']('Arrow_Right'))
-            self.Copy12.Bind(On_Hover_In=lambda E: self.Copy12.Config(Border_Color='#0078d7', Background='#d5dcf0'))
-            self.Copy12.Bind(On_Hover_Out=lambda E: self.Copy12.Config(Border_Color='#adadad', Background='#e1e1e1'))
+            self.Copy12.Config(Hover_Background='#d5dcf0', Hover_Border_Color='#0078d7')
             self.Copy12.Bind(On_Click=lambda E: self.Copy_From_1_To_2())
             self.Copy12.Create()
             
@@ -87,8 +88,7 @@ class Compare:
             self.Copy21.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Copy21.Config(Background='#e1e1e1', Foreground='black', Value='       COPY', Font_Size=10, Font_Weight='bold', Border_Size=1, Border_Color='#adadad')
             self.Copy21.Config(Compound='left', Path=self.Global['Image']('Arrow_Left'))
-            self.Copy21.Bind(On_Hover_In=lambda E: self.Copy21.Config(Border_Color='#0078d7', Background='#d5dcf0'))
-            self.Copy21.Bind(On_Hover_Out=lambda E: self.Copy21.Config(Border_Color='#adadad', Background='#e1e1e1'))
+            self.Copy21.Config(Hover_Background='#d5dcf0', Hover_Border_Color='#0078d7')
             self.Copy21.Bind(On_Click=lambda E: self.Copy_From_2_To_1())
             self.Copy21.Create()
             
@@ -97,8 +97,7 @@ class Compare:
             self.Close = self.Global['Gluonix'].Label(self.Frame)
             self.Close.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Close.Config(Background='#e1e1e1', Foreground='black', Value='Close', Font_Size=9, Font_Weight='normal', Border_Size=1, Border_Color='#adadad')
-            self.Close.Bind(On_Hover_In=lambda E: self.Close.Config(Border_Color='#0078d7', Background='#d5dcf0'))
-            self.Close.Bind(On_Hover_Out=lambda E: self.Close.Config(Border_Color='#adadad', Background='#e1e1e1'))
+            self.Close.Config(Hover_Background='#d5dcf0', Hover_Border_Color='#0078d7')
             self.Close.Bind(On_Click=lambda E: self.Close_Compare())
             self.Close.Create()
             

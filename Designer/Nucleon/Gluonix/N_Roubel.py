@@ -11,16 +11,15 @@ class Roubel:
         if self._GUI is not None:
             self._Type = "Roubel"
             try:
-                self._Config = ['Name', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Foreground', 'Light_Foreground', 'Dark_Foreground', 'Border_Color', 'Light_Border_Color', 'Dark_Border_Color', 'Border_Size', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Font_Size', 'Font_Weight', 'Font_Family', 'Value', 'Radius', 'Shadow_Size', 'Shadow_Color', 'Light_Shadow_Color', 'Dark_Shadow_Color', 'Shadow_Full', 'Hover_Background', 'Light_Hover_Background', 'Dark_Hover_Background', 'Hover_Foreground', 'Light_Hover_Foreground', 'Dark_Hover_Foreground', 'Hover_Border_Color', 'Light_Hover_Border_Color', 'Dark_Hover_Border_Color', 'Hover_Shadow_Color', 'Light_Hover_Shadow_Color', 'Dark_Hover_Shadow_Color']
+                self._Config = ['Name', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Foreground', 'Light_Foreground', 'Dark_Foreground', 'Border_Color', 'Light_Border_Color', 'Dark_Border_Color', 'Border_Size', 'Resize', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Font_Size', 'Font_Weight', 'Font_Family', 'Value', 'Radius', 'Shadow_Size', 'Shadow_Color', 'Light_Shadow_Color', 'Dark_Shadow_Color', 'Shadow_Full', 'Hover_Background', 'Light_Hover_Background', 'Dark_Hover_Background', 'Hover_Foreground', 'Light_Hover_Foreground', 'Dark_Hover_Foreground', 'Hover_Border_Color', 'Light_Hover_Border_Color', 'Dark_Hover_Border_Color', 'Hover_Shadow_Color', 'Light_Hover_Shadow_Color', 'Dark_Hover_Shadow_Color']
                 self._Initialized = False
                 self._Name = False
                 self._Last_Name = False
                 self._Widget = []
-                self._Resize_Font, self._Resize, self._Resize_Width, self._Resize_Height, self._Move, self._Move_Left, self._Move_Top = True, True, True, True, True, True, True
+                self._Resize = True
                 self._Popup = False
                 self._Display = True
                 self._Size_Update = False
-                self._Resize_Index = 0
                 self._Main = Main
                 self._Frame = Canvas(self._Main)
                 self._Border_Color = '#000000'
@@ -45,13 +44,10 @@ class Roubel:
                 self._Last_Shadow_Color = False
                 self._Value = ''
                 self._Widget = self._Frame._Frame.create_text(0, 0, text=self._Value, fill=self._Foreground, font=(self._Font_Family, self._Font_Size, self._Font_Weight), anchor='center', width=0, justify='center')
-                self._Resizable = self._Main._Resizable
                 self._Auto_Dark = True
                 self._On_Show = False
                 self._On_Hide = False
                 self._On_Change = False
-                self._On_Hover_In = False
-                self._On_Hover_Out = False
             except Exception as E:
                 self._GUI.Error(f"{self._Type} -> Init -> {E}")
         else:
@@ -99,25 +95,14 @@ class Roubel:
             
     def Show(self):
         try:
-            self._Display = True
-            if self._Resizable and self._Resize_Index<self._GUI._Resize_Index:
-                self.Resize()
-            else:
-                self.Display()
-            if self._On_Show:
-                self._On_Show()
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Show -> {E}")
-            
-    def Display(self):
-        try:
+            Left, Right, Width, Height = self._Frame.Box()
             self._Frame.Show()
+            self._Frame._Frame.coords(self._Widget, Width/2, Height/2)
             self._Frame._Frame.itemconfigure(self._Widget, state='normal')
             self._Frame._Frame.tag_raise(self._Widget)
-            self._Frame._Frame.coords(self._Widget, self._Width_Current/2, self._Height_Current/2)
             self._Display = True
         except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Display -> {E}")
+            self._GUI.Error(f"{self._Type} -> Show -> {E}")
     
     def Grab(self, Path=False):
         try:
@@ -125,10 +110,9 @@ class Roubel:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Grab -> {E}")
             
-    def Animate(self, Hide=False):
+    def Animate(self, Hide=False, Thread=True):
         try:
-            self._Frame.Animate(Widget=self._Widget, Hide=Hide)
-            self.Show()
+            self._Frame.Animate(Widget=self._Widget, Hide=Hide, Thread=True)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Animate -> {E}")
             self.Animate_Cancel()
@@ -167,12 +151,6 @@ class Roubel:
                 self._On_Hide = Input['On_Hide']
             if 'On_Change' in Input:
                 self._On_Change = Input['On_Change']
-            if 'On_Hover_In' in Input:
-                self._On_Hover_In = Input['On_Hover_In']
-            Input['On_Hover_In'] = lambda E: self.On_Hover_In(E)
-            if 'On_Hover_Out' in Input:
-                self._On_Hover_Out = Input['On_Hover_Out']
-            Input['On_Hover_Out'] = lambda E: self.On_Hover_Out(E)
             self._Frame.Bind(**Input)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Bind -> {E}")
@@ -194,8 +172,6 @@ class Roubel:
                 Config['Shadow_Color'] = self._Hover_Shadow_Color
             if len(Config)>0:
                 self.Config(**Config)
-            if self._On_Hover_In:
-                self._On_Hover_In(E)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> On_Hover_In -> {E}")
             
@@ -212,8 +188,6 @@ class Roubel:
                 Config['Shadow_Color'] = self._Last_Shadow_Color if self._Shadow_Color==self._Hover_Shadow_Color else self._Shadow_Color
             if len(Config)>0:
                 self.Config(**Config)
-            if self._On_Hover_Out:
-                self._On_Hover_Out(E)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> On_Hover_Out -> {E}")
             
@@ -244,7 +218,7 @@ class Roubel:
                     self._On_Change()
             elif self._Initialized:
                 if self._Display:
-                    self.Display()
+                    self.Show()
             if "Background" in Input:
                 self._Background_Main = not bool(Input["Background"])
         except Exception as E:
@@ -270,8 +244,7 @@ class Roubel:
                 self._Top = Top
             if Left is not None or Top is not None:
                 self._Frame.Position(Left=self._Left, Top=self._Top)
-                self.Relocate()
-            return [self._Left, self._Top]
+            return self._Frame.Position()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Position -> {E}")
             
@@ -283,10 +256,16 @@ class Roubel:
                 self._Height = Height
             if Width or Height:
                 self._Frame.Size(Width=self._Width, Height=self._Height)
-                self.Relocate()
-            return [self._Width, self._Height]
+                self.Create()
+            return self._Frame.Size()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Size -> {E}")
+            
+    def Box(self):
+        try:
+            return self._Frame.Box()
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Box -> {E}")
         
     def Locate(self, Width, Height, Left, Top):
         try:
@@ -320,18 +299,21 @@ class Roubel:
                 self.Update_Color()
             if not self._Initialized:
                 self.Update_Color()
-                self._Width_Current, self._Height_Current, self._Left_Current, self._Top_Current, self._Font_Size_Current = self._Width, self._Height, self._Left, self._Top, self._Font_Size
-                self._Frame.Config(Width=self._Width_Current, Height=self._Height_Current, Left=self._Left_Current, Top=self._Top_Current)
+                self._Frame.Config(Width=self._Width, Height=self._Height, Left=self._Left, Top=self._Top)
                 self._Frame.Config(Background=self._Background, Border_Size=self._Border_Size, Border_Color=self._Border_Color)
                 self._Frame.Create()
+                self._Frame._Item.append(self)
                 self._Frame.Bind(On_Hover_In=lambda E: self.On_Hover_In(E), On_Hover_Out=lambda E: self.On_Hover_Out(E))
                 if not self._Display:
                     self.Hide()
                 self._Main._Widget.append(self)
                 self._Initialized = True
-            self.Font()
-            self._Frame._Frame.itemconfig(self._Widget, text=self._Value, fill=self._Foreground, font=(self._Font_Family, self._Font_Size_Current, self._Font_Weight), width=self._Width_Current)
-            self.Resize()
+            
+            self._Frame._Frame.itemconfig(self._Widget, text=self._Value, fill=self._Foreground, font=(self._Font_Family, self._Font_Size, self._Font_Weight), width=self._Width)
+            if self._Display:
+                self.Show()
+            else:
+                self.Hide()
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
                     if self._Last_Name in self._Main.__dict__:
@@ -347,89 +329,9 @@ class Roubel:
             self._GUI.Initiate_Colors(self)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Update_Color -> {E}")
-            
-    def Font(self):
+    def Resize(self, Event):
         try:
-            if self._Resize_Font:
-                Width_Ratio = self._Frame._Width_Current / self._Frame._Width
-                Height_Ratio = self._Frame._Height_Current / self._Frame._Height
-                if Width_Ratio < Height_Ratio:
-                    self._Font_Size_Current = math.floor(self._Font_Size * Width_Ratio)
-                else:
-                    self._Font_Size_Current = math.floor(self._Font_Size * Height_Ratio)
-            else:
-                self._Font_Size_Current = self._Font_Size
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Font -> {E}")
-            
-    def Adjustment(self):
-        try:
-            Width_Difference = self._Main._Width_Current - self._Main._Width
-            Height_Difference = self._Main._Height_Current - self._Main._Height
-            Width_Ratio = self._Width / (self._Main._Width - self._Main._Border_Size * 2)
-            Height_Ratio = self._Height / (self._Main._Height - self._Main._Border_Size * 2)
-            Center_X = self._Left + self._Width / 2
-            Center_Y = self._Top + self._Height / 2
-            Is_Right = Center_X > self._Main._Width / 2
-            Is_Bottom = Center_Y > self._Main._Height / 2
-            self._Width_Adjustment = Width_Difference * Width_Ratio
-            self._Height_Adjustment = Height_Difference * Height_Ratio
-            if Is_Right:
-                Distance_From_Right = self._Main._Width - (self._Left + self._Width)
-                Ratio = Distance_From_Right / self._Main._Width
-                self._Left_Adjustment = Width_Difference * (1 - Ratio) - self._Width_Adjustment
-            else:
-                Ratio = self._Left / self._Main._Width
-                self._Left_Adjustment = Width_Difference * Ratio
-            if Is_Bottom:
-                Distance_From_Bottom = self._Main._Height - (self._Top + self._Height)
-                Ratio = Distance_From_Bottom / self._Main._Height
-                self._Top_Adjustment = Height_Difference * (1 - Ratio) - self._Height_Adjustment
-            else:
-                Ratio = self._Top / self._Main._Height
-                self._Top_Adjustment = Height_Difference * Ratio
-            if not self._Resize_Width and self._Move_Left and Is_Right:
-                self._Left_Adjustment += self._Width_Adjustment
-            if not self._Resize_Height and self._Move_Top and Is_Bottom:
-                self._Top_Adjustment += self._Height_Adjustment
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Adjustment -> {E}")
-            
-    def Relocate(self, Direct=False):
-        try:
-            if Direct or self._Resizable:
-                self.Adjustment()
-                if Direct or (self._Resize and self._Resize_Width):
-                    self._Width_Current = self._Width + self._Width_Adjustment
-                else:
-                    self._Width_Current = self._Width
-                if Direct or (self._Resize and self._Resize_Height):
-                    self._Height_Current = self._Height + self._Height_Adjustment
-                else:
-                    self._Height_Current = self._Height
-                if Direct or (self._Move and self._Move_Left):
-                    self._Left_Current = self._Left + self._Left_Adjustment
-                else:
-                    self._Left_Current = self._Left
-                if Direct or (self._Move and self._Move_Top):
-                    self._Top_Current = self._Top + self._Top_Adjustment
-                else:
-                    self._Top_Current = self._Top
-            else:
-                self._Width_Current = self._Width
-                self._Height_Current = self._Height
-                self._Left_Current = self._Left
-                self._Top_Current = self._Top
-            if self._Display:
-                self._Frame._Frame.itemconfig(self._Widget, font=(self._Font_Family, self._Font_Size_Current, self._Font_Weight), width=self._Width_Current)
-                self.Display()
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Relocate -> {E}")
-            
-    def Resize(self):
-        try:
-            self._Resize_Index = self._GUI._Resize_Index
-            self.Font()
-            self.Relocate()
+            self.Show()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Resize -> {E}")
+        

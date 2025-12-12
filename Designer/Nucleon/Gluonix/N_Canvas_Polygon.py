@@ -7,7 +7,6 @@ class Canvas_Polygon:
         self._Canvas = Main
         self._Config = ['Name', 'Outline', 'Fill', 'Thickness', 'Resize', 'Translucent', 'Alpha']
         self._Display = True
-        self._Resize_Index = 0
         self._Resize = True
         self._Name = False
         self._Last_Name = False
@@ -22,7 +21,7 @@ class Canvas_Polygon:
         Points = [0, 0, 0, 0]
         self._Widget = self._Canvas._Frame.create_polygon(Points, outline=self._Outline, width=self._Thickness, fill=self._Fill)
         self._Canvas._Widget.append(self)
-        self._Resizable = self._Canvas._Resizable
+        self._Canvas._Item.append(self)
         self._On_Show = False
         self._On_Hide = False
 
@@ -40,7 +39,7 @@ class Canvas_Polygon:
                 Temp_Main = Main
                 Temp_Type = Temp_Main._Type
                 while Temp_Type=='Group':
-                    Temp_Main = Main._Main
+                    Temp_Main = Temp_Main._Main
                     Temp_Type = Temp_Main._Type
                 if Temp_Type=='Canvas' or Temp_Type=='Scroll':
                     Instance = type(self)(Main)
@@ -49,7 +48,7 @@ class Canvas_Polygon:
                             setattr(Instance, "_"+Key, getattr(self, "_"+Key))
                     if Name:
                         setattr(Instance, "_Name", Name)
-                    Instance.Relocate()
+                    Instance.Create()
                     return Instance
                 else:
                     raise Exception('Widget can only copy to Canvas/Scroll')
@@ -69,23 +68,15 @@ class Canvas_Polygon:
             
     def Show(self):
         try:
+            if not self._Display and self._Resize and self._Canvas._Type!='Scroll':
+                self.Create()
+            self._Canvas._Frame.itemconfigure(self._Widget, state='normal')
+            self._Canvas._Frame.tag_raise(self._Widget)
             self._Display = True
-            if self._Resizable and self._Resize_Index<self._Canvas._GUI._Resize_Index:
-                self.Resize()
-            else:
-                self.Display()
             if self._On_Show:
                 self._On_Show()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Show -> {E}")
-
-    def Display(self):
-        try:
-            self._Canvas._Frame.itemconfigure(self._Widget, state='normal')
-            self._Canvas._Frame.tag_raise(self._Widget)
-            self._Display = True
-        except Exception as E:
-            self._Canvas._GUI.Error(f"{self._Type} -> Display -> {E}")
     
     def Delete(self):
         try:
@@ -126,7 +117,7 @@ class Canvas_Polygon:
                     setattr(self, "_"+Each+"_Current", Value)
                     Run = True
             if Run:
-                self.Relocate()
+                self.Create()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Config -> {E}")
             
@@ -138,7 +129,7 @@ class Canvas_Polygon:
             Top = 0 if Top is None else Top
             self._Points = [[X + Left, Y + Top] for X, Y in self._Points]
             if Left != 0 or Top != 0:
-                self.Relocate()
+                self.Create()
             return True
         except Exception as Error:
             self._Canvas._GUI.Error(f"{self._Type} -> Move -> {Error}")
@@ -170,12 +161,22 @@ class Canvas_Polygon:
             return [Width, Height]
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Size -> {E}")
+            
+    def Box(self):
+        try:
+            Box = self._Canvas._Frame.bbox(self._Widget)
+            X1, Y1, X2, Y2 = Box
+            Width = X2 - X1
+            Height = Y2 - Y1
+            return [X1, Y1, Width, Height]
+        except Exception as E:
+            self._Canvas._GUI.Error(f"{self._Type} -> Box -> {E}")
 
     def Add(self, X, Y):
         try:
             self._Points.append([X, Y])
             self._Points_Current.append([X, Y])
-            self.Relocate()
+            self.Create()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Add -> {E}")
 
@@ -184,7 +185,7 @@ class Canvas_Polygon:
             if 0 <= Index < len(self._Points):
                 self._Points.pop(Index)
                 self._Points_Current.pop(Index)
-                self.Relocate()
+                self.Create()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Remove -> {E}")
 
@@ -192,7 +193,7 @@ class Canvas_Polygon:
         try:
             self._Points = Points
             self._Points_Current = Points
-            self.Relocate()
+            self.Create()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Replace -> {E}")
             
@@ -213,10 +214,18 @@ class Canvas_Polygon:
 
     def Create(self):
         try:
+            if self._Resize and self._Canvas._Type!='Scroll':
+                Left, Right, Width, Height = self._Canvas.Box()
+                Width_Ratio = Width/self._Canvas._Width
+                Height_Ratio = Height/self._Canvas._Height
+            else:
+                Width_Ratio = 1
+                Height_Ratio = 1
             Stripple = f'gray{self.Stripple()}' if self._Translucent else ''
             self._Canvas._Frame.itemconfig(self._Widget, outline=self._Outline, width=self._Thickness, fill=self._Fill, stipple=Stripple)
             if len(self._Points)>1:
-                Points = [Item for Pair in self._Points_Current for Item in Pair]
+                Points = [[X * Width_Ratio, Y * Height_Ratio] for X, Y in self._Points]
+                Points = [Item for Pair in Points for Item in Pair]
             else:
                 Points = [0, 0, 0, 0]
             self._Canvas._Frame.coords(self._Widget, Points)
@@ -229,30 +238,12 @@ class Canvas_Polygon:
                 self._Last_Name = self._Name
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Create -> {E}")
-
-    def Adjustment(self):
-        try:
-            self._Width_Ratio = self._Canvas._Width_Current / self._Canvas._Width
-            self._Height_Ratio = self._Canvas._Height_Current / self._Canvas._Height
-        except Exception as E:
-            self._Canvas._GUI.Error(f"{self._Type} -> Adjustment -> {E}")
             
-    def Relocate(self, Direct=False):
+    def Resize(self, Event):
         try:
-            if Direct or (self._Resize and self._Resizable):
-                self.Adjustment()
-                self._Points_Current = [[X * self._Width_Ratio, Y * self._Height_Ratio] for X, Y in self._Points]
-            else:
-                self._Points_Current = self._Points.copy()
-            self.Create()
+            self._Canvas._Frame.itemconfigure(self._Widget, state='normal')
+            self._Canvas._Frame.tag_raise(self._Widget)
             if self._Display:
-                self.Display()
-        except Exception as E:
-            self._Canvas._GUI.Error(f"{self._Type} -> Relocate -> {E}")
-            
-    def Resize(self):
-        try:
-            self._Resize_Index = self._Canvas._GUI._Resize_Index
-            self.Relocate()
+                self.Create()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Resize -> {E}")

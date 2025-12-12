@@ -106,7 +106,7 @@ class Element:
             Fixture = self.Frame.Locate(100, 95, 0, 5)
             self.Tree = self.Global['Gluonix'].Tree(self.Frame)
             self.Tree.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
-            self.Tree.Config(Background='#FFFFFF', Border_Size=0, Scroll_Width=Fixture[0]*3, Display=True)
+            self.Tree.Config(Background='#FFFFFF', Border_Size=0, Display=True)
             self.Tree.Config(Foreground='#000000', Font_Size=16, Font_Weight='normal')
             self.Tree.Config(Resize=True, Move=True)
             self.Tree.Bind(On_Release=lambda E: self.Get_Current())

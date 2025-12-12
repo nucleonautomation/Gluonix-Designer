@@ -18,7 +18,7 @@ class Project:
             self.Widget = []
             
             Fixture = self.Home.Frame.Locate(20, 100, 0, 0)
-            self.Frame = self.Global['Gluonix'].Scroll(self.Home.Frame)
+            self.Frame = self.Global['Gluonix'].Frame(self.Home.Frame)
             self.Frame.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Frame.Config(Background='white', Border_Size=0, Display=True) 
             self.Frame.Config(Resize=True, Move=True)
@@ -39,6 +39,8 @@ class Project:
             self.New_Image.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.New_Image.Config(Path=self.Global['Image']('New'), Border_Size=0)
             self.New_Image.Bind(On_Click=lambda E: self.Create_Project(), Cursor_Hand=True)
+            self.New_Image.Bind(On_Hover_In=lambda E: self.Hover_In(Widget=self.New_Label))
+            self.New_Image.Bind(On_Hover_Out=lambda E: self.Hover_Out(Widget=self.New_Label))
             self.New_Image.Create()
                     #Label
             Fixture = self.Frame.Locate(70, 4, 25, 8)
@@ -46,6 +48,8 @@ class Project:
             self.New_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.New_Label.Config(Foreground='black', Value="New project", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
             self.New_Label.Bind(On_Click=lambda E: self.Create_Project(), Cursor_Hand=True)
+            self.New_Label.Bind(On_Hover_In=lambda E: self.Hover_In(Widget=self.New_Label))
+            self.New_Label.Bind(On_Hover_Out=lambda E: self.Hover_Out(Widget=self.New_Label))
             self.New_Label.Create()
             
                 #Open
@@ -55,6 +59,8 @@ class Project:
             self.Open_Image.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Open_Image.Config(Path=self.Global['Image']('Open'), Border_Size=0)
             self.Open_Image.Bind(On_Click=lambda E: self.Open_Project(), Cursor_Hand=True)
+            self.Open_Image.Bind(On_Hover_In=lambda E: self.Hover_In(Widget=self.Open_Label))
+            self.Open_Image.Bind(On_Hover_Out=lambda E: self.Hover_Out(Widget=self.Open_Label))
             self.Open_Image.Create()
                     #Label
             Fixture = self.Frame.Locate(70, 4, 25, 12)
@@ -62,6 +68,8 @@ class Project:
             self.Open_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Open_Label.Config(Foreground='black', Value="Open project", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
             self.Open_Label.Bind(On_Click=lambda E: self.Open_Project(), Cursor_Hand=True)
+            self.Open_Label.Bind(On_Hover_In=lambda E: self.Hover_In(Widget=self.Open_Label))
+            self.Open_Label.Bind(On_Hover_Out=lambda E: self.Hover_Out(Widget=self.Open_Label))
             self.Open_Label.Create()
             
                 #Compare
@@ -71,6 +79,8 @@ class Project:
             self.Compare_Image.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Compare_Image.Config(Path=self.Global['Image']('Compare'), Border_Size=0)
             self.Compare_Image.Bind(On_Click=lambda E: self.Open_Project(), Cursor_Hand=True)
+            self.Compare_Image.Bind(On_Hover_In=lambda E: self.Hover_In(Widget=self.Compare_Label))
+            self.Compare_Image.Bind(On_Hover_Out=lambda E: self.Hover_Out(Widget=self.Compare_Label))
             self.Compare_Image.Create()
                     #Label
             Fixture = self.Frame.Locate(70, 4, 25, 16)
@@ -78,22 +88,24 @@ class Project:
             self.Compare_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Compare_Label.Config(Foreground='black', Value="Compare project", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
             self.Compare_Label.Bind(On_Click=lambda E: self.Compare_Project(), Cursor_Hand=True)
+            self.Compare_Label.Bind(On_Hover_In=lambda E: self.Hover_In(Widget=self.Compare_Label))
+            self.Compare_Label.Bind(On_Hover_Out=lambda E: self.Hover_Out(Widget=self.Compare_Label))
             self.Compare_Label.Create()
             
                 #Version
                     #Current
             Fixture = self.Frame.Locate(17, 3, 10, 90)
-            self.Current_Label = self.Global['Gluonix'].Label(self.Frame)
-            self.Current_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
-            self.Current_Label.Config(Foreground='black', Value=f"V {self.Global['Version']}.{self.Global['Revision']}", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
-            self.Current_Label.Create()
+            self.Current_Version_Label = self.Global['Gluonix'].Label(self.Frame)
+            self.Current_Version_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Current_Version_Label.Config(Foreground='black', Value=f"V {self.Global['Version']}.{self.Global['Revision']}", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Current_Version_Label.Create()
             
                     #New
             Fixture = self.Frame.Locate(60, 3, 10, 93)
-            self.New_Label = self.Global['Gluonix'].Label(self.Frame)
-            self.New_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
-            self.New_Label.Config(Foreground='red', Value="", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0, Display=False)
-            self.New_Label.Create()
+            self.New_Version_Label = self.Global['Gluonix'].Label(self.Frame)
+            self.New_Version_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.New_Version_Label.Config(Foreground='red', Value="", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0, Display=False)
+            self.New_Version_Label.Create()
             
             #Create New Project
             self.New = New(self.Global, self)
@@ -101,6 +113,18 @@ class Project:
             #Create New Project
             self.Compare = Compare(self.Global, self)
                    
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Hover_In(self, Widget):
+        try:
+            Widget.Config(Font_Size=11)
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Hover_Out(self, Widget):
+        try:
+            Widget.Config(Font_Size=10)
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             

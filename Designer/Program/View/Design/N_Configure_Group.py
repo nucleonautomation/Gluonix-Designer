@@ -14,6 +14,8 @@ class Configure_Group:
             self.Root_ID = False
             self.Element = False
             
+            Top = 0
+            
             #Frame
             Fixture = self.Configure.Frame.Locate(100, 95, 0, 5)
             self.Frame = self.Global['Gluonix'].Scroll(self.Configure.Frame)
@@ -24,70 +26,75 @@ class Configure_Group:
             self.Configure.Widget.append(self)
             
             #Name Label
-            Fixture = self.Frame.Locate(25, 5, 3, 2)
+            Top += 2
+            Fixture = self.Frame.Locate(25, 5, 3, Top)
             self.Name_Label = self.Global['Gluonix'].Label(self.Frame)
-            self.Name_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Name_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Name_Label.Config(Foreground='#000000', Value="Name:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
             self.Name_Label.Create()
             
             #Name Entry
-            Fixture = self.Frame.Locate(60, 5, 28, 2)
+            Fixture = self.Frame.Locate(60, 5, 28, Top)
             self.Name_Entry = self.Global['Gluonix'].Entry(self.Frame)
-            self.Name_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Name_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Name_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='left', Border_Size=1)
             self.Name_Entry.Bind(On_Key_Release=lambda E: self.Update_Name())
             self.Name_Entry.Create()
             
             #Visibilty
-            Fixture = self.Frame.Locate(7, 5, 90, 2)
+            Fixture = self.Frame.Locate(7, 5, 90, Top)
             self.Visibilty_Image = {True: 'Visibilty_On', False: 'Visibilty_Off'}
             self.Visibilty = self.Global['Gluonix'].Image(self.Frame)
-            self.Visibilty.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Visibilty.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Visibilty.Config(Border_Size=0, Path=self.Global['Image'](self.Visibilty_Image[True]))
             self.Visibilty.Bind(On_Click=lambda E: self.Update_Visibilty())
             self.Visibilty.Create()
             
             #Move Label
-            Fixture = self.Frame.Locate(25, 5, 3, 9)
+            Top += 7
+            Fixture = self.Frame.Locate(25, 5, 3, Top)
             self.Move_Label = self.Global['Gluonix'].Label(self.Frame)
-            self.Move_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Move_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Move_Label.Config(Foreground='#000000', Value="Relative Move", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
             self.Move_Label.Create()
             
             #Left Label
-            Fixture = self.Frame.Locate(25, 5, 3, 16)
+            Top += 7
+            Fixture = self.Frame.Locate(25, 5, 3, Top)
             self.Left_Label = self.Global['Gluonix'].Label(self.Frame)
-            self.Left_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Left_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Left_Label.Config(Foreground='#000000', Value="Left:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
             self.Left_Label.Create()
             
             #Left Entry
-            Fixture = self.Frame.Locate(40, 5, 28, 16)
+            Fixture = self.Frame.Locate(40, 5, 28, Top)
             self.Left_Entry = self.Global['Gluonix'].Entry(self.Frame)
-            self.Left_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Left_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Left_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='center', Border_Size=1)
             self.Left_Entry.Bind(On_Key_Release=lambda E: self.Check_Left())
             self.Left_Entry.Create()
             
             #Top Label
-            Fixture = self.Frame.Locate(25, 5, 3, 23)
+            Top += 7
+            Fixture = self.Frame.Locate(25, 5, 3, Top)
             self.Top_Label = self.Global['Gluonix'].Label(self.Frame)
-            self.Top_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Top_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Top_Label.Config(Foreground='#000000', Value="Top:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
             self.Top_Label.Create()
             
             #Top Entry
-            Fixture = self.Frame.Locate(40, 5, 28, 23)
+            Fixture = self.Frame.Locate(40, 5, 28, Top)
             self.Top_Entry = self.Global['Gluonix'].Entry(self.Frame)
-            self.Top_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Top_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Top_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='center', Border_Size=1)
             self.Top_Entry.Bind(On_Key_Release=lambda E: self.Check_Top())
             self.Top_Entry.Create()
             
             #Move Button
-            Fixture = self.Frame.Locate(40, 5, 28, 30)
+            Top += 7
+            Fixture = self.Frame.Locate(40, 5, 28, Top)
             self.Move_Button = self.Global['Gluonix'].Label(self.Frame)
-            self.Move_Button.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Move_Button.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Move_Button.Config(Background='#e1e1e1', Foreground='black', Value='Move', Font_Size=12, Font_Weight='normal', Border_Size=1, Border_Color='#adadad')
             self.Move_Button.Bind(On_Hover_In=lambda E: self.Move_Button.Config(Border_Color='#0078d7', Background='#d5dcf0'))
             self.Move_Button.Bind(On_Hover_Out=lambda E: self.Move_Button.Config(Border_Color='#adadad', Background='#e1e1e1'))
@@ -152,6 +159,12 @@ class Configure_Group:
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
         self.Global['Loading'].Hide()
+            
+    def Movement_Update(self):
+        try:
+            pass
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             
     def Update_Name(self):
         try:

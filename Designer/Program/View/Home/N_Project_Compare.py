@@ -44,6 +44,7 @@ class Compare:
             self.Project_1_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Project_1_Entry.Config(Background='white', Foreground='black', Font_Size=10, Font_Weight='normal', Align='left', Border_Size=1)
             self.Project_1_Entry.Bind(On_Key_Release=lambda E: self.Project_1_Update_Path())
+            self.Project_1_Entry.Config(Hover_Background='#EEEEEE', Hover_Border_Color='#0078d7')
             self.Project_1_Entry.Create()
             
                 #Project 1 Browser
@@ -51,8 +52,7 @@ class Compare:
             self.Project_1_Browser = self.Global['Gluonix'].Label(self.Frame)
             self.Project_1_Browser.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Project_1_Browser.Config(Background='#e1e1e1', Foreground='black', Value='Browser...', Font_Size=9, Font_Weight='normal', Border_Size=1, Border_Color='#adadad')
-            self.Project_1_Browser.Bind(On_Hover_In=lambda E: self.Project_1_Browser.Config(Border_Color='#0078d7', Background='#d5dcf0'))
-            self.Project_1_Browser.Bind(On_Hover_Out=lambda E: self.Project_1_Browser.Config(Border_Color='#adadad', Background='#e1e1e1'))
+            self.Project_1_Browser.Config(Hover_Background='#d5dcf0', Hover_Border_Color='#0078d7')
             self.Project_1_Browser.Bind(On_Click=lambda E: self.Project_1_File_Select())
             self.Project_1_Browser.Create()
             
@@ -69,6 +69,7 @@ class Compare:
             self.Project_2_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Project_2_Entry.Config(Background='white', Foreground='black', Font_Size=10, Font_Weight='normal', Align='left', Border_Size=1)
             self.Project_2_Entry.Bind(On_Key_Release=lambda E: self.Project_2_Update_Path())
+            self.Project_2_Entry.Config(Hover_Background='#EEEEEE', Hover_Border_Color='#0078d7')
             self.Project_2_Entry.Create()
             
                 #Project 2 Browser
@@ -76,8 +77,7 @@ class Compare:
             self.Project_2_Browser = self.Global['Gluonix'].Label(self.Frame)
             self.Project_2_Browser.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Project_2_Browser.Config(Background='#e1e1e1', Foreground='black', Value='Browser...', Font_Size=9, Font_Weight='normal', Border_Size=1, Border_Color='#adadad')
-            self.Project_2_Browser.Bind(On_Hover_In=lambda E: self.Project_2_Browser.Config(Border_Color='#0078d7', Background='#d5dcf0'))
-            self.Project_2_Browser.Bind(On_Hover_Out=lambda E: self.Project_2_Browser.Config(Border_Color='#adadad', Background='#e1e1e1'))
+            self.Project_2_Browser.Config(Hover_Background='#d5dcf0', Hover_Border_Color='#0078d7')
             self.Project_2_Browser.Bind(On_Click=lambda E: self.Project_2_File_Select())
             self.Project_2_Browser.Create()
             
@@ -86,8 +86,7 @@ class Compare:
             self.Ok_Button = self.Global['Gluonix'].Label(self.Frame)
             self.Ok_Button.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Ok_Button.Config(Background='#e1e1e1', Foreground='black', Value='OK', Font_Size=9, Font_Weight='normal', Border_Size=1, Border_Color='#adadad')
-            self.Ok_Button.Bind(On_Hover_In=lambda E: self.Ok_Button.Config(Border_Color='#0078d7', Background='#d5dcf0'))
-            self.Ok_Button.Bind(On_Hover_Out=lambda E: self.Ok_Button.Config(Border_Color='#adadad', Background='#e1e1e1'))
+            self.Ok_Button.Config(Hover_Background='#d5dcf0', Hover_Border_Color='#0078d7')
             self.Ok_Button.Bind(On_Click=lambda E: self.Create())
             self.Ok_Button.Create()
             
@@ -96,8 +95,7 @@ class Compare:
             self.Cancel_Button = self.Global['Gluonix'].Label(self.Frame)
             self.Cancel_Button.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Cancel_Button.Config(Background='#e1e1e1', Foreground='black', Value='Cancel', Font_Size=9, Font_Weight='normal', Border_Size=1, Border_Color='#adadad')
-            self.Cancel_Button.Bind(On_Hover_In=lambda E: self.Cancel_Button.Config(Border_Color='#0078d7', Background='#d5dcf0'))
-            self.Cancel_Button.Bind(On_Hover_Out=lambda E: self.Cancel_Button.Config(Border_Color='#adadad', Background='#e1e1e1'))
+            self.Cancel_Button.Config(Hover_Background='#d5dcf0', Hover_Border_Color='#0078d7')
             self.Cancel_Button.Bind(On_Click=lambda E: self.Frame.Hide())
             self.Cancel_Button.Create()
                 

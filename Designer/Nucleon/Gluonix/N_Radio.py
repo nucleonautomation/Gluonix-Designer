@@ -3,7 +3,7 @@ import io
 import base64
 from PIL import Image as PIL_Image
 from .N_GUI import GUI
-from .N_Image_Lite import Image_Lite
+from .N_Image import Image
 from .N_Custom import Event_Bind
 
 def Create_Image(Image_Data):
@@ -46,19 +46,18 @@ class Radio:
         if self._GUI is not None:
             self._Type = "Radio"
             try:
-                self._Config = ['Name', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Value', 'Variable']
+                self._Config = ['Name', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Resize', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Value', 'Variable']
                 self._Initialized = False
                 self._Name = False
                 self._Last_Name = False
                 self._Widget = []
-                self._Resize_Font, self._Resize, self._Resize_Width, self._Resize_Height, self._Move, self._Move_Left, self._Move_Top = False, True, True, True, True, True, True
+                self._Resize = True
                 self._Image = {True: Image_True, False: Image_False}
                 self._Popup = False
                 self._Display = True
                 self._Size_Update = False
-                self._Resize_Index = 0
                 self._Main = Main
-                self._Frame = Image_Lite(self._Main)
+                self._Frame = Image(self._Main)
                 self._Frame.Config(Convert_Type='RGBA')
                 self._Background = self._Main._Background
                 self._Background_Main = True
@@ -66,7 +65,6 @@ class Radio:
                 self._On_Change = False
                 self._Value = False
                 self._Variable = False
-                self._Resizable = self._Main._Resizable
                 self._Auto_Dark = True
                 self._On_Show = False
                 self._On_Hide = False
@@ -116,22 +114,12 @@ class Radio:
             
     def Show(self):
         try:
+            self._Frame.Show()
             self._Display = True
-            if self._Resizable and self._Resize_Index<self._GUI._Resize_Index:
-                self.Resize()
-            else:
-                self.Display()
             if self._On_Show:
                 self._On_Show()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Show -> {E}")
-            
-    def Display(self):
-        try:
-            self._Frame.Show()
-            self._Display = True
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Display -> {E}")
     
     def Grab(self, Path=False):
         try:
@@ -139,10 +127,9 @@ class Radio:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Grab -> {E}")
             
-    def Animate(self):
+    def Animate(self, Hide=False, Thread=True):
         try:
-            self._Frame.Animate()
-            self.Show()
+            self._Frame.Animate(Thread=Thread)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Animate -> {E}")
             self.Animate_Cancel()
@@ -193,10 +180,13 @@ class Radio:
         try:
             if 'On_Show' in Input:
                 self._On_Show = Input['On_Show']
+                del Input['On_Show']
             if 'On_Hide' in Input:
                 self._On_Hide = Input['On_Hide']
+                del Input['On_Hide']
             if 'On_Change' in Input:
                 self._On_Change = Input['On_Change']
+                del Input['On_Change']
             self._Frame.Bind(**Input)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Bind -> {E}")
@@ -219,6 +209,8 @@ class Radio:
                     Value = Input[Each]
                     setattr(self, "_"+Each, Value)
                     Run = True
+            if 'Border_Size' in Input:
+                del Input['Border_Size']
             self._Frame.Config(**Input)
             if "Width" in Input or "Height" in Input or "Left" in Input or "Top" in Input:
                 self._Size_Update = True
@@ -261,7 +253,6 @@ class Radio:
                 self._Top = Top
             if Left is not None or Top is not None:
                 self._Frame.Position(Left=self._Left, Top=self._Top)
-                self.Relocate()
             return self._Frame.Position()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Position -> {E}")
@@ -274,10 +265,16 @@ class Radio:
                 self._Height = Height
             if Width or Height:
                 self._Frame.Size(Width=self._Width, Height=self._Height)
-                self.Relocate()
+                self.Create()
             return self._Frame.Size()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Size -> {E}")
+            
+    def Box(self):
+        try:
+            return self._Frame.Box()
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Box -> {E}")
         
     def Locate(self, Width, Height, Left, Top):
         try:
@@ -311,9 +308,8 @@ class Radio:
                 self.Update_Color()
             if not self._Initialized:
                 self.Update_Color()
-                self._Width_Current, self._Height_Current, self._Left_Current, self._Top_Current, = self._Width, self._Height, self._Left, self._Top
-                self._Frame.Config(Width=self._Width_Current, Height=self._Height_Current, Left=self._Left_Current, Top=self._Top_Current)
-                self._Frame.Config(Background=self._Background)
+                self._Frame.Config(Width=self._Width, Height=self._Height, Left=self._Left, Top=self._Top)
+                self._Frame.Config(Background=self._Background, Border_Size=0)
                 self._Frame.Config(Transparent=True, Use_Foreground=True)
                 self._Frame.Bind(On_Click=lambda E: self.Set_On_Click())
                 self._Frame.Create()
@@ -326,9 +322,8 @@ class Radio:
                 if self not in self._Variable._Widget:
                     self._Variable._Widget.append(self)
             self._Frame.Set(Path=self._Image[self._Check])
-            self.Resize()
             if self._Display:
-                self.Display()
+                self.Show()
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
                     if self._Last_Name in self._Main.__dict__:
@@ -344,17 +339,3 @@ class Radio:
             self._GUI.Initiate_Colors(self)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Update_Color -> {E}")
-            
-    def Relocate(self, Direct=False):
-        try:
-            self.Display()
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Relocate -> {E}")
-            
-    def Resize(self):
-        try:
-            self._Resize_Index = self._GUI._Resize_Index
-            self.Relocate()
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Resize -> {E}")
-            

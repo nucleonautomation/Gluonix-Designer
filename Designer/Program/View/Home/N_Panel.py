@@ -14,7 +14,7 @@ class Panel:
             self.Widget = []
             
             Fixture = self.Home.Frame.Locate(80, 100, 20, 0)
-            self.Frame = self.Global['Gluonix'].Scroll(self.Home.Frame)
+            self.Frame = self.Global['Gluonix'].Frame(self.Home.Frame)
             self.Frame.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Frame.Config(Border_Size=0, Display=True)
             self.Frame.Config(Resize=True, Move=True)

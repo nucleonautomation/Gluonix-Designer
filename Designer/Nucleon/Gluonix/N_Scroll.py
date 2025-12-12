@@ -1,5 +1,6 @@
 # IMPORT LIBRARIES
 import tkinter as TK
+import threading, math, time
 from .N_GUI import GUI
 from .N_Frame import Frame
 from .N_Custom import Event_Bind
@@ -24,16 +25,15 @@ class Scroll:
         if self._GUI is not None:
             self._Type = "Scroll"
             try:
-                self._Config = ['Name', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Border_Color', 'Light_Border_Color', 'Dark_Border_Color', 'Border_Size', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Left', 'Top', 'Width', 'Height', 'Scrollbar', 'Vertical', 'Horizontal', 'Last']
+                self._Config = ['Name', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Border_Color', 'Light_Border_Color', 'Dark_Border_Color', 'Border_Size', 'Resize', 'Popup', 'Left', 'Top', 'Width', 'Height', 'Scrollbar_Size', 'Vertical', 'Horizontal', 'Last']
                 self._Initialized = False
                 self._Name = False
                 self._Last_Name = False
                 self._Widget = []
-                self._Resize_Font, self._Resize, self._Resize_Width, self._Resize_Height, self._Move, self._Move_Left, self._Move_Top = False, True, True, True, True, True, True
+                self._Item = []
+                self._Resize = True
                 self._Popup = False
                 self._Display = True
-                self._Size_Update = False
-                self._Resize_Index = 0
                 self._Main = Main
                 self._Frame_Canvas = Frame(self._Main)
                 self._Canvas_Scroll = TK.Canvas(self._Frame_Canvas._Frame)
@@ -45,17 +45,17 @@ class Scroll:
                 self._Border_Size = 0
                 self._Background = self._Main._Background
                 self._Background_Main = True
-                self._Scrollbar = 25
+                self._Scrollbar_Size = 20
                 self._Vertical = False
                 self._Horizontal = False
-                self._Width_Frame = False
-                self._Height_Frame = False
+                self._Width_Frame = 0
+                self._Height_Frame = 0
                 self._Last = False
                 self._On_Resize = False
-                self._Resizable = self._Main._Resizable
                 self._Auto_Dark = True
                 self._On_Show = False
                 self._On_Hide = False
+                self._Configure_After_Id = None
             except Exception as E:
                 self._GUI.Error(f"{self._Type} -> Init -> {E}")
         else:
@@ -112,6 +112,31 @@ class Scroll:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Refresh -> {E}")
             
+    def On_Configure(self, Event):
+        try:
+            if self._Configure_After_Id is not None:
+                self._Canvas_Scroll.after_cancel(self._Configure_After_Id)
+            self._Configure_After_Id = self._Canvas_Scroll.after(50, self.On_Configure_Debounced)
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> On_Configure -> {E}")
+                
+    def On_Configure_Debounced(self):
+        try:
+            self._Configure_After_Id = None
+            T = threading.Thread(target=self.On_Configure_Thread, daemon=True)
+            T.start()
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> On_Configure_Debounced -> {E}")
+    
+    def On_Configure_Thread(self):
+        try:
+            if self._Last:
+                self.Update(self._Last)
+            else:
+                self.Update_All()
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> On_Configure_Thread -> {E}")
+            
     def Hide(self):
         try:
             self._Frame_Canvas.Hide()
@@ -124,28 +149,21 @@ class Scroll:
     def Show(self):
         try:
             self._Display = True
-            if self._Resizable and self._Resize_Index<self._GUI._Resize_Index:
-                self.Resize()
+            self._Frame_Canvas.Show()
+            if self._Last:
+                self.Update(self._Last)
             else:
-                self.Display()
+                self.Update_All()
             if self._On_Show:
                 self._On_Show()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Show -> {E}")
             
-    def Display(self):
+    def Animate(self, Hide=False, Thread=True):
         try:
-            self._Frame_Canvas.Show()
-            self._Display = True
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Display -> {E}")
-            
-    def Animate(self):
-        try:
-            self._Frame_Canvas.Animate()
+            self._Frame_Canvas.Animate(Hide=Hide, Thread=True)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Animate -> {E}")
-            self.Animate_Cancel()
             
     def Animate_Cancel(self):
         try:
@@ -155,13 +173,19 @@ class Scroll:
             
     def Animate_From(self, Left, Top, Time=None, Speed=None, Ease=None):
         try:
-            if Time is not None: self._Animate_Time = Time
-            if Speed is not None: self._Animate_Speed = Speed
-            if Ease  is not None: self._Animate_Ease = Ease
+            if Time is not None:
+                self._Animate_Time = Time
+            if Speed is not None:
+                self._Animate_Speed = Speed
+            if Ease is not None:
+                self._Animate_Ease = Ease
             self._Animate_Left, self._Animate_Top = Left, Top
-            if Time is not None: self._Frame_Canvas._Animate_Time = Time
-            if Speed is not None: self._Frame_Canvas._Animate_Speed = Speed
-            if Ease  is not None: self._Frame_Canvas._Animate_Ease = Ease
+            if Time is not None:
+                self._Frame_Canvas._Animate_Time = Time
+            if Speed is not None:
+                self._Frame_Canvas._Animate_Speed = Speed
+            if Ease is not None:
+                self._Frame_Canvas._Animate_Ease = Ease
             self._Frame_Canvas._Animate_Left, self._Frame_Canvas._Animate_Top = Left, Top
             self._Frame_Canvas.Animate()
         except Exception as E:
@@ -210,8 +234,6 @@ class Scroll:
                 self._On_Show = Input['On_Show']
             if 'On_Hide' in Input:
                 self._On_Hide = Input['On_Hide']
-            if "On_Resize" in Input:
-                self._On_Resize = Input["On_Resize"]
             Event_Bind(self._Frame, **Input)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Bind -> {E}")
@@ -241,8 +263,6 @@ class Scroll:
                     setattr(self, "_"+Each, Value)
                     Run = True
             self._Frame_Canvas.Config(**Input)
-            if "Width" in Input or "Height" in Input or "Left" in Input or "Top" in Input:
-                self._Size_Update = True
             if self._Initialized and Run:
                 self.Create()
             if "Background" in Input:
@@ -258,8 +278,6 @@ class Scroll:
                         self.Nothing = False
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Config -> {E}")
-            
-
             
     def Move(self, Left=None, Top=None):
         try:
@@ -295,7 +313,7 @@ class Scroll:
                 self.Config(Left=self._Left, Top=self._Top)
             return self._Frame_Canvas.Position()
         except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Position -> {E}")
+            self._GUI.Error(f("{self._Type} -> Position -> {E}"))
             
     def Size(self, Width=False, Height=False):
         try:
@@ -308,6 +326,12 @@ class Scroll:
             return self._Frame_Canvas.Size()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Size -> {E}")
+            
+    def Box(self):
+        try:
+            return self._Frame_Canvas.Box()
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Box -> {E}")
         
     def Locate(self, Width, Height, Left, Top):
         try:
@@ -341,31 +365,38 @@ class Scroll:
                 self.Update_Color()
             if not self._Initialized:
                 self.Update_Color()
-                self._Width_Current, self._Width_Frame, self._Height_Current, self._Height_Frame, self._Left_Current, self._Top_Current = self._Width, self._Width, self._Height, self._Height, self._Left, self._Top
-                self._Frame_Canvas.Config(Width=self._Width_Current, Height=self._Height_Current, Left=self._Left_Current, Top=self._Top_Current)
+                self._Width_Frame = self._Width
+                self._Height_Frame = self._Height
+                self._Frame_Canvas.Config(Width=self._Width, Height=self._Height, Left=self._Left, Top=self._Top)
                 self._Frame_Canvas.Config(Background=self._Background, Border_Size=self._Border_Size, Border_Color=self._Border_Color)
                 self._Frame_Canvas.Create()
+                self._Canvas_Scroll.bind("<Configure>", self.On_Configure, add="+")
                 self._Frame.bind("<MouseWheel>", self.Scroll)
+                self._Frame.bind("<Configure>", lambda e: self._Canvas_Scroll.configure(scrollregion=self._Canvas_Scroll.bbox("all")))
                 if not self._Display:
                     self.Hide()
                 self._Main._Widget.append(self)
+                self._Canvas_Scroll.config(background=self._Background, highlightthickness=0)
+                self._Canvas_Scroll.place(relx=0, rely=0, relwidth=1, relheight=1)
+                self._Frame.config(background=self._Background, highlightthickness=0)
                 self._Initialized = True
-            self._Canvas_Scroll.config(background=self._Background, width=self._Width_Frame, height=self._Height_Frame, highlightthickness=0)
-            self._Scrollbar_Vertical.config(orient="vertical", command=self._Canvas_Scroll.yview, width=self._Scrollbar)
-            self._Scrollbar_Horizontal.config(orient="horizontal", command=self._Canvas_Scroll.xview, width=self._Scrollbar)
-            self._Frame.config(background=self._Background, width=self._Width_Frame, height=self._Height_Frame)
+            self._Scrollbar_Vertical.config(orient="vertical", command=self._Canvas_Scroll.yview, width=self._Scrollbar_Size)
+            self._Scrollbar_Horizontal.config(orient="horizontal", command=self._Canvas_Scroll.xview, width=self._Scrollbar_Size)
+            self._Frame.place(relx=0, rely=0, relwidth=(self._Width-self._Scrollbar_Size)/self._Width, relheight=(self._Height-self._Scrollbar_Size)/self._Height)
             self._Frame['highlightthickness']=0
-            self._Frame.bind("<Configure>", lambda e: self._Canvas_Scroll.configure(scrollregion=self._Canvas_Scroll.bbox("all")))
             if not self._Frame_Scroll:
                 self._Frame_Scroll = self._Canvas_Scroll.create_window((0, 0), window=self._Frame, anchor="nw")
                 self._Canvas_Scroll.configure(yscrollcommand=self._Scrollbar_Vertical.set)
                 self._Canvas_Scroll.configure(xscrollcommand=self._Scrollbar_Horizontal.set)
                 self._Canvas_Scroll.pack(side="left", fill="both", expand=True)
+            if self._Last:
+                self.Update(self._Last)
+            else:
+                self.Update_All()
             if self._Vertical:
-                self._Scrollbar_Vertical.place(relx=1, rely=0, relheight=1, anchor="ne")
+                self._Scrollbar_Vertical.place(relx=(self._Width-self._Scrollbar_Size)/self._Width, rely=0, relwidth=self._Scrollbar_Size/self._Width, relheight=1)
             if self._Horizontal:
-                self._Scrollbar_Horizontal.place(relx=0, rely=1, relwidth=1, anchor="sw")
-            self.Resize(Trigger=False)
+                self._Scrollbar_Horizontal.place(relx=0, rely=(self._Height-self._Scrollbar_Size)/self._Height, relwidth=1, relheight=self._Scrollbar_Size/self._Height)
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
                     if self._Last_Name in self._Main.__dict__:
@@ -382,148 +413,54 @@ class Scroll:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Update_Color -> {E}")
              
-    def Update(self, Widget):
+    def _Update_Scrollbars(self):
         try:
-            try:
-                Widget.Resize()
-                self._Last = Widget
-            except Exception:
-                self.Nothing = False
-            if self._Width_Frame < (Widget._Left_Current+Widget._Width_Current):
-                Extra_Space = self._Scrollbar
-                self._Width_Frame = Widget._Left_Current+Widget._Width_Current+Extra_Space
-            if self._Height_Frame < (Widget._Top_Current+Widget._Height_Current):
-                Extra_Space = self._Scrollbar
-                self._Height_Frame = Widget._Top_Current+Widget._Height_Current+Extra_Space
+            Left, Top, Width, Height = self._Frame_Canvas.Box()
             self._Frame.config(width=self._Width_Frame, height=self._Height_Frame)
-            if self._Width_Current >= self._Width_Frame:
-                self._Scrollbar_Horizontal.place_forget()
-            else:
-                self._Scrollbar_Horizontal.place(relx=0, rely=1, relwidth=1, anchor="sw")
-            if self._Height_Current >= self._Height_Frame:
+            if Height >= self._Height_Frame:
                 self._Scrollbar_Vertical.place_forget()
             else:
-                self._Scrollbar_Vertical.place(relx=1, rely=0, relheight=1, anchor="ne")
+                self._Scrollbar_Vertical.place(relx=(self._Width-self._Scrollbar_Size)/self._Width, rely=0, relwidth=self._Scrollbar_Size/self._Width, relheight=1)
+            if Width >= self._Width_Frame:
+                self._Scrollbar_Horizontal.place_forget()
+            else:
+                self._Scrollbar_Horizontal.place(relx=0, rely=(self._Height-self._Scrollbar_Size)/self._Height, relwidth=1, relheight=self._Scrollbar_Size/self._Height)
             if self._Vertical:
-                self._Scrollbar_Vertical.place(relx=1, rely=0, relheight=1, anchor="ne")
+                self._Scrollbar_Vertical.place(relx=(self._Width-self._Scrollbar_Size)/self._Width, rely=0, relwidth=self._Scrollbar_Size/self._Width, relheight=1)
             if self._Horizontal:
-                self._Scrollbar_Horizontal.place(relx=0, rely=1, relwidth=1, anchor="sw")
+                self._Scrollbar_Vertical.place(relx=(self._Width-self._Scrollbar_Size)/self._Width, rely=0, relwidth=self._Scrollbar_Size/self._Width, relheight=1)
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> _Update_Scrollbars -> {E}")
+             
+    def Update(self, Widget):
+        try:
+            Extra_Space = self._Scrollbar_Size
+            Left, Top, Width, Height = Widget.Box()
+            Right = Left + Width
+            Bottom = Top + Height
+            if self._Width_Frame < Right:
+                self._Width_Frame = Right + Extra_Space*2
+            if self._Height_Frame < Bottom:
+                self._Height_Frame = Bottom + Extra_Space*3
+            self._Update_Scrollbars()
+            self._Last = Widget
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Update -> {E}")
              
     def Update_All(self):
         try:
+            Extra_Space = self._Scrollbar_Size
             for Widget in self._Widget:
-                try:
-                    Widget.Resize()
-                except Exception:
-                    self.Nothing = False
-                if self._Width_Frame < (Widget._Left_Current+Widget._Width_Current):
-                    Extra_Space = self._Scrollbar
-                    self._Width_Frame = Widget._Left_Current+Widget._Width_Current+Extra_Space
-                if self._Height_Frame < (Widget._Top_Current+Widget._Height_Current):
-                    Extra_Space = self._Scrollbar
-                    self._Height_Frame = Widget._Top_Current+Widget._Height_Current+Extra_Space
-            self._Frame.config(width=self._Width_Frame, height=self._Height_Frame)
-            if self._Width_Current >= self._Width_Frame:
-                self._Scrollbar_Horizontal.place_forget()
-            else:
-                self._Scrollbar_Horizontal.place(relx=0, rely=1, relwidth=1, anchor="sw")
-            if self._Height_Current >= self._Height_Frame:
-                self._Scrollbar_Vertical.place_forget()
-            else:
-                self._Scrollbar_Vertical.place(relx=1, rely=0, relheight=1, anchor="ne")
-            if self._Vertical:
-                self._Scrollbar_Vertical.place(relx=1, rely=0, relheight=1, anchor="ne")
-            if self._Horizontal:
-                self._Scrollbar_Horizontal.place(relx=0, rely=1, relwidth=1, anchor="sw")
+                Left, Top, Width, Height = Widget.Box()
+                Right = Left + Width
+                Bottom = Top + Height
+                if self._Width_Frame < Right:
+                    self._Width_Frame = Right + Extra_Space
+                if self._Height_Frame < Bottom:
+                    self._Height_Frame = Bottom + Extra_Space
+            self._Update_Scrollbars()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Update_All -> {E}")
-            
-    def Adjustment(self):
-        try:
-            Width_Difference = self._Main._Width_Current - self._Main._Width
-            Height_Difference = self._Main._Height_Current - self._Main._Height
-            Width_Ratio = self._Width / (self._Main._Width - self._Main._Border_Size * 2)
-            Height_Ratio = self._Height / (self._Main._Height - self._Main._Border_Size * 2)
-            Center_X = self._Left + self._Width / 2
-            Center_Y = self._Top + self._Height / 2
-            Is_Right = Center_X > self._Main._Width / 2
-            Is_Bottom = Center_Y > self._Main._Height / 2
-            self._Width_Adjustment = Width_Difference * Width_Ratio
-            self._Height_Adjustment = Height_Difference * Height_Ratio
-            if Is_Right:
-                Distance_From_Right = self._Main._Width - (self._Left + self._Width)
-                Ratio = Distance_From_Right / self._Main._Width
-                self._Left_Adjustment = Width_Difference * (1 - Ratio) - self._Width_Adjustment
-            else:
-                Ratio = self._Left / self._Main._Width
-                self._Left_Adjustment = Width_Difference * Ratio
-            if Is_Bottom:
-                Distance_From_Bottom = self._Main._Height - (self._Top + self._Height)
-                Ratio = Distance_From_Bottom / self._Main._Height
-                self._Top_Adjustment = Height_Difference * (1 - Ratio) - self._Height_Adjustment
-            else:
-                Ratio = self._Top / self._Main._Height
-                self._Top_Adjustment = Height_Difference * Ratio
-            if not self._Resize_Width and self._Move_Left and Is_Right:
-                self._Left_Adjustment += self._Width_Adjustment
-            if not self._Resize_Height and self._Move_Top and Is_Bottom:
-                self._Top_Adjustment += self._Height_Adjustment
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Adjustment -> {E}")
-            
-    def Relocate(self, Direct=False):
-        try:
-            if Direct or self._Resizable:
-                self.Adjustment()
-                if Direct or (self._Resize and self._Resize_Width):
-                    self._Width_Current = self._Width + self._Width_Adjustment
-                else:
-                    self._Width_Current = self._Width
-                if Direct or (self._Resize and self._Resize_Height):
-                    self._Height_Current = self._Height + self._Height_Adjustment
-                else:
-                    self._Height_Current = self._Height
-                if Direct or (self._Move and self._Move_Left):
-                    self._Left_Current = self._Left + self._Left_Adjustment
-                else:
-                    self._Left_Current = self._Left
-                if Direct or (self._Move and self._Move_Top):
-                    self._Top_Current = self._Top + self._Top_Adjustment
-                else:
-                    self._Top_Current = self._Top
-            else:
-                self._Width_Current = self._Width
-                self._Height_Current = self._Height
-                self._Left_Current = self._Left
-                self._Top_Current = self._Top
-            self._Width_Frame = self._Width_Current
-            self._Height_Frame = self._Height_Current
-            self._Frame.config(width=self._Width_Frame, height=self._Height_Frame)
-            if self._Display:
-                self.Display()
-            if self._Last:
-                self.Update(self._Last)
-            else:
-                self.Update_All()
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Relocate -> {E}")
-            
-    def Resize(self, Trigger=True):
-        try:
-            self.Relocate()
-            if self._Resizable:
-                for Each in self._Widget:
-                    try:
-                        if Each._Display:
-                            Each.Resize()
-                    except Exception:
-                        self.Nothing = False
-            if self._On_Resize and Trigger:
-                self._On_Resize()
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Resize -> {E}")
 
     def Hide_Item(self, Item=False):
         try:

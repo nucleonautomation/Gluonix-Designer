@@ -1,5 +1,14 @@
 # Change Log
 
+## V(6.3)
+- Gluonix Library Speed Optimizations
+- Removed Interactive Image
+- Added Dynamic Image For Both Regular Image & Canvas Image, Same Behavior As Interactive Image
+- Removed All Lite Widgets
+- Async Image Open For Large & URL Images
+- Scroll Contrainer Scrollbar Optimizations
+- Bug Filex
+
 ## V(6.2)
 - Bux Fixes In ALL Image Widget Open, Error Out With Array
 - Removed rquests Dependency In PIP Install

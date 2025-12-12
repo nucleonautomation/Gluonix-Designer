@@ -7,7 +7,6 @@ class Canvas_Oval:
         self._Canvas = Main
         self._Config = ['Name', 'Outline', 'Fill', 'Width', 'Height', 'Left', 'Top', 'Animate_Left', 'Animate_Top', 'Animate_Width', 'Animate_Height', 'Animate_Time', 'Thickness', 'Resize']
         self._Display = True
-        self._Resize_Index = 0
         self._Resize = True
         self._Name = False
         self._Last_Name = False
@@ -28,7 +27,7 @@ class Canvas_Oval:
         self._Width, self._Height, self._Left, self._Top = 0, 0, 0, 0
         self._Widget = self._Canvas._Frame.create_oval(0, 0, 0, 0, outline=self._Outline, width=self._Thickness, fill=self._Fill)
         self._Canvas._Widget.append(self)
-        self._Resizable = self._Canvas._Resizable
+        self._Canvas._Item.append(self)
         self._On_Show = False
         self._On_Hide = False
         self._On_Animate = False
@@ -47,7 +46,7 @@ class Canvas_Oval:
                 Temp_Main = Main
                 Temp_Type = Temp_Main._Type
                 while Temp_Type=='Group':
-                    Temp_Main = Main._Main
+                    Temp_Main = Temp_Main._Main
                     Temp_Type = Temp_Main._Type
                 if Temp_Type=='Canvas' or Temp_Type=='Scroll':
                     Instance = type(self)(Main)
@@ -56,7 +55,7 @@ class Canvas_Oval:
                             setattr(Instance, "_"+Key, getattr(self, "_"+Key))
                     if Name:
                         setattr(Instance, "_Name", Name)
-                    Instance.Relocate()
+                    Instance.Create()
                     return Instance
                 else:
                     raise Exception('Widget can only copy to Canvas/Scroll')
@@ -77,25 +76,17 @@ class Canvas_Oval:
             
     def Show(self):
         try:
+            if not self._Display and self._Resize and self._Canvas._Type!='Scroll':
+                self.Create()
+            self._Canvas._Frame.itemconfigure(self._Widget, state='normal')
+            self._Canvas._Frame.tag_raise(self._Widget)
             self._Display = True
-            if self._Resizable and self._Resize_Index<self._Canvas._GUI._Resize_Index:
-                self.Resize()
-            else:
-                self.Display()
             if self._On_Show:
                 self._On_Show()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Show -> {E}")
-
-    def Display(self):
-        try:
-            self._Canvas._Frame.itemconfigure(self._Widget, state='normal')
-            self._Canvas._Frame.tag_raise(self._Widget)
-            self._Display = True
-        except Exception as E:
-            self._Canvas._GUI.Error(f"{self._Type} -> Display -> {E}")
             
-    def Animate(self, Hide=False):
+    def Animate(self, Hide=False, Thread=True):
         try:
             self.Animate_Cancel()
             Final_Left = float(self._Left)
@@ -183,9 +174,12 @@ class Canvas_Oval:
                     if Sleep_For > 0:
                         time.sleep(Sleep_For)
             self.Show()
-            T = threading.Thread(target=Worker, daemon=True)
-            self._Anim_Thread = T
-            T.start()
+            if Thread:
+                T = threading.Thread(target=Worker, daemon=True)
+                self._Anim_Thread = T
+                T.start()
+            else:
+                Worker()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Animate -> {E}")
             self.Animate_Cancel()
@@ -243,7 +237,7 @@ class Canvas_Oval:
                     setattr(self, "_"+Each+"_Current", Value)
                     Run = True
             if Run:
-                self.Relocate()
+                self.Create()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Config -> {E}")
             
@@ -278,7 +272,7 @@ class Canvas_Oval:
             if Top is not None:
                 self._Top = Top
             if Left is not None or Top is not None:
-                self.Relocate()
+                self.Create()
             return [self._Left, self._Top]
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Position -> {E}")
@@ -290,15 +284,36 @@ class Canvas_Oval:
             if Height:
                 self._Height = Height
             if Width or Height:
-                self.Relocate()
+                self.Create()
             return [self._Width, self._Height]
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Size -> {E}")
+            
+    def Box(self):
+        try:
+            Box = self._Canvas._Frame.bbox(self._Widget)
+            X1, Y1, X2, Y2 = Box
+            Width = X2 - X1
+            Height = Y2 - Y1
+            return [X1, Y1, Width, Height]
+        except Exception as E:
+            self._Canvas._GUI.Error(f"{self._Type} -> Box -> {E}")
         
     def Create(self):
         try:
+            if self._Resize and self._Canvas._Type!='Scroll':
+                Left, Right, Width, Height = self._Canvas.Box()
+                Width_Ratio = Width/self._Canvas._Width
+                Height_Ratio = Height/self._Canvas._Height
+            else:
+                Width_Ratio = 1
+                Height_Ratio = 1
+            self._X1 = abs(self._Left)
+            self._Y1 = abs(self._Top)
+            self._X2 = abs(self._Left + self._Width)
+            self._Y2 = abs(self._Top + self._Height)
             self._Canvas._Frame.itemconfig(self._Widget, outline=self._Outline, width=self._Thickness, fill=self._Fill)
-            self._Canvas._Frame.coords(self._Widget, self._X1_Current, self._Y1_Current, self._X2_Current, self._Y2_Current)
+            self._Canvas._Frame.coords(self._Widget, self._X1*Width_Ratio, self._Y1*Height_Ratio, self._X2*Width_Ratio, self._Y2*Height_Ratio)
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
                     if self._Last_Name in self._Canvas.__dict__:
@@ -308,36 +323,12 @@ class Canvas_Oval:
                 self._Last_Name = self._Name
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Create -> {E}")
-
-    def Adjustment(self):
-        try:
-            self._Width_Ratio = self._Canvas._Width_Current / self._Canvas._Width
-            self._Height_Ratio = self._Canvas._Height_Current / self._Canvas._Height
-        except Exception as E:
-            self._Canvas._GUI.Error(f"{self._Type} -> Adjustment -> {E}")
             
-    def Relocate(self, Direct=False):
+    def Resize(self, Event):
         try:
-            if Direct or (self._Resize and self._Resizable):
-                self.Adjustment()
-                self._X1_Current = self._Left * self._Width_Ratio
-                self._X2_Current = (self._Left + self._Width) * self._Width_Ratio
-                self._Y1_Current = self._Top * self._Height_Ratio
-                self._Y2_Current = (self._Top + self._Height) * self._Height_Ratio
-            else:
-                self._X1_Current = self._Left
-                self._X2_Current = (self._Left + self._Width)
-                self._Y1_Current = self._Top
-                self._Y2_Current = (self._Top + self._Height)
-            self.Create()
+            self._Canvas._Frame.itemconfigure(self._Widget, state='normal')
+            self._Canvas._Frame.tag_raise(self._Widget)
             if self._Display:
-                self.Display()
-        except Exception as E:
-            self._Canvas._GUI.Error(f"{self._Type} -> Relocate -> {E}")
-            
-    def Resize(self):
-        try:
-            self._Resize_Index = self._Canvas._GUI._Resize_Index
-            self.Relocate()
+                self.Create()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Resize -> {E}")

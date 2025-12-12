@@ -33,7 +33,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 # -------------------------------------------------------------------------------------------------------------------------------
 Title = "Gluonix Designer - Nucleon Automation"
 Version = 6
-Revision = 2
+Revision = 3
 Error_List = []
 Error_Display = True
 Error_Log = True
@@ -176,11 +176,11 @@ def Version_Check():
                 Parsed = json.loads(Data.decode("utf-8"))
                 Latest_Version = float(Parsed["info"]["version"])
         if Latest_Version>Current_Version:
-            Main.Home.Project.New_Label.Set(f"Update Available V({Latest_Version})")
-            Main.Home.Project.New_Label.Show()
+            Main.Home.Project.New_Version_Label.Set(f"Update Available V({Latest_Version})")
+            Main.Home.Project.New_Version_Label.Show()
             GUI.Config(Title=f"{Title} - Update Available V({Latest_Version})")
         else:
-            Main.Home.Project.New_Label.Hide()
+            Main.Home.Project.New_Version_Label.Hide()
     except:
         pass
         

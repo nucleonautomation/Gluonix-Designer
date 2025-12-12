@@ -8,7 +8,6 @@ class Canvas_Text:
         self._Canvas = Main
         self._Config = ['Name', 'Width', 'Height', 'Left', 'Top', 'Color', 'Background', 'Size', 'Value', 'Weight', 'Font', 'Resize', 'Justify', 'Anchor', 'Resize_Font', 'Vertical', 'Rotate', 'Skew_Horizontal', 'Skew_Vertical']
         self._Display = True
-        self._Resize_Index = 0
         self._Resize = True
         self._Name = False
         self._Last_Name = False
@@ -29,13 +28,39 @@ class Canvas_Text:
         self._Skew_Vertical = 0
         self._Widget = self._Canvas.Image()
         self._Widget.Config(Name = False, Transparent = True)
-        self._Resizable = self._Canvas._Resizable
+        self._Canvas._Item.append(self._Widget)
 
     def __str__(self):
         return "Nucleon_Glunoix_Canvas_Text[]"
 
     def __repr__(self):
         return "Nucleon_Glunoix_Canvas_Text[]"
+
+    def Copy(self, Name=False, Main=False):
+        try:
+            if not Main:
+                Main = self._Canvas
+            if Main._Type in ['Canvas', 'Scroll', 'Group']:
+                Temp_Main = Main
+                Temp_Type = Temp_Main._Type
+                while Temp_Type=='Group':
+                    Temp_Main = Temp_Main._Main
+                    Temp_Type = Temp_Main._Type
+                if Temp_Type=='Canvas' or Temp_Type=='Scroll':
+                    Instance = type(self)(Main)
+                    for Key in self._Config:
+                        if hasattr(self, "_"+Key):
+                            setattr(Instance, "_"+Key, getattr(self, "_"+Key))
+                    if Name:
+                        setattr(Instance, "_Name", Name)
+                    Instance.Create()
+                    return Instance
+                else:
+                    raise Exception('Widget can only copy to Canvas/Scroll')
+            else:
+                raise Exception('Widget can only copy to Canvas/Scroll')
+        except Exception as E:
+            self._Canvas._GUI.Error(f"{self._Type} -> Copy -> {E}")
 
     def Delete(self):
         try:
@@ -112,7 +137,7 @@ class Canvas_Text:
             if Forward:
                 self._Widget.Config(**Forward)
             if Run:
-                self.Relocate()
+                self.Create()
         except Exception as Error:
             self._Canvas._GUI.Error(f"{self._Type} -> Config -> {Error}")
 
@@ -148,7 +173,7 @@ class Canvas_Text:
                 self._Top = Top
             if Left is not None or Top is not None:
                 self._Widget.Position(self._Left, self._Top)
-                self.Relocate()
+                self.Create()
             return [self._Left, self._Top]
         except Exception as Error:
             self._Canvas._GUI.Error(f"{self._Type} -> Position -> {Error}")
@@ -161,10 +186,16 @@ class Canvas_Text:
                 self._Height = Height
             if Width or Height:
                 self._Widget.Size(self._Width, self._Height)
-                self.Relocate()
+                self.Create()
             return [self._Width, self._Height]
         except Exception as Error:
             self._Canvas._GUI.Error(f"{self._Type} -> Size -> {Error}")
+            
+    def Box(self):
+        try:
+            return self._Widget.Box()
+        except Exception as E:
+            self._Canvas._GUI.Error(f"{self._Type} -> Box -> {E}")
 
     def Bind(self, **Input):
         try:
@@ -186,40 +217,15 @@ class Canvas_Text:
                 self._Last_Name = self._Name
         except Exception as Error:
             self._Canvas._GUI.Error(f"{self._Type} -> Create -> {Error}")
-
-    def Relocate(self, Direct = False):
+            
+    def Resize(self, Event):
         try:
-            if self._Resize and self._Resizable:
-                Width_Ratio = self._Canvas._Width_Current / self._Canvas._Width
-                Height_Ratio = self._Canvas._Height_Current / self._Canvas._Height
-                self._X_Current = self._Left * Width_Ratio
-                self._Y_Current = self._Top * Height_Ratio
-                self._Width_Current = self._Width * Width_Ratio
-                self._Height_Current = self._Height * Height_Ratio
-            else:
-                self._X_Current = self._Left
-                self._Y_Current = self._Top
-                self._Width_Current = self._Width
-                self._Height_Current = self._Height
-            if self._Resize_Font:
-                Width_Ratio = self._Canvas._Width_Current / self._Canvas._Width
-                Height_Ratio = self._Canvas._Height_Current / self._Canvas._Height
-                Size_Value = math.floor(self._Size * (Width_Ratio if Width_Ratio < Height_Ratio else Height_Ratio))
-            else:
-                Size_Value = self._Size
-            self._Size_Current = Size_Value
-            self.Create()
+            self._Canvas._Frame.itemconfigure(self._Widget, state='normal')
+            self._Canvas._Frame.tag_raise(self._Widget)
             if self._Display:
-                self.Display()
-        except Exception as Error:
-            self._Canvas._GUI.Error(f"{self._Type} -> Relocate -> {Error}")
-
-    def Resize(self):
-        try:
-            self._Resize_Index = self._Canvas._GUI._Resize_Index
-            self.Relocate()
-        except Exception as Error:
-            self._Canvas._GUI.Error(f"{self._Type} -> Resize -> {Error}")
+                self.Create()
+        except Exception as E:
+            self._Canvas._GUI.Error(f"{self._Type} -> Resize -> {E}")
 
     def Render(self):
         try:

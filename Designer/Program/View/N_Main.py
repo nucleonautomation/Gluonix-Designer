@@ -15,7 +15,7 @@ class Main:
             self.Widget = []
             #Frame
             Fixture = self.Global['GUI'].Locate(100, 100, 0, 0)
-            self.Frame = self.Global['Gluonix'].Scroll(self.Global['GUI'])
+            self.Frame = self.Global['Gluonix'].Frame(self.Global['GUI'])
             self.Frame.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Frame.Config(Border_Size=0, Scrollbar=20)
             self.Frame.Config(Resize=True, Move=True)

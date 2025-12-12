@@ -129,9 +129,11 @@ def Load_Child(Parent, Root, Global):
     try:
         Widgets = Database.Get(f"SELECT * FROM `Widget` WHERE `Root`='{Parent}'", Keys=True)
         for Widget in Widgets:
+            if Widget['Type'].endswith('_Lite'):
+                Widget['Type'] = Widget['Type'][:-5]
             if Widget['Type']=='Image':
-                if bool(Widget['Interactive']):
-                    Temp_Class = getattr(Gluonix, "Image_Zoom")
+                if bool(Widget['Dynamic']):
+                    Temp_Class = getattr(Gluonix, "Dynamic_Image")
                 else:
                     Temp_Class = getattr(Gluonix, f"{Widget['Type']}")
             else:
@@ -150,9 +152,7 @@ def Load_Child(Parent, Root, Global):
             Temp_Widget.Config(Foreground=Widget['Foreground'], Border_Size=Widget['Border_Size'], Border_Color=Widget['Border_Color'], Radius=Widget['Radius'], Display=bool(Widget['Display']), Disable=bool(Widget['Disabled']))
             Temp_Widget.Config(Font_Size=Widget['Font_Size'], Font_Weight=Widget['Font_Weight'], Font_Family=Widget['Font_Family'], Align=Widget['Align'], Value=Widget['Value'])
             Temp_Widget.Config(Shadow_Size=Widget['Shadow_Size'], Shadow_Color=Widget['Shadow_Color'], Shadow_Full=Widget['Shadow_Full'])
-            Temp_Widget.Config(Resize=True, Move=True)
-            Temp_Widget.Config(Resize_Width=bool(Widget['Resize_Width']), Resize_Height=bool(Widget['Resize_Height']))
-            Temp_Widget.Config(Move_Left=bool(Widget['Move_Left']), Move_Top=bool(Widget['Move_Top']))
+            Temp_Widget.Config(Resize=bool(Widget['Resize']))
             Temp_Widget.Config(Progress=Widget['Progress'], Zero=Widget['Zero'], Increment=Widget['Increment'], Mimimum=Widget['Minimum'], Maximum=Widget['Maximum'])
             Temp_Widget.Config(Path=File(Widget['ID']))
             Temp_Widget.Config(Url=bool(Widget['Url']), Transparent=bool(Widget['Transparent']), Rotate=Widget['Rotate'], Compound=Widget['Compound'], Aspect_Ratio=bool(Widget['Aspect_Ratio']))
@@ -161,7 +161,13 @@ def Load_Child(Parent, Root, Global):
             Temp_Widget.Create()
         Items = Database.Get(f"SELECT * FROM `Item` WHERE `Root`='{Parent}'", Keys=True)
         for Item in Items:
-            Temp_Class = getattr(Gluonix, f"{Item['Type']}")
+            if Item['Type']=='Canvas_Image':
+                if bool(Item['Dynamic']):
+                    Temp_Class = getattr(Gluonix, "Canvas_Dynamic_Image")
+                else:
+                    Temp_Class = getattr(Gluonix, f"{Item['Type']}")
+            else:
+                Temp_Class = getattr(Gluonix, f"{Item['Type']}")
             Temp_Item = Temp_Class(Root)
             Fixture = [Item['Width'], Item['Height'], Item['Left'], Item['Top']]
             Temp_Item.Config(Name=Item['Name'])
@@ -174,7 +180,7 @@ def Load_Child(Parent, Root, Global):
             Temp_Item.Config(Size=Item['Size'], Weight=Item['Weight'], Font=Item['Font'], Value=Item['Value'])
             Temp_Item.Config(Thickness=Item['Thickness'], Fill=Item['Fill'], Outline=Item['Outline'], Color=Item['Color'])
             Temp_Item.Config(Justify=Item['Justify'], Anchor=Item['Anchor'])
-            Temp_Item.Config(Resize=bool(Item['Resize']), Move=bool(Item['Move']), Vertical=bool(Item['Vertical']))
+            Temp_Item.Config(Resize=bool(Item['Resize']), Vertical=bool(Item['Vertical']))
             Temp_Item.Config(Skew_Horizontal=Item['Skew_Horizontal'], Skew_Vertical=Item['Skew_Vertical'])
             Temp_Item.Config(Angle=Item['Angle'])
             Temp_Item.Config(Url=bool(Item['Url']), Array=bool(Item['Array']), Pil=bool(Item['Pil']), Transparent=bool(Item['Transparent']), Rotate=Item['Rotate'], Aspect_Ratio=bool(Item['Aspect_Ratio']))
@@ -196,9 +202,7 @@ def Load_Child(Parent, Root, Global):
                 Temp_Frame.Config(Background=Frame['Background'])
             Temp_Frame.Config(Border_Size=Frame['Border_Size'], Border_Color=Frame['Border_Color'], Radius=Frame['Radius'], Display=bool(Frame['Display']))
             Temp_Frame.Config(Shadow_Size=Frame['Shadow_Size'], Shadow_Color=Frame['Shadow_Color'], Shadow_Full=Frame['Shadow_Full'])
-            Temp_Frame.Config(Resize=True, Move=True)
-            Temp_Frame.Config(Resize_Width=bool(Frame['Resize_Width']), Resize_Height=bool(Frame['Resize_Height']))
-            Temp_Frame.Config(Move_Left=bool(Frame['Move_Left']), Move_Top=bool(Frame['Move_Top']))
+            Temp_Frame.Config(Resize=bool(Frame['Resize']))
             Temp_Frame.Create()
             Load_Child(Frame['ID'], Temp_Frame, Global)
     except Exception as E:

@@ -41,8 +41,9 @@ class New:
             Fixture = self.Frame.Locate(70, 6, 13, 16)
             self.Name_Entry = self.Global['Gluonix'].Entry(self.Frame)
             self.Name_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
-            self.Name_Entry.Config(Background='white', Foreground='black', Font_Size=10, Font_Weight='normal', Align='left', Border_Size=1)
+            self.Name_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=10, Font_Weight='normal', Align='left', Border_Size=1)
             self.Name_Entry.Bind(On_Key_Release=lambda E: self.Update_Path())
+            self.Name_Entry.Config(Hover_Background='#EEEEEE', Hover_Border_Color='#0078d7')
             self.Name_Entry.Create()
             
                 #Location Label
@@ -56,8 +57,9 @@ class New:
             Fixture = self.Frame.Locate(70, 6, 13, 24)
             self.Location_Entry = self.Global['Gluonix'].Entry(self.Frame)
             self.Location_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
-            self.Location_Entry.Config(Background='white', Foreground='black', Font_Size=10, Font_Weight='normal', Align='left', Border_Size=1)
+            self.Location_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=10, Font_Weight='normal', Align='left', Border_Size=1)
             self.Location_Entry.Bind(On_Key_Release=lambda E: self.Update_Path())
+            self.Location_Entry.Config(Hover_Background='#EEEEEE', Hover_Border_Color='#0078d7')
             self.Location_Entry.Create()
             
                 #Location Browser
@@ -65,8 +67,7 @@ class New:
             self.Location_Browser = self.Global['Gluonix'].Label(self.Frame)
             self.Location_Browser.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Location_Browser.Config(Background='#e1e1e1', Foreground='black', Value='Browser...', Font_Size=9, Font_Weight='normal', Border_Size=1, Border_Color='#adadad')
-            self.Location_Browser.Bind(On_Hover_In=lambda E: self.Location_Browser.Config(Border_Color='#0078d7', Background='#d5dcf0'))
-            self.Location_Browser.Bind(On_Hover_Out=lambda E: self.Location_Browser.Config(Border_Color='#adadad', Background='#e1e1e1'))
+            self.Location_Browser.Config(Hover_Background='#d5dcf0', Hover_Border_Color='#0078d7')
             self.Location_Browser.Bind(On_Click=lambda E: self.Project_Folder())
             self.Location_Browser.Create()
             
@@ -77,7 +78,6 @@ class New:
             self.Project_Path_Label.Config(Foreground='black', Font_Size=9, Font_Weight='normal', Align='w', Border_Size=0)
             self.Project_Path_Label.Config(Value="The project will be created in")
             self.Project_Path_Label.Create()
-            self.Location_Browser.Create()
             
                 #Project Path
             Fixture = self.Frame.Locate(70, 15, 13, 38.5)
@@ -98,6 +98,7 @@ class New:
             self.Type_Select = self.Global['Gluonix'].Select(self.Frame)
             self.Type_Select.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Type_Select.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Type_Select.Config(Hover_Background='#EEEEEE', Hover_Border_Color='#0078d7')
             self.Type_Select.Add('Design')
             self.Type_Select.Add('Runtime')
             self.Type_Select.Create()
@@ -108,8 +109,7 @@ class New:
             self.Ok_Button = self.Global['Gluonix'].Label(self.Frame)
             self.Ok_Button.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Ok_Button.Config(Background='#e1e1e1', Foreground='black', Value='OK', Font_Size=9, Font_Weight='normal', Border_Size=1, Border_Color='#adadad')
-            self.Ok_Button.Bind(On_Hover_In=lambda E: self.Ok_Button.Config(Border_Color='#0078d7', Background='#d5dcf0'))
-            self.Ok_Button.Bind(On_Hover_Out=lambda E: self.Ok_Button.Config(Border_Color='#adadad', Background='#e1e1e1'))
+            self.Ok_Button.Config(Hover_Background='#d5dcf0', Hover_Border_Color='#0078d7')
             self.Ok_Button.Bind(On_Click=lambda E: self.Create())
             self.Ok_Button.Create()
             
@@ -118,8 +118,7 @@ class New:
             self.Cancel_Button = self.Global['Gluonix'].Label(self.Frame)
             self.Cancel_Button.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Cancel_Button.Config(Background='#e1e1e1', Foreground='black', Value='Cancel', Font_Size=9, Font_Weight='normal', Border_Size=1, Border_Color='#adadad')
-            self.Cancel_Button.Bind(On_Hover_In=lambda E: self.Cancel_Button.Config(Border_Color='#0078d7', Background='#d5dcf0'))
-            self.Cancel_Button.Bind(On_Hover_Out=lambda E: self.Cancel_Button.Config(Border_Color='#adadad', Background='#e1e1e1'))
+            self.Cancel_Button.Config(Hover_Background='#d5dcf0', Hover_Border_Color='#0078d7')
             self.Cancel_Button.Bind(On_Click=lambda E: self.Frame.Hide())
             self.Cancel_Button.Create()
                 

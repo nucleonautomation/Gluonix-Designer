@@ -12,16 +12,14 @@ class Frame:
         if self._GUI is not None:
             self._Type = "Frame"
             try:
-                self._Config = ['Name', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Border_Color', 'Light_Border_Color', 'Dark_Border_Color', 'Border_Size', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Animate_Left', 'Animate_Top', 'Animate_Width', 'Animate_Height', 'Animate_Time', 'Hover_Background', 'Light_Hover_Background', 'Dark_Hover_Background', 'Hover_Border_Color', 'Light_Hover_Border_Color', 'Dark_Hover_Border_Color']
+                self._Config = ['Name', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Border_Color', 'Light_Border_Color', 'Dark_Border_Color', 'Border_Size', 'Resize', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Animate_Left', 'Animate_Top', 'Animate_Width', 'Animate_Height', 'Animate_Time', 'Hover_Background', 'Light_Hover_Background', 'Dark_Hover_Background', 'Hover_Border_Color', 'Light_Hover_Border_Color', 'Dark_Hover_Border_Color']
                 self._Initialized = False
                 self._Widget = []
                 self._Name = False
                 self._Last_Name = False
-                self._Resize_Font, self._Resize, self._Resize_Width, self._Resize_Height, self._Move, self._Move_Left, self._Move_Top = False, True, True, True, True, True, True
+                self._Resize = True
                 self._Popup = False
                 self._Display = True
-                self._Size_Update = False
-                self._Resize_Index = 0
                 self._Main = Main
                 self._Frame = TK.Frame(self._Main._Frame)
                 self._Border_Color = '#000000'
@@ -42,14 +40,10 @@ class Frame:
                 self._Animate_Width = 0
                 self._Animate_Height = 0
                 self._Animate_Time = 1.0
-                self._On_Resize = False
-                self._Resizable = self._Main._Resizable
                 self._Auto_Dark = True
                 self._On_Show = False
                 self._On_Hide = False
                 self._On_Animate = False
-                self._On_Hover_In = False
-                self._On_Hover_Out = False
             except Exception as E:
                 self._GUI.Error(f"{self._Type} -> Init -> {E}")
         else:
@@ -107,38 +101,57 @@ class Frame:
                 self._On_Hide()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Hide -> {E}")
+
+    def _Build_Place_Args(self, Left, Top, Width, Height):
+        try:
+            Place_Args = {}
+            Parent_Width = float(getattr(self._Main, "_Width", 0) or 0)
+            Parent_Height = float(getattr(self._Main, "_Height", 0) or 0)
+            if self._Resize and self._Main._Type!='Scroll' and Parent_Width > 0 and Parent_Height > 0:
+                Place_Args["relx"] = float(Left) / Parent_Width
+                Place_Args["rely"] = float(Top) / Parent_Height
+                if Width>0:
+                    Place_Args["relwidth"] = float(Width) / Parent_Width
+                if Height>0:
+                    Place_Args["relheight"] = float(Height) / Parent_Height
+            else:
+                Place_Args["x"] = int(round(Left))
+                Place_Args["y"] = int(round(Top))
+                if Width>0:
+                    Place_Args["width"] = int(round(Width))
+                if Height>0:
+                    Place_Args["height"] = int(round(Height))
+            return Place_Args
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> _Build_Place_Args -> {E}")
+            return {}
+
+    def _Place_Geometry(self, Left, Top, Width, Height):
+        try:
+            Place_Args = self._Build_Place_Args(Left, Top, Width, Height)
+            self._Frame.place(**Place_Args)
+            self._Frame.lift()
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> _Place_Geometry -> {E}")
             
     def Show(self):
         try:
+            if self._Animating:
+                return
             self._Display = True
-            if self._Resizable and self._Resize_Index<self._GUI._Resize_Index:
-                self.Resize()
-            else:
-                self.Display()
+            self._Place_Geometry(self._Left, self._Top, self._Width, self._Height)
             if self._On_Show:
                 self._On_Show()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Show -> {E}")
             
-    def Display(self):
-        try:
-            if self._Animating:
-                return
-            self._Frame.place(x=self._Left_Current, y=self._Top_Current, width=self._Width_Current, height=self._Height_Current)
-            self._Frame.lift()
-            self._Display = True
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Display -> {E}")
-            
-    def Animate(self, Widget=None, Hide=False):
+    def Animate(self, Widget=None, Hide=False, Thread=True):
         try:
             self.Animate_Cancel()
-            if not hasattr(self, "_Width_Current") or not hasattr(self, "_Height_Current"):
-                self.Resize(Trigger=False)
             Final_Left = float(self._Left)
             Final_Top = float(self._Top)
-            Final_Width = float(self._Width_Current)
-            Final_Height = float(self._Height_Current)
+            Final_Width = float(self._Width)
+            Final_Height = float(self._Height)
             Start_Left = float(self._Animate_Left)
             Start_Top = float(self._Animate_Top)
             Animate_Width = float(getattr(self, "_Animate_Width", 0) or 0)
@@ -149,16 +162,14 @@ class Frame:
             Same_Pos = int(round(Start_Left)) == int(round(Final_Left)) and int(round(Start_Top)) == int(round(Final_Top))
             Same_Size = int(round(Start_Width)) == int(round(Final_Width)) and int(round(Start_Height)) == int(round(Final_Height))
             if Same_Pos and (not Size_Anim or Same_Size):
-                self._Frame.place(x=int(round(Final_Left)), y=int(round(Final_Top)), width=int(round(Final_Width)), height=int(round(Final_Height)))
-                self._Frame.lift()
+                self._Place_Geometry(Final_Left, Final_Top, Final_Width, Final_Height)
                 self._Display = True
                 self.Show()
                 return
             def Show_Start():
                 if not self._Frame.winfo_exists():
                     return
-                self._Frame.place(x=int(round(Start_Left)), y=int(round(Start_Top)), width=int(round(Start_Width)), height=int(round(Start_Height)))
-                self._Frame.lift()
+                self._Place_Geometry(Start_Left, Start_Top, Start_Width, Start_Height)
                 self._Display = True
             self._Frame.after(0, Show_Start)
             Dx = Final_Left - Start_Left
@@ -170,8 +181,7 @@ class Frame:
                 def Snap_Same():
                     if not self._Frame.winfo_exists():
                         return
-                    self._Frame.place(x=int(round(Final_Left)), y=int(round(Final_Top)), width=int(round(Final_Width)), height=int(round(Final_Height)))
-                    self._Frame.lift()
+                    self._Place_Geometry(Final_Left, Final_Top, Final_Width, Final_Height)
                     self._Display = True
                     self.Show()
                 self._Frame.after(0, Snap_Same)
@@ -196,7 +206,7 @@ class Frame:
                         def Snap_Final():
                             if not self._Frame.winfo_exists():
                                 return
-                            self._Frame.place(x=int(round(Final_Left)), y=int(round(Final_Top)), width=int(round(Final_Width)), height=int(round(Final_Height)))
+                            self._Place_Geometry(Final_Left, Final_Top, Final_Width, Final_Height)
                             self._Animating = False
                             if Hide:
                                 self.Hide()
@@ -216,9 +226,9 @@ class Frame:
                             if not self._Frame.winfo_exists():
                                 return
                             if self._Animating:
-                                self._Frame.place(x=C[0], y=C[1], width=C[2], height=C[3])
+                                self._Place_Geometry(C[0], C[1], C[2], C[3])
                                 if Widget is not None:
-                                    Widget.place(x=0, y=0, width=C[2]-(self._Border_Size*2), height=C[3]-(self._Border_Size*2))
+                                    Widget.place(relx=0, rely=0, relwidth=1, relheight=1)
                         self._Frame.after(0, Post)
                     Next_Tick += Frame_Interval
                     Sleep_For = Next_Tick - time.perf_counter()
@@ -227,10 +237,13 @@ class Frame:
                         Sleep_For = Frame_Interval
                     if Sleep_For > 0:
                         time.sleep(Sleep_For)
-            self.Show()
-            T = threading.Thread(target=Worker, daemon=True)
-            self._Anim_Thread = T
-            T.start()
+            self._Display = True
+            if Thread:
+                T = threading.Thread(target=Worker, daemon=True)
+                self._Anim_Thread = T
+                T.start()
+            else:
+                Worker()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Animate -> {E}")
             self.Animate_Cancel()
@@ -272,14 +285,6 @@ class Frame:
                 self._On_Hide = Input['On_Hide']
             if 'On_Animate' in Input:
                 self._On_Animate = Input['On_Animate']
-            if "On_Resize" in Input:
-                self._On_Resize = Input["On_Resize"]
-            if 'On_Hover_In' in Input:
-                self._On_Hover_In = Input['On_Hover_In']
-            Input['On_Hover_In'] = lambda E: self.On_Hover_In(E)
-            if 'On_Hover_Out' in Input:
-                self._On_Hover_Out = Input['On_Hover_Out']
-            Input['On_Hover_Out'] = lambda E: self.On_Hover_Out(E)
             Event_Bind(self._Frame, **Input)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Bind -> {E}")
@@ -295,8 +300,6 @@ class Frame:
                 Config['Border_Color'] = self._Hover_Border_Color
             if len(Config)>0:
                 self.Config(**Config)
-            if self._On_Hover_In:
-                self._On_Hover_In(E)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> On_Hover_In -> {E}")
             
@@ -309,8 +312,6 @@ class Frame:
                 Config['Border_Color'] = self._Last_Border_Color if self._Border_Color==self._Hover_Border_Color else self._Border_Color
             if len(Config)>0:
                 self.Config(**Config)
-            if self._On_Hover_Out:
-                self._On_Hover_Out(E)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> On_Hover_Out -> {E}")
             
@@ -332,8 +333,6 @@ class Frame:
                     Value = Input[Each]
                     setattr(self, "_"+Each, Value)
                     Run = True
-            if "Width" in Input or "Height" in Input or "Left" in Input or "Top" in Input:
-                self._Size_Update = True
             if self._Initialized and Run:
                 self.Create()
             if "Background" in Input:
@@ -374,6 +373,12 @@ class Frame:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Center -> {E}")
             
+    def Box(self):
+        try:
+            return [self._Frame.winfo_x(), self._Frame.winfo_y(), self._Frame.winfo_width(), self._Frame.winfo_height()]
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Box -> {E}")
+            
     def Position(self, Left=None, Top=None):
         try:
             if Left is not None:
@@ -381,8 +386,9 @@ class Frame:
             if Top is not None:
                 self._Top = Top
             if Left is not None or Top is not None:
-                self.Relocate()
-            return [self._Left, self._Top]
+                if self._Display:
+                    self._Place_Geometry(self._Left, self._Top, 0, 0)
+            return [int(self._Left), int(self._Top)]
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Position -> {E}")
             
@@ -393,8 +399,9 @@ class Frame:
             if Height:
                 self._Height = Height
             if Width or Height:
-                self.Resize()
-            return [self._Width, self._Height]
+                if self._Display:
+                    self._Place_Geometry(self._Left, self._Top, self._Width, self._Height)
+            return [int(self._Width), int(self._Height)]
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Size -> {E}")
         
@@ -420,6 +427,7 @@ class Frame:
             
     def Create(self):
         try:
+            First_Init = not self._Initialized
             if not self._Background:
                 self._Background = self._Main._Background
                 if not hasattr(self, "_Light_Background"):
@@ -428,9 +436,8 @@ class Frame:
                     setattr(self, "_Dark_Background", self._GUI.Invert(self._Background))
             if self._Auto_Dark and not self._GUI._Dark_Mode:
                 self.Update_Color()
-            if not self._Initialized:
+            if First_Init:
                 self.Update_Color()
-                self._Width_Current, self._Height_Current, self._Left_Current, self._Top_Current = self._Width, self._Height, self._Left, self._Top
                 if not self._Display:
                     self.Hide()
                 self._Main._Widget.append(self)
@@ -440,7 +447,10 @@ class Frame:
             self._Frame['highlightbackground']=self._Border_Color
             self._Frame['highlightcolor']=self._Border_Color
             self._Frame['highlightthickness']=self._Border_Size
-            self.Resize(Trigger=False)
+            if self._Display:
+                self._Place_Geometry(self._Left, self._Top, self._Width, self._Height)
+            else:
+                self.Hide()
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
                     if self._Last_Name in self._Main.__dict__:
@@ -456,86 +466,6 @@ class Frame:
             self._GUI.Initiate_Colors(self)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Update_Color -> {E}")
-            
-    def Adjustment(self):
-        try:
-            Width_Difference = self._Main._Width_Current - self._Main._Width
-            Height_Difference = self._Main._Height_Current - self._Main._Height
-            Width_Ratio = self._Width / (self._Main._Width - self._Main._Border_Size * 2)
-            Height_Ratio = self._Height / (self._Main._Height - self._Main._Border_Size * 2)
-            Center_X = self._Left + self._Width / 2
-            Center_Y = self._Top + self._Height / 2
-            Is_Right = Center_X > self._Main._Width / 2
-            Is_Bottom = Center_Y > self._Main._Height / 2
-            self._Width_Adjustment = Width_Difference * Width_Ratio
-            self._Height_Adjustment = Height_Difference * Height_Ratio
-            if Is_Right:
-                Distance_From_Right = self._Main._Width - (self._Left + self._Width)
-                Ratio = Distance_From_Right / self._Main._Width
-                self._Left_Adjustment = Width_Difference * (1 - Ratio) - self._Width_Adjustment
-            else:
-                Ratio = self._Left / self._Main._Width
-                self._Left_Adjustment = Width_Difference * Ratio
-            if Is_Bottom:
-                Distance_From_Bottom = self._Main._Height - (self._Top + self._Height)
-                Ratio = Distance_From_Bottom / self._Main._Height
-                self._Top_Adjustment = Height_Difference * (1 - Ratio) - self._Height_Adjustment
-            else:
-                Ratio = self._Top / self._Main._Height
-                self._Top_Adjustment = Height_Difference * Ratio
-            if not self._Resize_Width and self._Move_Left and Is_Right:
-                self._Left_Adjustment += self._Width_Adjustment
-            if not self._Resize_Height and self._Move_Top and Is_Bottom:
-                self._Top_Adjustment += self._Height_Adjustment
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Adjustment -> {E}")
-
-    def Relocate(self, Direct=False):
-        try:
-            if self._Animating and not Direct:
-                return
-            if Direct or self._Resizable:
-                self.Adjustment()
-                if Direct or (self._Resize and self._Resize_Width):
-                    self._Width_Current = self._Width + self._Width_Adjustment
-                else:
-                    self._Width_Current = self._Width
-                if Direct or (self._Resize and self._Resize_Height):
-                    self._Height_Current = self._Height + self._Height_Adjustment
-                else:
-                    self._Height_Current = self._Height
-                if Direct or (self._Move and self._Move_Left):
-                    self._Left_Current = self._Left + self._Left_Adjustment
-                else:
-                    self._Left_Current = self._Left
-                if Direct or (self._Move and self._Move_Top):
-                    self._Top_Current = self._Top + self._Top_Adjustment
-                else:
-                    self._Top_Current = self._Top
-            else:
-                self._Width_Current = self._Width
-                self._Height_Current = self._Height
-                self._Left_Current = self._Left
-                self._Top_Current = self._Top
-            if self._Display:
-                self.Display()
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Relocate -> {E}")
-            
-    def Resize(self, Trigger=True):
-        try:
-            self.Relocate()
-            if self._Resizable:
-                for Each in self._Widget:
-                    try:
-                        if Each._Display:
-                            Each.Resize()
-                    except Exception:
-                        self.Nothing = False
-            if self._On_Resize and Trigger:
-                self._On_Resize()
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Resize -> {E}")
             
     def Video(self):
         try:

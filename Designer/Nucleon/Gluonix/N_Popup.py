@@ -81,8 +81,8 @@ class Popup():
                         if Current_Width >= Screen_Width and Current_Height >= (Screen_Height - 48):
                             self.Restore()
                             return
-                    self._Restore_Width = self._Width_Current
-                    self._Restore_Height = self._Height_Current
+                    self._Restore_Width = self._Width
+                    self._Restore_Height = self._Height
                     SWP_SHOWWINDOW = 0x40
                     DLL.user32.SetWindowPos(
                         Hwnd, 0, 0, 0,
@@ -95,8 +95,8 @@ class Popup():
                     if self._Frame.state() == 'zoomed':
                         self.Restore()
                         return
-                self._Restore_Width = self._Width_Current
-                self._Restore_Height = self._Height_Current
+                self._Restore_Width = self._Width
+                self._Restore_Height = self._Height
                 self._Frame.state('zoomed')
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Maximize -> {E}")
@@ -113,18 +113,18 @@ class Popup():
             ):
                 return
             if self._Restore_Width and self._Restore_Height:
-                self._Width_Current = self._Restore_Width
-                self._Height_Current = self._Restore_Height
+                self._Width = self._Restore_Width
+                self._Height = self._Restore_Height
             if not self._Toolbar:
                 if self._Window:
                     Hwnd = DLL.user32.GetParent(self._Frame.winfo_id())
                     SWP_SHOWWINDOW = 0x40
                     DLL.user32.SetWindowPos(
                         Hwnd, 0,
-                        int(self._Left_Current),
-                        int(self._Top_Current),
-                        int(self._Width_Current),
-                        int(self._Height_Current),
+                        int(self._Left),
+                        int(self._Top),
+                        int(self._Width),
+                        int(self._Height),
                         SWP_SHOWWINDOW
                     )
             else:
@@ -160,6 +160,13 @@ class Popup():
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> On_Close -> {E}")
             
+    def On_Configure(self, Event):
+        try:
+            self._Left = Event.x
+            self._Top = Event.y
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> On_Configure -> {E}")
+            
     def Hide(self):
         try:
             self._Frame.withdraw()
@@ -181,40 +188,6 @@ class Popup():
             return self.Grab_Widget(Path=Path)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Grab -> {E}")
-            
-    def Event(self, E=None):
-        try:
-            Widget = str(E.widget)
-            Frame = str(self._Frame)
-            if Widget==Frame:
-                Width = E.width
-                Height = E.height
-                Left = E.x
-                Top = E.y
-                self._Left = Left
-                self._Top = Top
-                if (Width!=self._Width_Current) or (Height!=self._Height_Current):
-                    self._Width_Current = Width
-                    self._Height_Current = Height
-                    if self._Resize_Timer:
-                        self._Frame.after_cancel(self._Resize_Timer)
-                    self._Resize_Timer = self._Frame.after(self._Resize_Delay, self.Event_Runner)
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Event -> {E}")
-            
-    def Event_Runner(self):
-        try:
-            self._Resize_Index += 1
-            for Each in self._Widget:
-                try:
-                    if Each._Display:
-                        Each.Resize()
-                except Exception:
-                    self.Nothing = False
-            if self._On_Resize:
-                self._On_Resize()
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Event_Runner -> {E}")
             
     def After(self, Delay, Function):
         try:
@@ -403,8 +376,8 @@ class Popup():
         
     def Ratio(self):
         try:
-            Width_Ratio = self._Width_Current/self._Width
-            Height_Ratio = self._Height_Current/self._Height
+            Width_Ratio = self._Width/self._Width
+            Height_Ratio = self._Height/self._Height
             return [Width_Ratio, Height_Ratio]
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Ratio -> {E}")
@@ -447,7 +420,6 @@ class Popup():
                     self._Frame.attributes('-fullscreen',True)
                     self._Frame.overrideredirect(True)
                 else:
-                    self._Frame.bind("<Configure>", self.Event)
                     if self._Alignment == 'Percentage':
                         self._Width = int(self._Frame.winfo_screenwidth() * (self._Width/100))
                         self._Height = int(self._Frame.winfo_screenheight() * (self._Height/100))
@@ -460,7 +432,8 @@ class Popup():
                         self._Frame.overrideredirect(False)
                     else:
                         self._Frame.overrideredirect(True)
-                self._Width_Current, self._Height_Current, self._Left_Current, self._Top_Current = self._Width, self._Height, self._Left, self._Top
+                self._Frame.bind("<Configure>", self.On_Configure, add="+")
+                self._Width, self._Height, self._Left, self._Top = self._Width, self._Height, self._Left, self._Top
                 if self._Menu_Enable:
                     self._Menu = TK.Menu(self._Frame)
                     self._Frame.config(menu=self._Menu)

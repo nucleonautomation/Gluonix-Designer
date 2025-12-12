@@ -48,7 +48,8 @@ class Overview:
             Fixture = self.Frame.Locate(15, 4, 72, 7)
             self.Display_Select = self.Global['Gluonix'].Select(self.Frame)
             self.Display_Select.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
-            self.Display_Select.Config(Foreground='black', Font_Size=11, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Display_Select.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=11, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Display_Select.Config(Hover_Background='#EEEEEE', Hover_Border_Color='#0078d7')
             self.Display_Select.Bind(On_Change=lambda E: self.Update(Partial=True))
             self.Display_Select.Create()
             
@@ -99,7 +100,8 @@ class Overview:
             Fixture = self.Frame.Locate(30, 5, 12, 16)
             self.Title_Entry = self.Global['Gluonix'].Entry(self.Frame)
             self.Title_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
-            self.Title_Entry.Config(Background='white', Foreground='black', Font_Size=10, Font_Weight='normal', Align='left', Border_Size=1)
+            self.Title_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=10, Font_Weight='normal', Align='left', Border_Size=1)
+            self.Title_Entry.Config(Hover_Background='#EEEEEE', Hover_Border_Color='#0078d7')
             self.Title_Entry.Create()
             
                 #Background Label
@@ -128,7 +130,8 @@ class Overview:
             Fixture = self.Frame.Locate(12, 5, 82, 16)
             self.Alignment_Select = self.Global['Gluonix'].Select(self.Frame)
             self.Alignment_Select.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
-            self.Alignment_Select.Config(Background='white', Foreground='black', Font_Size=11, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Alignment_Select.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=11, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Alignment_Select.Config(Hover_Background='#EEEEEE', Hover_Border_Color='#0078d7')
             self.Alignment_Select.Create()
             self.Alignment_Select.Add('Percentage')
             self.Alignment_Select.Add('Pixel')
@@ -144,7 +147,8 @@ class Overview:
             Fixture = self.Frame.Locate(7, 5, 12, 25)
             self.Width_Entry = self.Global['Gluonix'].Entry(self.Frame)
             self.Width_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
-            self.Width_Entry.Config(Background='white', Foreground='black', Font_Size=10, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Width_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=10, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Width_Entry.Config(Hover_Background='#EEEEEE', Hover_Border_Color='#0078d7')
             self.Width_Entry.Create()
             
                 #Height Label
@@ -158,7 +162,8 @@ class Overview:
             Fixture = self.Frame.Locate(7, 5, 31, 25)
             self.Height_Entry = self.Global['Gluonix'].Entry(self.Frame)
             self.Height_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
-            self.Height_Entry.Config(Background='white', Foreground='black', Font_Size=10, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Height_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=10, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Height_Entry.Config(Hover_Background='#EEEEEE', Hover_Border_Color='#0078d7')
             self.Height_Entry.Create()
             
                 #Left Label
@@ -172,7 +177,8 @@ class Overview:
             Fixture = self.Frame.Locate(7, 5, 49, 25)
             self.Left_Entry = self.Global['Gluonix'].Entry(self.Frame)
             self.Left_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
-            self.Left_Entry.Config(Background='white', Foreground='black', Font_Size=10, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Left_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=10, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Left_Entry.Config(Hover_Background='#EEEEEE', Hover_Border_Color='#0078d7')
             self.Left_Entry.Create()
             
                 #Top Label
@@ -186,7 +192,8 @@ class Overview:
             Fixture = self.Frame.Locate(7, 5, 67, 25)
             self.Top_Entry = self.Global['Gluonix'].Entry(self.Frame)
             self.Top_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
-            self.Top_Entry.Config(Background='white', Foreground='black', Font_Size=10, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Top_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=10, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Top_Entry.Config(Hover_Background='#EEEEEE', Hover_Border_Color='#0078d7')
             self.Top_Entry.Create()
             
                 #Full Screen Label
@@ -300,7 +307,8 @@ class Overview:
             Fixture = self.Frame.Locate(6, 5, 61, 43)
             self.Version_Entry = self.Global['Gluonix'].Spinner(self.Frame)
             self.Version_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
-            self.Version_Entry.Config(Background='white', Foreground='black', Font_Size=10, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Version_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=10, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Version_Entry.Config(Hover_Background='#EEEEEE', Hover_Border_Color='#0078d7')
             self.Version_Entry.Create()
             
                 #Revision Label
@@ -314,7 +322,8 @@ class Overview:
             Fixture = self.Frame.Locate(6, 5, 84, 43)
             self.Revision_Entry = self.Global['Gluonix'].Spinner(self.Frame)
             self.Revision_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
-            self.Revision_Entry.Config(Background='white', Foreground='black', Font_Size=10, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Revision_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=10, Font_Weight='normal', Align='center', Border_Size=1)
+            self.Revision_Entry.Config(Hover_Background='#EEEEEE', Hover_Border_Color='#0078d7')
             self.Revision_Entry.Create()
             
                 #Icon Label
@@ -336,8 +345,7 @@ class Overview:
             self.Icon_Browser = self.Global['Gluonix'].Label(self.Frame)
             self.Icon_Browser.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Icon_Browser.Config(Background='#e1e1e1', Foreground='black', Value='Browser...', Font_Size=9, Font_Weight='normal', Border_Size=1, Border_Color='#adadad')
-            self.Icon_Browser.Bind(On_Hover_In=lambda E: self.Icon_Browser.Config(Border_Color='#0078d7', Background='#d5dcf0'))
-            self.Icon_Browser.Bind(On_Hover_Out=lambda E: self.Icon_Browser.Config(Border_Color='#adadad', Background='#e1e1e1'))
+            self.Icon_Browser.Config(Hover_Background='#d5dcf0', Hover_Border_Color='#0078d7')
             self.Icon_Browser.Bind(On_Click=lambda E: self.Select_Icon())
             self.Icon_Browser.Create()
             
@@ -346,8 +354,7 @@ class Overview:
             self.Deploy_Button = self.Global['Gluonix'].Label(self.Frame)
             self.Deploy_Button.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Deploy_Button.Config(Background='#D2B4DE', Foreground='black', Value='Deploy', Font_Size=9, Font_Weight='normal', Border_Size=1, Border_Color='#5B2C6F')
-            self.Deploy_Button.Bind(On_Hover_In=lambda E: self.Deploy_Button.Config(Background='#8E44AD'))
-            self.Deploy_Button.Bind(On_Hover_Out=lambda E: self.Deploy_Button.Config(Background='#D2B4DE'))
+            self.Deploy_Button.Config(Hover_Background='#BB8FCE')
             self.Deploy_Button.Bind(On_Click=lambda E: self.Deploy())
             self.Deploy_Button.Create()
             
@@ -356,8 +363,7 @@ class Overview:
             self.Design_Button = self.Global['Gluonix'].Label(self.Frame)
             self.Design_Button.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Design_Button.Config(Background='#FAD7A0', Foreground='black', Value='Design', Font_Size=9, Font_Weight='normal', Border_Size=1, Border_Color='#935116')
-            self.Design_Button.Bind(On_Hover_In=lambda E: self.Design_Button.Config(Background='#F39C12'))
-            self.Design_Button.Bind(On_Hover_Out=lambda E: self.Design_Button.Config(Background='#FAD7A0'))
+            self.Design_Button.Config(Hover_Background='#F39C12')
             self.Design_Button.Bind(On_Click=lambda E: self.Save_Check(Launch=True, Direct=True))
             self.Design_Button.Create()
             
@@ -366,8 +372,7 @@ class Overview:
             self.Save_Button = self.Global['Gluonix'].Label(self.Frame)
             self.Save_Button.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Save_Button.Config(Background='#ABEBC6', Foreground='black', Value='Save', Font_Size=9, Font_Weight='normal', Border_Size=1, Border_Color='#1D8348')
-            self.Save_Button.Bind(On_Hover_In=lambda E: self.Save_Button.Config(Background='#2ECC71'))
-            self.Save_Button.Bind(On_Hover_Out=lambda E: self.Save_Button.Config(Background='#ABEBC6'))
+            self.Save_Button.Config(Hover_Background='#2ECC71')
             self.Save_Button.Bind(On_Click=lambda E: self.Save_Check())
             self.Save_Button.Create()
             
@@ -391,8 +396,7 @@ class Overview:
             self.Resize_Reject_Button = self.Global['Gluonix'].Label(self.Resize_Frame)
             self.Resize_Reject_Button.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Resize_Reject_Button.Config(Background='#F5B7B1', Foreground='black', Value='Reject', Font_Size=9, Font_Weight='normal', Border_Size=1, Border_Color='#1D8348')
-            self.Resize_Reject_Button.Bind(On_Hover_In=lambda E: self.Resize_Reject_Button.Config(Background='#E74C3C'))
-            self.Resize_Reject_Button.Bind(On_Hover_Out=lambda E: self.Resize_Reject_Button.Config(Background='#F5B7B1'))
+            self.Resize_Reject_Button.Config(Hover_Background='#E74C3C')
             self.Resize_Reject_Button.Bind(On_Click=lambda E: self.Resize_Reject())
             self.Resize_Reject_Button.Create()
             
@@ -401,8 +405,7 @@ class Overview:
             self.Resize_Accept_Button = self.Global['Gluonix'].Label(self.Resize_Frame)
             self.Resize_Accept_Button.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Resize_Accept_Button.Config(Background='#ABEBC6', Foreground='black', Value='Accept', Font_Size=9, Font_Weight='normal', Border_Size=1, Border_Color='#1D8348')
-            self.Resize_Accept_Button.Bind(On_Hover_In=lambda E: self.Resize_Accept_Button.Config(Background='#2ECC71'))
-            self.Resize_Accept_Button.Bind(On_Hover_Out=lambda E: self.Resize_Accept_Button.Config(Background='#ABEBC6'))
+            self.Resize_Accept_Button.Config(Hover_Background='#2ECC71')
             self.Resize_Accept_Button.Bind(On_Click=lambda E: self.Resize_Accept())
             self.Resize_Accept_Button.Create()
             
@@ -686,6 +689,11 @@ class Overview:
                 self.Deploy_Button.Set('Run' if self.Runtime else 'Deploy')
                 TempDatabase = self.Global['Gluonix'].SQL(f'{self.Project_Path}/Data/NGD.dll')
                 if not Partial:
+                    TempDatabase.Post("UPDATE `Widget` SET `Type`='Label',`Border_Size`=0 WHERE `Type`='Label_Lite'")
+                    TempDatabase.Post("UPDATE `Widget` SET `Type`='Button',`Border_Size`=0 WHERE `Type`='Button_Lite'")
+                    TempDatabase.Post("UPDATE `Widget` SET `Type`='Compound',`Border_Size`=0 WHERE `Type`='Compound_Lite'")
+                    TempDatabase.Post("UPDATE `Widget` SET `Type`='Image',`Border_Size`=0 WHERE `Type`='Image_Lite'")
+                    TempDatabase.Post("UPDATE `Widget` SET `Type`='Entry',`Border_Size`=0 WHERE `Type`='Entry_Lite'")
                     self.Project_Data = {}
                     Project_Data_Temp = TempDatabase.Get("SELECT * FROM `Variable`", Keys=True)
                     for Each in Project_Data_Temp:

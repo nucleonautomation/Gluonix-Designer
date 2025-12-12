@@ -11,17 +11,12 @@ from .N_Configure_Canvas import Configure_Canvas
 from .N_Configure_Scroll import Configure_Scroll
 from .N_Configure_Label import Configure_Label
 from .N_Configure_Roubel import Configure_Roubel
-from .N_Configure_Label_Lite import Configure_Label_Lite
 from .N_Configure_Bar import Configure_Bar
 from .N_Configure_Button import Configure_Button
-from .N_Configure_Button_Lite import Configure_Button_Lite
 from .N_Configure_Compound import Configure_Compound
-from .N_Configure_Compound_Lite import Configure_Compound_Lite
 from .N_Configure_Image import Configure_Image
-from .N_Configure_Image_Lite import Configure_Image_Lite
 from .N_Configure_Line import Configure_Line
 from .N_Configure_Entry import Configure_Entry
-from .N_Configure_Entry_Lite import Configure_Entry_Lite
 from .N_Configure_List import Configure_List
 from .N_Configure_Select import Configure_Select
 from .N_Configure_Spinner import Configure_Spinner
@@ -127,21 +122,6 @@ class Configure:
             
             #Configure Tree
             self.Configure_Tree = Configure_Tree(self.Global, self)
-            
-            #Configure Label Lite
-            self.Configure_Label_Lite = Configure_Label_Lite(self.Global, self)
-            
-            #Configure Compound Lite
-            self.Configure_Compound_Lite = Configure_Compound_Lite(self.Global, self)
-            
-            #Configure Image Lite
-            self.Configure_Image_Lite = Configure_Image_Lite(self.Global, self)
-            
-            #Configure Button Lite
-            self.Configure_Button_Lite = Configure_Button_Lite(self.Global, self)
-            
-            #Configure Button Lite
-            self.Configure_Entry_Lite = Configure_Entry_Lite(self.Global, self)
             
             #Configure Group
             self.Configure_Group = Configure_Group(self.Global, self)

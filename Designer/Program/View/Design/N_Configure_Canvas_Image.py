@@ -16,6 +16,8 @@ class Configure_Canvas_Image:
             self.Root_ID = False
             self.Element = False
             
+            Top = 0
+            
             #Frame
             Fixture = self.Configure.Frame.Locate(100, 95, 0, 5)
             self.Frame = self.Global['Gluonix'].Scroll(self.Configure.Frame)
@@ -26,224 +28,252 @@ class Configure_Canvas_Image:
             self.Configure.Widget.append(self)
             
             #Name Label
-            Fixture = self.Frame.Locate(25, 5, 3, 2)
+            Top += 2
+            Fixture = self.Frame.Locate(25, 5, 3, Top)
             self.Name_Label = self.Global['Gluonix'].Label(self.Frame)
-            self.Name_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Name_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Name_Label.Config(Foreground='#000000', Value="Name:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
             self.Name_Label.Create()
             
             #Name Entry
-            Fixture = self.Frame.Locate(60, 5, 28, 2)
+            Fixture = self.Frame.Locate(60, 5, 28, Top)
             self.Name_Entry = self.Global['Gluonix'].Entry(self.Frame)
-            self.Name_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Name_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Name_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='left', Border_Size=1)
             self.Name_Entry.Bind(On_Key_Release=lambda E: self.Update_Name())
             self.Name_Entry.Create()
             
             #Visibilty
-            Fixture = self.Frame.Locate(7, 5, 90, 2)
+            Fixture = self.Frame.Locate(7, 5, 90, Top)
             self.Visibilty_Image = {True: 'Visibilty_On', False: 'Visibilty_Off'}
             self.Visibilty = self.Global['Gluonix'].Image(self.Frame)
-            self.Visibilty.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Visibilty.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Visibilty.Config(Border_Size=0, Path=self.Global['Image'](self.Visibilty_Image[True]))
             self.Visibilty.Bind(On_Click=lambda E: self.Update_Visibilty())
             self.Visibilty.Create()
             
             #Width Label
-            Fixture = self.Frame.Locate(25, 5, 3, 9)
+            Top += 7
+            Fixture = self.Frame.Locate(25, 5, 3, Top)
             self.Width_Label = self.Global['Gluonix'].Label(self.Frame)
-            self.Width_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Width_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Width_Label.Config(Foreground='#000000', Value="Width:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
             self.Width_Label.Create()
             
             #Width Entry
-            Fixture = self.Frame.Locate(40, 5, 28, 9)
+            Fixture = self.Frame.Locate(40, 5, 28, Top)
             self.Width_Entry = self.Global['Gluonix'].Entry(self.Frame)
-            self.Width_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Width_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Width_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='center', Border_Size=1)
             self.Width_Entry.Bind(On_Key_Release=lambda E: self.Update_Width())
             self.Width_Entry.Create()
             
             #Alignment Lock
-            Fixture = self.Frame.Locate(7, 5, 73, 9)
+            Fixture = self.Frame.Locate(7, 5, 73, Top)
             self.Lock = False
             self.Lock_Image = {True: 'Lock_Closed', False: 'Lock_Open'}
             self.Alignment_Lock = self.Global['Gluonix'].Image(self.Frame)
-            self.Alignment_Lock.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Alignment_Lock.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Alignment_Lock.Config(Border_Size=0)
             self.Alignment_Lock.Bind(On_Click=lambda E: self.Update_Lock())
             self.Alignment_Lock.Create()
             
             #Height Label
-            Fixture = self.Frame.Locate(25, 5, 3, 16)
+            Top += 7
+            Fixture = self.Frame.Locate(25, 5, 3, Top)
             self.Height_Label = self.Global['Gluonix'].Label(self.Frame)
-            self.Height_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Height_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Height_Label.Config(Foreground='#000000', Value="Height:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
             self.Height_Label.Create()
             
             #Height Entry
-            Fixture = self.Frame.Locate(40, 5, 28, 16)
+            Fixture = self.Frame.Locate(40, 5, 28, Top)
             self.Height_Entry = self.Global['Gluonix'].Entry(self.Frame)
-            self.Height_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Height_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Height_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='center', Border_Size=1)
             self.Height_Entry.Bind(On_Key_Release=lambda E: self.Update_Height())
             self.Height_Entry.Create()
             
             #Left Label
-            Fixture = self.Frame.Locate(25, 5, 3, 23)
+            Top += 7
+            Fixture = self.Frame.Locate(25, 5, 3, Top)
             self.Left_Label = self.Global['Gluonix'].Label(self.Frame)
-            self.Left_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Left_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Left_Label.Config(Foreground='#000000', Value="Left:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
             self.Left_Label.Create()
             
             #Left Entry
-            Fixture = self.Frame.Locate(40, 5, 28, 23)
+            Fixture = self.Frame.Locate(40, 5, 28, Top)
             self.Left_Entry = self.Global['Gluonix'].Entry(self.Frame)
-            self.Left_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Left_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Left_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='center', Border_Size=1)
             self.Left_Entry.Bind(On_Key_Release=lambda E: self.Update_Left())
             self.Left_Entry.Create()
             
             #Top Label
-            Fixture = self.Frame.Locate(25, 5, 3, 30)
+            Top += 7
+            Fixture = self.Frame.Locate(25, 5, 3, Top)
             self.Top_Label = self.Global['Gluonix'].Label(self.Frame)
-            self.Top_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Top_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Top_Label.Config(Foreground='#000000', Value="Top:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
             self.Top_Label.Create()
             
             #Top Entry
-            Fixture = self.Frame.Locate(40, 5, 28, 30)
+            Fixture = self.Frame.Locate(40, 5, 28, Top)
             self.Top_Entry = self.Global['Gluonix'].Entry(self.Frame)
-            self.Top_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Top_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Top_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='center', Border_Size=1)
             self.Top_Entry.Bind(On_Key_Release=lambda E: self.Update_Top())
             self.Top_Entry.Create()
             
             #Resize Label
-            Fixture = self.Frame.Locate(25, 5, 3, 37)
+            Top += 7
+            Fixture = self.Frame.Locate(25, 5, 3, Top)
             self.Resize_Label = self.Global['Gluonix'].Label(self.Frame)
-            self.Resize_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
-            self.Resize_Label.Config(Foreground='#000000', Value="Resize:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Resize_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
+            self.Resize_Label.Config(Foreground='#000000', Value="Resizable:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
             self.Resize_Label.Create()
             
             #Resize Check
-            Fixture = self.Frame.Locate(7, 5, 27.7, 37)
+            Fixture = self.Frame.Locate(7, 5, 27.7, Top)
             self.Resize_Check = self.Global['Gluonix'].Check(self.Frame)
-            self.Resize_Check.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Resize_Check.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Resize_Check.Config(Border_Size=0)
             self.Resize_Check.Bind(On_Change=lambda : self.Update_Resize())
             self.Resize_Check.Create()
             
-            #Move Label
-            Fixture = self.Frame.Locate(25, 5, 3, 44)
-            self.Move_Label = self.Global['Gluonix'].Label(self.Frame)
-            self.Move_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
-            self.Move_Label.Config(Foreground='#000000', Value="Move:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
-            self.Move_Label.Create()
+            #Dynamic Label
+            Top += 7
+            Fixture = self.Frame.Locate(25, 5, 3, Top)
+            self.Dynamic_Label = self.Global['Gluonix'].Label(self.Frame)
+            self.Dynamic_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
+            self.Dynamic_Label.Config(Foreground='#000000', Value="Dynamic:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Dynamic_Label.Create()
             
-            #Move Check
-            Fixture = self.Frame.Locate(7, 5, 27.7, 44)
-            self.Move_Check = self.Global['Gluonix'].Check(self.Frame)
-            self.Move_Check.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
-            self.Move_Check.Config(Border_Size=0)
-            self.Move_Check.Bind(On_Change=lambda : self.Update_Move())
-            self.Move_Check.Create()
+            #Dynamic Check
+            Fixture = self.Frame.Locate(7, 5, 27.7, Top)
+            self.Dynamic_Check = self.Global['Gluonix'].Check(self.Frame)
+            self.Dynamic_Check.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
+            self.Dynamic_Check.Config(Border_Size=0)
+            self.Dynamic_Check.Bind(On_Change=lambda : self.Update_Dynamic())
+            self.Dynamic_Check.Create()
             
             #Transparent Label
-            Fixture = self.Frame.Locate(25, 5, 3, 51)
+            Top += 7
+            Fixture = self.Frame.Locate(25, 5, 3, Top)
             self.Transparent_Label = self.Global['Gluonix'].Label(self.Frame)
-            self.Transparent_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Transparent_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Transparent_Label.Config(Foreground='#000000', Value="Transparent:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
             self.Transparent_Label.Create()
             
             #Transparent Check
-            Fixture = self.Frame.Locate(7, 5, 27.7, 51)
+            Fixture = self.Frame.Locate(7, 5, 27.7, Top)
             self.Transparent_Check = self.Global['Gluonix'].Check(self.Frame)
-            self.Transparent_Check.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Transparent_Check.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Transparent_Check.Config(Border_Size=0)
             self.Transparent_Check.Bind(On_Change=lambda : self.Update_Transparent())
             self.Transparent_Check.Create()
             
+            #Aspect Ratio Label
+            Top += 7
+            Fixture = self.Frame.Locate(25, 5, 3, Top)
+            self.Aspect_Ratio_Label = self.Global['Gluonix'].Label(self.Frame)
+            self.Aspect_Ratio_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
+            self.Aspect_Ratio_Label.Config(Foreground='#000000', Value="Aspect Ratio:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Aspect_Ratio_Label.Create()
+            
+            #Aspect Ratio Check
+            Fixture = self.Frame.Locate(7, 5, 27.7, Top)
+            self.Aspect_Ratio_Check = self.Global['Gluonix'].Check(self.Frame)
+            self.Aspect_Ratio_Check.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
+            self.Aspect_Ratio_Check.Config(Border_Size=0)
+            self.Aspect_Ratio_Check.Bind(On_Change=lambda : self.Update_Aspect_Ratio())
+            self.Aspect_Ratio_Check.Create()
+            
             #Rotate Label
-            Fixture = self.Frame.Locate(25, 5, 3, 58)
+            Top += 7
+            Fixture = self.Frame.Locate(25, 5, 3, Top)
             self.Rotate_Label = self.Global['Gluonix'].Label(self.Frame)
-            self.Rotate_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Rotate_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Rotate_Label.Config(Foreground='#000000', Value="Rotate:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
             self.Rotate_Label.Create()
             
             #Rotate Entry
-            Fixture = self.Frame.Locate(40, 5, 28, 58)
+            Fixture = self.Frame.Locate(40, 5, 28, Top)
             self.Rotate_Entry = self.Global['Gluonix'].Entry(self.Frame)
-            self.Rotate_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Rotate_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Rotate_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='center', Border_Size=1)
             self.Rotate_Entry.Bind(On_Key_Release=lambda E: self.Update_Rotate())
             self.Rotate_Entry.Create()
             
             #Skew Horizontal Label
-            Fixture = self.Frame.Locate(25, 5, 3, 65)
+            Top += 7
+            Fixture = self.Frame.Locate(25, 5, 3, Top)
             self.Skew_Horizontal_Label = self.Global['Gluonix'].Label(self.Frame)
-            self.Skew_Horizontal_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Skew_Horizontal_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Skew_Horizontal_Label.Config(Foreground='#000000', Value="Skew Horizontal:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
             self.Skew_Horizontal_Label.Create()
             
             #Skew Horizontal Entry
-            Fixture = self.Frame.Locate(40, 5, 28, 65)
+            Fixture = self.Frame.Locate(40, 5, 28, Top)
             self.Skew_Horizontal_Entry = self.Global['Gluonix'].Entry(self.Frame)
-            self.Skew_Horizontal_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Skew_Horizontal_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Skew_Horizontal_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='center', Border_Size=1)
             self.Skew_Horizontal_Entry.Bind(On_Key_Release=lambda E: self.Update_Skew_Horizontal())
             self.Skew_Horizontal_Entry.Create()
             
             #Skew Vertical Label
-            Fixture = self.Frame.Locate(25, 5, 3, 72)
+            Top += 7
+            Fixture = self.Frame.Locate(25, 5, 3, Top)
             self.Skew_Vertical_Label = self.Global['Gluonix'].Label(self.Frame)
-            self.Skew_Vertical_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Skew_Vertical_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Skew_Vertical_Label.Config(Foreground='#000000', Value="Skew Vertical:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
             self.Skew_Vertical_Label.Create()
             
             #Skew Vertical Entry
-            Fixture = self.Frame.Locate(40, 5, 28, 72)
+            Fixture = self.Frame.Locate(40, 5, 28, Top)
             self.Skew_Vertical_Entry = self.Global['Gluonix'].Entry(self.Frame)
-            self.Skew_Vertical_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Skew_Vertical_Entry.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Skew_Vertical_Entry.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='center', Border_Size=1)
             self.Skew_Vertical_Entry.Bind(On_Key_Release=lambda E: self.Update_Skew_Vertical())
             self.Skew_Vertical_Entry.Create()
             
             #Image Label
-            Fixture = self.Frame.Locate(25, 5, 3, 79)
+            Top += 7
+            Fixture = self.Frame.Locate(25, 5, 3, Top)
             self.Image_Label = self.Global['Gluonix'].Label(self.Frame)
-            self.Image_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Image_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Image_Label.Config(Foreground='#000000', Value="Image:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
             self.Image_Label.Create()
             
             #Delete
-            Fixture = self.Frame.Locate(7, 5, 18, 79)
+            Fixture = self.Frame.Locate(7, 5, 18, Top)
             self.Delete_Image = self.Global['Gluonix'].Image(self.Frame)
-            self.Delete_Image.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Delete_Image.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Delete_Image.Config(Path=self.Global['Image']('Delete'), Border_Size=0, Hand_Cursor=True, Display=True)
             self.Delete_Image.Bind(On_Click=lambda E: self.Show_Delete())
             self.Delete_Image.Create()
             
             #Delete Comfirm
-            Fixture = self.Frame.Locate(7, 5, 18, 86)
+            Fixture = self.Frame.Locate(7, 5, 18, Top+7)
             self.Delete_Confirm_Image = self.Global['Gluonix'].Image(self.Frame)
-            self.Delete_Confirm_Image.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Delete_Confirm_Image.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Delete_Confirm_Image.Config(Path=self.Global['Image']('Success'), Border_Size=0, Hand_Cursor=True, Display=False)
             self.Delete_Confirm_Image.Bind(On_Click=lambda E: self.Delete())
             self.Delete_Confirm_Image.Create()
             
             #Delete Cancel
-            Fixture = self.Frame.Locate(7, 5, 18, 79)
+            Fixture = self.Frame.Locate(7, 5, 18, Top)
             self.Delete_Cancel_Image = self.Global['Gluonix'].Image(self.Frame)
-            self.Delete_Cancel_Image.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Delete_Cancel_Image.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Delete_Cancel_Image.Config(Path=self.Global['Image']('Close'), Border_Size=0, Hand_Cursor=True, Display=False)
             self.Delete_Cancel_Image.Bind(On_Click=lambda E: self.Hide_Delete())
             self.Delete_Cancel_Image.Create()
             
             #Image Image
-            Fixture = self.Frame.Locate(60, 30, 28, 79)
+            Fixture = self.Frame.Locate(60, 30, 28, Top)
             self.Image_Image = self.Global['Gluonix'].Image(self.Frame)
-            self.Image_Image.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Image_Image.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Image_Image.Config(Border_Size=1)
             self.Image_Image.Bind(On_Click=lambda E: self.Update_Image())
             self.Image_Image.Create()
@@ -281,8 +311,9 @@ class Configure_Canvas_Image:
                     self.Left_Entry.Set(Widget_Data['Left'])
                     self.Top_Entry.Set(Widget_Data['Top'])
                     self.Resize_Check.Set(bool(Widget_Data['Resize']))
-                    self.Move_Check.Set(bool(Widget_Data['Move']))
+                    self.Dynamic_Check.Set(bool(Widget_Data['Dynamic']))
                     self.Transparent_Check.Set(bool(Widget_Data['Transparent']))
+                    self.Aspect_Ratio_Check.Set(bool(Widget_Data['Aspect_Ratio']))
                     self.Rotate_Entry.Set(Widget_Data['Rotate'])
                     self.Skew_Horizontal_Entry.Set(Widget_Data['Skew_Horizontal'])
                     self.Skew_Vertical_Entry.Set(Widget_Data['Skew_Vertical'])
@@ -439,12 +470,10 @@ class Configure_Canvas_Image:
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             
-    def Update_Move(self):
+    def Update_Dynamic(self):
         try:
-            Move = self.Move_Check.Get()
-            self.Configure.Design.Database.Post(f"UPDATE `Item` SET `Move`='{int(Move)}' WHERE `ID`='{self.ID}'")
-            if self.Element:
-                self.Element.Config(Move=Move)
+            Dynamic = self.Dynamic_Check.Get()
+            self.Configure.Design.Database.Post(f"UPDATE `Item` SET `Dynamic`='{int(Dynamic)}' WHERE `ID`='{self.ID}'")
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             
@@ -454,6 +483,15 @@ class Configure_Canvas_Image:
             self.Configure.Design.Database.Post(f"UPDATE `Item` SET `Transparent`='{int(Transparent)}' WHERE `ID`='{self.ID}'")
             if self.Element:
                 self.Element.Config(Transparent=Transparent)
+        except Exception as E:
+            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
+            
+    def Update_Aspect_Ratio(self):
+        try:
+            Aspect_Ratio = self.Aspect_Ratio_Check.Get()
+            self.Configure.Design.Database.Post(f"UPDATE `Item` SET `Aspect_Ratio`='{int(Aspect_Ratio)}' WHERE `ID`='{self.ID}'")
+            if self.Element:
+                self.Element.Config(Aspect_Ratio=Aspect_Ratio)
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             

@@ -19,14 +19,14 @@ class Loading:
             self.Global['Widget'].append(self.Frame)
                 #Image
             Fixture = self.Frame.Locate(20, 96, 7, 2)
-            self.Image = self.Global['Gluonix'].Image_Lite(self.Frame)
+            self.Image = self.Global['Gluonix'].Image(self.Frame)
             self.Image.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Image.Config(Path=self.Global['Image']('Loading', 'gif'))
             self.Image.Create()
             self.Image.Hide()
                 #Label
             Fixture = self.Frame.Locate(67, 96, 31, 2)
-            self.Label = self.Global['Gluonix'].Label_Lite(self.Frame)
+            self.Label = self.Global['Gluonix'].Label(self.Frame)
             self.Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Label.Config(Foreground='black', Value="Haunting In Progress...", Font_Size=10, Font_Weight='normal', Align='center')
             self.Label.Create()

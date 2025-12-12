@@ -141,7 +141,7 @@ class Stock_Canvas_RectangleR:
                     Widget.Config(Size=Widget_Data['Size'], Weight=Widget_Data['Weight'], Font=Widget_Data['Font'], Value=Widget_Data['Value'])
                     Widget.Config(Thickness=Widget_Data['Thickness'], Fill=Widget_Data['Fill'], Outline=Widget_Data['Outline'])
                     Widget.Config(Justify=bool(Widget_Data['Justify']), Anchor=bool(Widget_Data['Anchor']))
-                    Widget.Config(Resize=bool(Widget_Data['Resize']), Move=bool(Widget_Data['Move']))
+                    Widget.Config(Resize=bool(Widget_Data['Resize']))
                     Widget.Config(Skew_Horizontal=Widget_Data['Skew_Horizontal'], Skew_Vertical=Widget_Data['Skew_Vertical'])
                     Widget.Config(Angle=Widget_Data['Angle'])
                     Widget.Config(Path=f"{self.Stock.Design.Project_Path}/Data/File/{ID}")
@@ -149,7 +149,6 @@ class Stock_Canvas_RectangleR:
                     Widget.Lock = bool(Widget_Data['Lock'])
                     Widget.Create()
                     if Latest:
-                        Widget.Hide()
                         Widget.Config(Animate_Left=-1*(Left+Width), Animate_Top=-1*(Top+Height), Animate_Time=0.5)
                         Widget.Animate()
                         Configure = getattr(self.Stock.Design.Configure, f'Configure_{self.Type}')

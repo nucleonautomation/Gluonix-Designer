@@ -3,7 +3,6 @@ import os
 import sys
 import time
 import datetime
-import _thread
 from PIL import Image as PIL_Image, ImageTk as PIL_ImageTk, ImageGrab as PIL_ImageGrab
 import tkinter as TK
 from .N_Custom import Event_Bind
@@ -38,9 +37,6 @@ class GUI():
             self._Popup = []
             self._Type = "GUI"
             self._Frame = TK.Tk()
-            self._Resize_Timer = False
-            self._Resize_Delay = 200
-            self._Resize_Index = 0
             self._Title = "Nucleon Gluonix"
             self._Icon = ""
             self._Background = "#F0F0F0"
@@ -60,6 +56,8 @@ class GUI():
             self._On_Hide = False
             self._Window = False
             self._Dark_Mode = False
+            self._Style = TK.ttk.Style()
+            self._Style.theme_use('clam')
             if os.name == 'nt':
                 self._Window = True
                     
@@ -109,8 +107,8 @@ class GUI():
                         if Current_Width >= Screen_Width and Current_Height >= (Screen_Height - 48):
                             self.Restore()
                             return
-                    self._Restore_Width = self._Width_Current
-                    self._Restore_Height = self._Height_Current
+                    self._Restore_Width = self._Width
+                    self._Restore_Height = self._Height
                     SWP_SHOWWINDOW = 0x40
                     DLL.user32.SetWindowPos(
                         Hwnd, 0, 0, 0,
@@ -123,8 +121,8 @@ class GUI():
                     if self._Frame.state() == 'zoomed':
                         self.Restore()
                         return
-                self._Restore_Width = self._Width_Current
-                self._Restore_Height = self._Height_Current
+                self._Restore_Width = self._Width
+                self._Restore_Height = self._Height
                 self._Frame.state('zoomed')
         except Exception as E:
             self.Error(f"{self._Type} -> Maximize -> {E}")
@@ -141,18 +139,18 @@ class GUI():
             ):
                 return
             if self._Restore_Width and self._Restore_Height:
-                self._Width_Current = self._Restore_Width
-                self._Height_Current = self._Restore_Height
+                self._Width = self._Restore_Width
+                self._Height = self._Restore_Height
             if not self._Toolbar:
                 if self._Window:
                     Hwnd = DLL.user32.GetParent(self._Frame.winfo_id())
                     SWP_SHOWWINDOW = 0x40
                     DLL.user32.SetWindowPos(
                         Hwnd, 0,
-                        int(self._Left_Current),
-                        int(self._Top_Current),
-                        int(self._Width_Current),
-                        int(self._Height_Current),
+                        int(self._Left),
+                        int(self._Top),
+                        int(self._Width),
+                        int(self._Height),
                         SWP_SHOWWINDOW
                     )
             else:
@@ -193,6 +191,13 @@ class GUI():
         except Exception as E:
             self.Error(f"{self._Type} -> On_Close -> {E}")
             
+    def On_Configure(self, Event):
+        try:
+            self._Left = Event.x
+            self._Top = Event.y
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> On_Configure -> {E}")
+            
     def Hide(self):
         try:
             self._Frame.withdraw()
@@ -232,40 +237,6 @@ class GUI():
             self._Frame.mainloop()
         except Exception as E:
             self.Error(f"{self._Type} -> Start -> {E}")
-            
-    def Event(self, E=None):
-        try:
-            Widget = str(E.widget)
-            Frame = str(self._Frame)
-            if Widget==Frame:
-                Width = E.width
-                Height = E.height
-                Left = E.x
-                Top = E.y
-                self._Left = Left
-                self._Top = Top
-                if (Width!=self._Width_Current) or (Height!=self._Height_Current):
-                    self._Width_Current = Width
-                    self._Height_Current = Height
-                    if self._Resize_Timer:
-                        self._Frame.after_cancel(self._Resize_Timer)
-                    self._Resize_Timer = self._Frame.after(self._Resize_Delay, self.Event_Runner)
-        except Exception as E:
-            self.Error(f"{self._Type} -> Event -> {E}")
-            
-    def Event_Runner(self):
-        try:
-            self._Resize_Index += 1
-            for Each in self._Widget:
-                try:
-                    if Each._Display:
-                        Each.Resize()
-                except Exception:
-                    self.Nothing = False
-            if self._On_Resize:
-                self._On_Resize()
-        except Exception as E:
-            self.Error(f"{self._Type} -> Event_Runner -> {E}")
             
     def After(self, Delay, Function):
         try:
@@ -442,8 +413,8 @@ class GUI():
         
     def Ratio(self):
         try:
-            Width_Ratio = self._Width_Current/self._Width
-            Height_Ratio = self._Height_Current/self._Height
+            Width_Ratio = self._Width/self._Width
+            Height_Ratio = self._Height/self._Height
             return [Width_Ratio, Height_Ratio]
         except Exception as E:
             self.Error(f"{self._Type} -> Ratio -> {E}")
@@ -494,7 +465,6 @@ class GUI():
                     self._Frame.attributes('-fullscreen',True)
                     self._Frame.overrideredirect(True)
                 else:
-                    self._Frame.bind("<Configure>", self.Event)
                     if self._Alignment == 'Percentage':
                         self._Width = int(self._Frame.winfo_screenwidth() * (self._Width/100))
                         self._Height = int(self._Frame.winfo_screenheight() * (self._Height/100))
@@ -507,7 +477,8 @@ class GUI():
                         self._Frame.overrideredirect(False)
                     else:
                         self._Frame.overrideredirect(True)
-                self._Width_Current, self._Height_Current, self._Left_Current, self._Top_Current = self._Width, self._Height, self._Left, self._Top
+                self._Frame.bind("<Configure>", self.On_Configure, add="+")
+                self._Width, self._Height, self._Left, self._Top = self._Width, self._Height, self._Left, self._Top
                 if self._Menu_Enable:
                     self._Menu = TK.Menu(self._Frame)
                     self._Frame.config(menu=self._Menu)
@@ -571,6 +542,62 @@ class GUI():
                 return Hex
         except Exception as E:
             self.Error(f"{self._Type} -> Invert -> {E}")
+            
+    def Fade(self, Hex, Intensity):
+        try:
+            if Hex:
+                Html_To_Hex = {
+                    "black": "#000000",
+                    "white": "#FFFFFF",
+                    "red": "#FF0000",
+                    "green": "#008000",
+                    "blue": "#0000FF",
+                    "yellow": "#FFFF00",
+                    "cyan": "#00FFFF",
+                    "magenta": "#FF00FF",
+                    "gray": "#808080",
+                    "grey": "#808080",
+                    "orange": "#FFA500",
+                    "purple": "#800080",
+                    "pink": "#FFC0CB",
+                    "brown": "#A52A2A",
+                    "lime": "#00FF00",
+                    "navy": "#000080",
+                    "teal": "#008080",
+                    "maroon": "#800000",
+                    "olive": "#808000",
+                    "silver": "#C0C0C0"
+                }
+                if isinstance(Hex, str) and not Hex.startswith("#"):
+                    Hex = Html_To_Hex.get(Hex.lower(), Hex)
+                Hex = Hex.lstrip("#")
+                R = int(Hex[0:2], 16)
+                G = int(Hex[2:4], 16)
+                B = int(Hex[4:6], 16)
+                Intensity = float(Intensity)
+                if Intensity < 0:
+                    Intensity = 0
+                if Intensity > 200:
+                    Intensity = 200
+                if Intensity < 100:
+                    Lighten_Amount = (100 - Intensity) / 100.0
+                    R_New = int(R + (255 - R) * Lighten_Amount)
+                    G_New = int(G + (255 - G) * Lighten_Amount)
+                    B_New = int(B + (255 - B) * Lighten_Amount)
+                elif Intensity > 100:
+                    Darken_Amount = (Intensity - 100) / 100.0
+                    R_New = int(R * (1.0 - Darken_Amount))
+                    G_New = int(G * (1.0 - Darken_Amount))
+                    B_New = int(B * (1.0 - Darken_Amount))
+                else:
+                    R_New = R
+                    G_New = G
+                    B_New = B
+                return f"#{R_New:02X}{G_New:02X}{B_New:02X}"
+            else:
+                return Hex
+        except Exception as E:
+            self.Error(f"{self._Type} -> Fade -> {E}")
             
     def Initiate_Colors(self, Widget):
         try:

@@ -1,30 +1,38 @@
-from sqlite3 import connect as SQLite3_connect
-from _thread import allocate_lock as Thread_allocate_lock, get_ident as Thread_get_ident
+from sqlite3 import connect
+from threading import Lock, get_ident
 
-class SQL:
-    def __init__(self, Database):
-        self.Database = Database
-        self.Local = {}
-        self.Lock = Thread_allocate_lock()
-        self.ReturnData = False
-        self.Nothing = False
+class SQL():
+    
+    def __init__(self, Path):
+        self._Path = Path
+        self._Local = {}
+        self._Lock = Lock()
+        self._ReturnData = False
+        self._Nothing = False
 
     def __str__(self):
-        return "Sql[Database=" + str(self.Database) + "]"
+        return f"SQL[Database:{self._Path}]"
 
     def __repr__(self):
-        return "Sql[Database=" + str(self.Database) + "]"
+        return f"SQL[Database:{self._Path}]"
+
+    def __dir__(self):
+        return []
+
+    @property
+    def __dict__(self):
+        return {}
 
     def GetConnection(self):
-        ThreadId = Thread_get_ident()
-        if ThreadId not in self.Local:
-            Connection = SQLite3_connect(self.Database, uri=True, check_same_thread=False)
+        ThreadId = get_ident()
+        if ThreadId not in self._Local:
+            Connection = connect(self._Path, uri=True, check_same_thread=False)
             Connection.execute("PRAGMA journal_mode=WAL")
-            self.Local[ThreadId] = Connection
-        return self.Local[ThreadId]
+            self._Local[ThreadId] = Connection
+        return self._Local[ThreadId]
 
-    def Get(self, Command, Keys=False):
-        with self.Lock:
+    def Get(self, Command, Keys=True):
+        with self._Lock:
             Connection = self.GetConnection()
             Cursor = Connection.cursor()
             Rows = Cursor.execute(Command)
@@ -32,23 +40,23 @@ class SQL:
             if Keys and "SELECT *" in Command.upper():
                 Columns = Cursor.description
                 Column = [Name[0] for Name in Columns]
-                self.ReturnData = []
+                self._ReturnData = []
                 for Row in Rows:
                     TempRow = {Column[X]: Row[X] for X in range(len(Column))}
-                    self.ReturnData.append(TempRow)
+                    self._ReturnData.append(TempRow)
             else:
-                self.ReturnData = Rows
-            return self.ReturnData
+                self._ReturnData = Rows
+            return self._ReturnData
 
     def Post(self, Command, Keys=False):
-        with self.Lock:
+        with self._Lock:
             Connection = self.GetConnection()
             Cursor = Connection.cursor()
-            self.Nothing = Cursor.execute(Command)
+            self._Nothing = Cursor.execute(Command)
             Connection.commit()
 
     def Close(self):
-        ThreadId = Thread_get_ident()
-        if ThreadId in self.Local:
-            self.Local[ThreadId].close()
-            del self.Local[ThreadId]
+        ThreadId = get_ident()
+        if ThreadId in self._Local:
+            self._Local[ThreadId].close()
+            del self._Local[ThreadId]

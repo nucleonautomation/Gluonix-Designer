@@ -44,8 +44,7 @@ class Design:
             self.Close = self.Global['Gluonix'].Label(self.Frame)
             self.Close.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Close.Config(Background='#e1e1e1', Foreground='black', Value='Close', Font_Size=9, Font_Weight='normal', Border_Size=1, Border_Color='#adadad')
-            self.Close.Bind(On_Hover_In=lambda E: self.Close.Config(Border_Color='#0078d7', Background='#d5dcf0'))
-            self.Close.Bind(On_Hover_Out=lambda E: self.Close.Config(Border_Color='#adadad', Background='#e1e1e1'))
+            self.Close.Config(Hover_Background='#d5dcf0', Hover_Border_Color='#0078d7')
             self.Close.Bind(On_Click=lambda E: self.Close_Project())
             self.Close.Create()
             
@@ -85,7 +84,9 @@ class Design:
                         Temp_Root.Add_Menu(Name='File')
                         Temp_Root.Add_Menu(Name='Help')
                     self.Element.Default(Parent=self.Display_ID)
+                    self.Configure.Reset_All()
                     self.Configure.Hide_All()
+                    self.Element.Current = None
                     self.Frame.Show()
                     Temp_Root.Show()
                 self.Global['Loading'].Hide()

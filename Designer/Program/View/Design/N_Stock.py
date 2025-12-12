@@ -11,17 +11,12 @@ from .N_Stock_Canvas import Stock_Canvas
 from .N_Stock_Scroll import Stock_Scroll
 from .N_Stock_Label import Stock_Label
 from .N_Stock_Roubel import Stock_Roubel
-from .N_Stock_Label_Lite import Stock_Label_Lite
 from .N_Stock_Bar import Stock_Bar
 from .N_Stock_Button import Stock_Button
-from .N_Stock_Button_Lite import Stock_Button_Lite
 from .N_Stock_Compound import Stock_Compound
-from .N_Stock_Compound_Lite import Stock_Compound_Lite
 from .N_Stock_Image import Stock_Image
-from .N_Stock_Image_Lite import Stock_Image_Lite
 from .N_Stock_Line import Stock_Line
 from .N_Stock_Entry import Stock_Entry
-from .N_Stock_Entry_Lite import Stock_Entry_Lite
 from .N_Stock_List import Stock_List
 from .N_Stock_Select import Stock_Select
 from .N_Stock_Spinner import Stock_Spinner
@@ -78,7 +73,7 @@ class Stock:
             
             #Frame
             Fixture = self.Frame.Locate(100, 95, 0, 5)
-            self.Scroll = self.Global['Gluonix'].Scroll(self.Frame)
+            self.Scroll = self.Global['Gluonix'].Frame(self.Frame)
             self.Scroll.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Scroll.Config(Background='#FFFFFF', Border_Size=0, Display=True)
             self.Scroll.Config(Resize=True, Move=True)
@@ -187,48 +182,18 @@ class Stock:
             #Stock Roubel
             self.Stock_Roubel = Stock_Roubel(self.Global, self, self.Center, self.Top)
             
-            # Lite
+            # Item
             
             #Label
             self.Top += 7
             Fixture = self.Scroll.Locate(100, 3, 0, self.Top)
-            self.Label_Lite = self.Global['Gluonix'].Label(self.Scroll)
-            self.Label_Lite.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
-            self.Label_Lite.Config(Background='#FFFFFF', Border_Size=0, Display=True)
-            self.Label_Lite.Config(Foreground='#000000', Font_Size=12, Font_Weight='normal', Align='w')
-            self.Label_Lite.Config(Resize=True, Move=True)
-            self.Label_Lite.Set(' LITE WIDGET')
-            self.Label_Lite.Create()
-            
-            #Stock Label Lite
-            self.Top += 4
-            self.Stock_Label_Lite = Stock_Label_Lite(self.Global, self, self.Left, self.Top)
-            
-            #Stock Image Lite
-            self.Stock_Image_Lite = Stock_Image_Lite(self.Global, self, self.Center, self.Top)
-            
-            #Stock Compound Lite
-            self.Stock_Compound_Lite = Stock_Compound_Lite(self.Global, self, self.Right, self.Top)
-            
-            #Stock Button Lite
-            self.Top += 6
-            self.Stock_Button_Lite = Stock_Button_Lite(self.Global, self, self.Left, self.Top)
-            
-            #Stock Image Lite
-            self.Stock_Entry_Lite = Stock_Entry_Lite(self.Global, self, self.Center, self.Top)
-            
-            # Lite
-            
-            #Label
-            self.Top += 7
-            Fixture = self.Scroll.Locate(100, 3, 0, self.Top)
-            self.Label_Lite = self.Global['Gluonix'].Label(self.Scroll)
-            self.Label_Lite.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
-            self.Label_Lite.Config(Background='#FFFFFF', Border_Size=0, Display=True)
-            self.Label_Lite.Config(Foreground='#000000', Font_Size=12, Font_Weight='normal', Align='w')
-            self.Label_Lite.Config(Resize=True, Move=True)
-            self.Label_Lite.Set(' CANVAS ITEM')
-            self.Label_Lite.Create()
+            self.Label = self.Global['Gluonix'].Label(self.Scroll)
+            self.Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
+            self.Label.Config(Background='#FFFFFF', Border_Size=0, Display=True)
+            self.Label.Config(Foreground='#000000', Font_Size=12, Font_Weight='normal', Align='w')
+            self.Label.Config(Resize=True, Move=True)
+            self.Label.Set(' CANVAS ITEM')
+            self.Label.Create()
             
             #Stock Canvas Line
             self.Top += 4
@@ -261,7 +226,7 @@ class Stock:
             self.Stock_Canvas_Circle = Stock_Canvas_Circle(self.Global, self, self.Right, self.Top)
             
             #Update Scroll
-            #self.Scroll.Update(self.Stock_Button_Lite.Label)
+            #self.Scroll.Update(self.Stock_Button.Label)
                    
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))

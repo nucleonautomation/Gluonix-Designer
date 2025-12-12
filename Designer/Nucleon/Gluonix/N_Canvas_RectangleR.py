@@ -7,7 +7,6 @@ class Canvas_RectangleR:
         self._Canvas = Main
         self._Config = ['Name', 'Outline', 'Fill', 'Width', 'Height', 'Left', 'Top', 'Animate_Left', 'Animate_Top', 'Animate_Width', 'Animate_Height', 'Animate_Time', 'Angle', 'Radius', 'Thickness', 'Resize', 'Translucent', 'Alpha', 'Skew_Horizontal', 'Skew_Vertical']
         self._Display = True
-        self._Resize_Index = 0
         self._Resize = True
         self._Name = False
         self._Last_Name = False
@@ -35,7 +34,7 @@ class Canvas_RectangleR:
         self._Width_Current, self._Height_Current, self._Left_Current, self._Top_Current = 1, 1, 1, 1
         self._Widget = self._Canvas._Frame.create_polygon([0, 0, 0, 0], outline=self._Outline, width=self._Thickness, fill=self._Fill, smooth=True)
         self._Canvas._Widget.append(self)
-        self._Resizable = self._Canvas._Resizable
+        self._Canvas._Item.append(self)
         self._On_Show = False
         self._On_Hide = False
         self._On_Animate = False
@@ -54,7 +53,7 @@ class Canvas_RectangleR:
                 Temp_Main = Main
                 Temp_Type = Temp_Main._Type
                 while Temp_Type=='Group':
-                    Temp_Main = Main._Main
+                    Temp_Main = Temp_Main._Main
                     Temp_Type = Temp_Main._Type
                 if Temp_Type=='Canvas' or Temp_Type=='Scroll':
                     Instance = type(self)(Main)
@@ -63,7 +62,7 @@ class Canvas_RectangleR:
                             setattr(Instance, "_"+Key, getattr(self, "_"+Key))
                     if Name:
                         setattr(Instance, "_Name", Name)
-                    Instance.Relocate()
+                    Instance.Create()
                     return Instance
                 else:
                     raise Exception('Widget can only copy to Canvas/Scroll')
@@ -84,25 +83,17 @@ class Canvas_RectangleR:
             
     def Show(self):
         try:
+            if not self._Display and self._Resize and self._Canvas._Type!='Scroll':
+                self.Create()
+            self._Canvas._Frame.itemconfigure(self._Widget, state='normal')
+            self._Canvas._Frame.tag_raise(self._Widget)
             self._Display = True
-            if self._Resizable and self._Resize_Index<self._Canvas._GUI._Resize_Index:
-                self.Resize()
-            else:
-                self.Display()
             if self._On_Show:
                 self._On_Show()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Show -> {E}")
-
-    def Display(self):
-        try:
-            self._Canvas._Frame.itemconfigure(self._Widget, state='normal')
-            self._Canvas._Frame.tag_raise(self._Widget)
-            self._Display = True
-        except Exception as E:
-            self._Canvas._GUI.Error(f"{self._Type} -> Display -> {E}")
             
-    def Animate(self, Hide=False):
+    def Animate(self, Hide=False, Thread=True):
         try:
             self.Animate_Cancel()
             Final_Left = float(self._Left)
@@ -190,9 +181,12 @@ class Canvas_RectangleR:
                     if Sleep_For > 0:
                         time.sleep(Sleep_For)
             self.Show()
-            T = threading.Thread(target=Worker, daemon=True)
-            self._Anim_Thread = T
-            T.start()
+            if Thread:
+                T = threading.Thread(target=Worker, daemon=True)
+                self._Anim_Thread = T
+                T.start()
+            else:
+                Worker()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Animate -> {E}")
             self.Animate_Cancel()
@@ -250,7 +244,7 @@ class Canvas_RectangleR:
                     setattr(self, "_"+Each+"_Current", Value)
                     Run = True
             if Run:
-                self.Relocate()
+                self.Create()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Config -> {E}")
             
@@ -279,7 +273,7 @@ class Canvas_RectangleR:
             if Top is not None:
                 self._Top = Top
             if Left is not None or Top is not None:
-                self.Relocate()
+                self.Create()
             return [self._Left, self._Top]
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Position -> {E}")
@@ -291,16 +285,26 @@ class Canvas_RectangleR:
             if Height:
                 self._Height = Height
             if Width or Height:
-                self.Relocate()
+                self.Create()
             return [self._Width, self._Height]
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Size -> {E}")
+            
+    def Box(self):
+        try:
+            Box = self._Canvas._Frame.bbox(self._Widget)
+            X1, Y1, X2, Y2 = Box
+            Width = X2 - X1
+            Height = Y2 - Y1
+            return [X1, Y1, Width, Height]
+        except Exception as E:
+            self._Canvas._GUI.Error(f"{self._Type} -> Box -> {E}")
         
     def Angle(self, Value=None):
         try:
             if Value is not None:
                 self._Angle = Value
-                self.Relocate()
+                self.Create()
             return self._Angle
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Angle -> {E}")
@@ -309,7 +313,7 @@ class Canvas_RectangleR:
         try:
             if Value is not None:
                 self._Angle += Value
-                self.Relocate()
+                self.Create()
             return self._Angle
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Rotate -> {E}")
@@ -339,8 +343,15 @@ class Canvas_RectangleR:
             
     def Rectangle(self):
         try:
-            Width = self._Width_Current
-            Height = self._Height_Current
+            if self._Resize and self._Canvas._Type!='Scroll':
+                Left, Right, Width, Height = self._Canvas.Box()
+                Width_Ratio = Width/self._Canvas._Width
+                Height_Ratio = Height/self._Canvas._Height
+            else:
+                Width_Ratio = 1
+                Height_Ratio = 1
+            Width = self._Width*Width_Ratio
+            Height = self._Height*Height_Ratio
             Radius = min(self._Radius, Width / 2, Height / 2)
             Angle_Rad = math.radians(self._Angle)
             Steps = 5
@@ -414,7 +425,7 @@ class Canvas_RectangleR:
                 NX = (a * SX + b * SY + c) / Den
                 NY = (d * SX + e * SY + f) / Den
                 Skewed_Points.append((NX - HW, NY - HH))
-            C_X, C_Y = self._Left_Current, self._Top_Current
+            C_X, C_Y = self._Left*Width_Ratio, self._Top*Height_Ratio
             Final_Points = [self.Rotation(X, Y, 0, 0, Angle_Rad, Translate=(C_X, C_Y)) for (X, Y) in Skewed_Points]
             Flat_Points = [Coord for Point in Final_Points for Coord in Point]
             Stripple = f'gray{self.Stripple()}' if self._Translucent else ''
@@ -450,36 +461,12 @@ class Canvas_RectangleR:
                 self._Last_Name = self._Name
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Create -> {E}")
-
-    def Adjustment(self):
-        try:
-            self._Width_Ratio = self._Canvas._Width_Current / self._Canvas._Width
-            self._Height_Ratio = self._Canvas._Height_Current / self._Canvas._Height
-        except Exception as E:
-            self._Canvas._GUI.Error(f"{self._Type} -> Adjustment -> {E}")
             
-    def Relocate(self, Direct=False):
+    def Resize(self, Event):
         try:
-            if Direct or (self._Resize and self._Resizable):
-                self.Adjustment()
-                self._Left_Current = self._Left * self._Width_Ratio
-                self._Width_Current = self._Width * self._Width_Ratio
-                self._Top_Current = self._Top * self._Height_Ratio
-                self._Height_Current = self._Height * self._Height_Ratio
-            else:
-                self._Left_Current = self._Left
-                self._Width_Current = self._Width
-                self._Top_Current = self._Top
-                self._Height_Current = self._Height
-            self.Create()
+            self._Canvas._Frame.itemconfigure(self._Widget, state='normal')
+            self._Canvas._Frame.tag_raise(self._Widget)
             if self._Display:
-                self.Display()
-        except Exception as E:
-            self._Canvas._GUI.Error(f"{self._Type} -> Relocate -> {E}")
-            
-    def Resize(self):
-        try:
-            self._Resize_Index = self._Canvas._GUI._Resize_Index
-            self.Relocate()
+                self.Create()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Resize -> {E}")

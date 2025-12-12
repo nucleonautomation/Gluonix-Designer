@@ -142,7 +142,7 @@ class Stock_Canvas_Text:
                         Widget.Config(Background=Widget_Data['Background'])
                     Widget.Config(Size=Widget_Data['Size'], Weight=Widget_Data['Weight'], Font=Widget_Data['Font'], Value=Widget_Data['Value'])
                     Widget.Config(Thickness=Widget_Data['Thickness'], Fill=Widget_Data['Fill'], Outline=Widget_Data['Outline'], Color=Widget_Data['Color'])
-                    Widget.Config(Resize=bool(Widget_Data['Resize']), Move=bool(Widget_Data['Move']), Vertical=bool(Widget_Data['Vertical']))
+                    Widget.Config(Resize=bool(Widget_Data['Resize']), Vertical=bool(Widget_Data['Vertical']))
                     Widget.Config(Path=f"{self.Stock.Design.Project_Path}/Data/File/{ID}")
                     Widget.Config(Justify=Widget_Data['Justify'], Anchor=Widget_Data['Anchor'])
                     Widget.Config(Skew_Horizontal=Widget_Data['Skew_Horizontal'], Skew_Vertical=Widget_Data['Skew_Vertical'])
@@ -150,7 +150,6 @@ class Stock_Canvas_Text:
                     Widget.Lock = bool(Widget_Data['Lock'])
                     Widget.Create()
                     if Latest:
-                        Widget.Hide()
                         Widget.Config(Animate_Left=-1*(Left+Width), Animate_Top=-1*(Top+Height), Animate_Time=0.5)
                         Widget.Animate()
                         Configure = getattr(self.Stock.Design.Configure, f'Configure_{self.Type}')

@@ -2,7 +2,6 @@
 import tkinter as TK
 import threading, math, time
 from .N_GUI import GUI
-from .N_Frame import Frame
 from .N_Custom import Event_Bind
 
 class Entry:
@@ -12,23 +11,21 @@ class Entry:
         if self._GUI is not None:
             self._Type = "Entry"
             try:
-                self._Config = ['Name', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Foreground', 'Light_Foreground', 'Dark_Foreground', 'Border_Color', 'Light_Border_Color', 'Dark_Border_Color', 'Border_Size', 'Resize_Width', 'Resize', 'Resize_Height', 'Move', 'Move_Left', 'Move_Top', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Font_Size', 'Font_Weight', 'Font_Family', 'Align', 'Disable', 'Secure', 'Disable_Background', 'Disable_Foreground', 'Select_Background', 'Select_Foreground', 'Hover_Background', 'Light_Hover_Background', 'Dark_Hover_Background', 'Hover_Foreground', 'Light_Hover_Foreground', 'Dark_Hover_Foreground', 'Hover_Border_Color', 'Light_Hover_Border_Color', 'Dark_Hover_Border_Color']
+                self._Config = ['Name', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Foreground', 'Light_Foreground', 'Dark_Foreground', 'Border_Color', 'Light_Border_Color', 'Dark_Border_Color', 'Border_Size', 'Resize', 'Popup', 'Display', 'Left', 'Top', 'Width', 'Height', 'Animate_Left', 'Animate_Top', 'Animate_Width', 'Animate_Height', 'Animate_Time', 'Font_Size', 'Font_Weight', 'Font_Family', 'Align', 'Disable', 'Secure', 'Disable_Background', 'Disable_Foreground', 'Select_Background', 'Select_Foreground', 'Hover_Background', 'Light_Hover_Background', 'Dark_Hover_Background', 'Hover_Foreground', 'Light_Hover_Foreground', 'Dark_Hover_Foreground', 'Hover_Border_Color', 'Light_Hover_Border_Color', 'Dark_Hover_Border_Color']
                 self._Initialized = False
                 self._Widget = []
                 self._Name = False
                 self._Last_Name = False
-                self._Resize_Font, self._Resize, self._Resize_Width, self._Resize_Height, self._Move, self._Move_Left, self._Move_Top = True, True, True, True, True, True, True
+                self._Resize = True
                 self._Popup = False
                 self._Display = True
                 self._Size_Update = False
-                self._Resize_Index = 0
                 self._Main = Main
-                self._Frame = Frame(self._Main)
-                self._Widget = TK.Entry(self._Frame._Frame)
-                self._Border_Color = '#000000'
-                self._Border_Size = 0
+                self._Widget = TK.Entry(self._Main._Frame)
                 self._Background = self._Main._Background
                 self._Background_Main = True
+                self._Border_Color = '#000000'
+                self._Border_Size = 0
                 self._Foreground = '#000000'
                 self._Disable_Foreground = self._Foreground
                 self._Disable_Background = '#d0d3d4'
@@ -40,18 +37,26 @@ class Entry:
                 self._Last_Background = False
                 self._Last_Foreground = False
                 self._Last_Border_Color = False
+                self._Animating = False
+                self._Anim_Stop = threading.Event()
+                self._Anim_Thread = None
+                self._Animate_Ease = lambda t: (1 - (1 - t)**3)
+                self._Animate_Speed = None
+                self._Animate_Left = 0
+                self._Animate_Top = 0
+                self._Animate_Width = 0
+                self._Animate_Height = 0
+                self._Animate_Time = 1.0
                 self._Font_Size = 12
                 self._Font_Weight = 'normal'
                 self._Font_Family = 'Helvetica'
                 self._Align = 'center'
                 self._Disable = False
                 self._Secure = False
-                self._Resizable = self._Main._Resizable
                 self._Auto_Dark = True
                 self._On_Show = False
                 self._On_Hide = False
-                self._On_Hover_In = False
-                self._On_Hover_Out = False
+                self._On_Animate = False
             except Exception as E:
                 self._GUI.Error(f"{self._Type} -> Init -> {E}")
         else:
@@ -80,42 +85,66 @@ class Entry:
         
     def Delete(self):
         try:
+            self.Animate_Cancel()
             self._Main._Widget.remove(self)
             self._Widget.destroy()
-            self._Frame.Delete()
             if self:
                 del self
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Delete -> {E}")
-            
+
     def Hide(self):
         try:
-            self._Frame.Hide()
+            self.Animate_Cancel()
+            self._Widget.place_forget()
             self._Display = False
             if self._On_Hide:
                 self._On_Hide()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Hide -> {E}")
             
+    def _Build_Place_Args(self, Left, Top, Width, Height):
+        try:
+            Place_Args = {}
+            Parent_Width = float(getattr(self._Main, "_Width", 0) or 0)
+            Parent_Height = float(getattr(self._Main, "_Height", 0) or 0)
+            if self._Resize and self._Main._Type!='Scroll' and Parent_Width > 0 and Parent_Height > 0:
+                Place_Args["relx"] = float(Left) / Parent_Width
+                Place_Args["rely"] = float(Top) / Parent_Height
+                if Width>0:
+                    Place_Args["relwidth"] = float(Width) / Parent_Width
+                if Height>0:
+                    Place_Args["relheight"] = float(Height) / Parent_Height
+            else:
+                Place_Args["x"] = int(round(Left))
+                Place_Args["y"] = int(round(Top))
+                if Width>0:
+                    Place_Args["width"] = int(round(Width))
+                if Height>0:
+                    Place_Args["height"] = int(round(Height))
+            return Place_Args
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> _Build_Place_Args -> {E}")
+            return {}
+
+    def _Place_Geometry(self, Left, Top, Width, Height):
+        try:
+            Place_Args = self._Build_Place_Args(Left, Top, Width, Height)
+            self._Widget.place(**Place_Args)
+            self._Widget.lift()
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> _Place_Geometry -> {E}")
+            
     def Show(self):
         try:
+            if self._Animating:
+                return
             self._Display = True
-            if self._Resizable and self._Resize_Index<self._GUI._Resize_Index:
-                self.Resize()
-            else:
-                self.Display()
+            self._Place_Geometry(self._Left, self._Top, self._Width, self._Height)
             if self._On_Show:
                 self._On_Show()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Show -> {E}")
-            
-    def Display(self):
-        try:
-            self._Frame.Show()
-            self._Widget.place(x=0, y=0, width=self._Width_Current-(self._Border_Size*2), height=self._Height_Current-(self._Border_Size*2))
-            self._Display = True
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Display -> {E}")
             
     def Focus(self):
         try:
@@ -129,17 +158,124 @@ class Entry:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Grab -> {E}")
             
-    def Animate(self, Hide=False):
+    def Animate(self, Hide=False, Thread=True):
         try:
-            self._Frame.Animate(Widget=self._Widget)
+            self.Animate_Cancel()
+            Final_Left = float(getattr(self, "_Left", 0))
+            Final_Top = float(getattr(self, "_Top", 0))
+            Final_Width = float(getattr(self, "_Width", 0))
+            Final_Height = float(getattr(self, "_Height", 0))
+            Start_Left = float(self._Animate_Left)
+            Start_Top = float(self._Animate_Top)
+            Animate_Width = float(getattr(self, "_Animate_Width", 0) or 0)
+            Animate_Height = float(getattr(self, "_Animate_Height", 0) or 0)
+            Size_Anim = not (Animate_Width == 0 and Animate_Height == 0)
+            Start_Width = Animate_Width if Size_Anim else Final_Width
+            Start_Height = Animate_Height if Size_Anim else Final_Height
+            Same_Pos = int(round(Start_Left)) == int(round(Final_Left)) and int(round(Start_Top)) == int(round(Final_Top))
+            Same_Size = int(round(Start_Width)) == int(round(Final_Width)) and int(round(Start_Height)) == int(round(Final_Height))
+            if Same_Pos and (not Size_Anim or Same_Size):
+                def Snap_Same():
+                    if not self._Widget.winfo_exists():
+                        return
+                    self._Place_Geometry(Final_Left, Final_Top, Final_Width, Final_Height)
+                    self._Animating = False
+                    if Hide:
+                        self.Hide()
+                    if self._On_Animate:
+                        self._On_Animate()
+                self._GUI._Frame.after(0, Snap_Same)
+                return
+            def Show_Start():
+                if not self._Widget.winfo_exists():
+                    return
+                self._Place_Geometry(Start_Left, Start_Top, Start_Width, Start_Height)
+            self._GUI._Frame.after(0, Show_Start)
+            Dx = Final_Left - Start_Left
+            Dy = Final_Top - Start_Top
+            Dw = Final_Width - Start_Width if Size_Anim else 0.0
+            Dh = Final_Height - Start_Height if Size_Anim else 0.0
+            Dist = math.hypot(math.hypot(Dx, Dy), math.hypot(Dw, Dh))
+            if Dist == 0.0:
+                def Snap_Final():
+                    if not self._Widget.winfo_exists():
+                        return
+                    self._Place_Geometry(Final_Left, Final_Top, Final_Width, Final_Height)
+                    self._Animating = False
+                    if Hide:
+                        self.Hide()
+                    if self._On_Animate:
+                        self._On_Animate()
+                self._GUI._Frame.after(0, Snap_Final)
+                return
+            if self._Animate_Speed and self._Animate_Speed > 0:
+                Duration = max(0.001, Dist / float(self._Animate_Speed))
+            else:
+                Duration = max(0.001, float(self._Animate_Time))
+            Ease = self._Animate_Ease or (lambda t: t)
+            Target_FPS = 90.0
+            Frame_Interval = 1.0 / Target_FPS
+            self._Animating = True
+            Stop = self._Anim_Stop
+            def Worker():
+                T0 = time.perf_counter()
+                Next_Tick = T0
+                Last = None
+                while not Stop.is_set():
+                    Now = time.perf_counter()
+                    T = (Now - T0) / Duration
+                    if T >= 1.0:
+                        def Snap_End():
+                            if not self._Widget.winfo_exists():
+                                return
+                            self._Place_Geometry(Final_Left, Final_Top, Final_Width, Final_Height)
+                            self._Animating = False
+                            if Hide:
+                                self.Hide()
+                            if self._On_Animate:
+                                self._On_Animate()
+                        self._GUI._Frame.after(0, Snap_End)
+                        return
+                    K = Ease(max(0.0, min(1.0, T)))
+                    X = Start_Left + Dx * K
+                    Y = Start_Top + Dy * K
+                    W = Start_Width + Dw * K
+                    H = Start_Height + Dh * K
+                    Cur = (int(round(X)), int(round(Y)), int(round(W)), int(round(H)))
+                    if Cur != Last:
+                        Last = Cur
+                        def Post(C=Cur):
+                            if not self._Widget.winfo_exists():
+                                return
+                            if self._Animating:
+                                self._Place_Geometry(C[0], C[1], C[2], C[3])
+                        self._GUI._Frame.after(0, Post)
+                    Next_Tick += Frame_Interval
+                    Sleep_For = Next_Tick - time.perf_counter()
+                    if Sleep_For < -2 * Frame_Interval:
+                        Next_Tick = time.perf_counter()
+                        Sleep_For = Frame_Interval
+                    if Sleep_For > 0:
+                        time.sleep(Sleep_For)
             self.Show()
+            if Thread:
+                T = threading.Thread(target=Worker, daemon=True)
+                self._Anim_Thread = T
+                T.start()
+            else:
+                Worker()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Animate -> {E}")
             self.Animate_Cancel()
-            
+
     def Animate_Cancel(self):
         try:
-            self._Frame.Animate_Cancel()
+            self._Animating = False
+            if self._Anim_Thread and self._Anim_Thread.is_alive():
+                self._Anim_Stop.set()
+                self._Anim_Thread.join(timeout=0.2)
+            self._Anim_Stop.clear()
+            self._Anim_Thread = None
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Animate_Cancel -> {E}")
             
@@ -166,7 +302,7 @@ class Entry:
         try:
             return self._Widget
         except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Widget -> {E}")
+            self._GUI.Error(f("{self._Type} -> Widget -> {E}"))
             
     def Bind(self, **Input):
         try:
@@ -174,13 +310,8 @@ class Entry:
                 self._On_Show = Input['On_Show']
             if 'On_Hide' in Input:
                 self._On_Hide = Input['On_Hide']
-            self._Frame.Bind(**Input)
-            if 'On_Hover_In' in Input:
-                self._On_Hover_In = Input['On_Hover_In']
-            Input['On_Hover_In'] = lambda E: self.On_Hover_In(E)
-            if 'On_Hover_Out' in Input:
-                self._On_Hover_Out = Input['On_Hover_Out']
-            Input['On_Hover_Out'] = lambda E: self.On_Hover_Out(E)
+            if 'On_Animate' in Input:
+                self._On_Animate = Input['On_Animate']
             Event_Bind(self._Widget, **Input)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Bind -> {E}")
@@ -199,8 +330,6 @@ class Entry:
                 Config['Border_Color'] = self._Hover_Border_Color
             if len(Config)>0:
                 self.Config(**Config)
-            if self._On_Hover_In:
-                self._On_Hover_In(E)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> On_Hover_In -> {E}")
             
@@ -215,8 +344,6 @@ class Entry:
                 Config['Border_Color'] = self._Last_Border_Color if self._Border_Color==self._Hover_Border_Color else self._Border_Color
             if len(Config)>0:
                 self.Config(**Config)
-            if self._On_Hover_Out:
-                self._On_Hover_Out(E)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> On_Hover_Out -> {E}")
             
@@ -238,9 +365,6 @@ class Entry:
                     Value = Input[Each]
                     setattr(self, "_"+Each, Value)
                     Run = True
-            self._Frame.Config(**Input)
-            if "Width" in Input or "Height" in Input or "Left" in Input or "Top" in Input:
-                self._Size_Update = True
             if self._Initialized and Run:
                 self.Create()
             if "Background" in Input:
@@ -254,7 +378,7 @@ class Entry:
                 self._Left += Left
             if Top is not None:
                 self._Top += Top
-            if Left is not None or Top is not None:
+            if (Left is not None or Top is not None) and self._Initialized and self._Display:
                 self.Position(Left=self._Left, Top=self._Top)
             return True
         except Exception as E:
@@ -266,7 +390,7 @@ class Entry:
                 self._Left = Left-self._Width/2
             if Top is not None:
                 self._Top = Top-self._Height/2
-            if Left is not None or Top is not None:
+            if (Left is not None or Top is not None) and self._Initialized and self._Display:
                 self.Position(Left=self._Left, Top=self._Top)
             return [self._Left+self._Width/2, self._Top+self._Height/2]
         except Exception as E:
@@ -278,10 +402,10 @@ class Entry:
                 self._Left = Left
             if Top is not None:
                 self._Top = Top
-            if Left is not None or Top is not None:
-                self._Frame.Position(Left=self._Left, Top=self._Top)
-                self.Relocate()
-            return self._Frame.Position()
+            if (Left is not None or Top is not None) and self._Initialized and self._Display:
+                if self._Display and not self._Animating:
+                    self._Place_Geometry(self._Left, self._Top, 0, 0)
+            return [int(self._Left), int(self._Top)]
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Position -> {E}")
             
@@ -291,19 +415,25 @@ class Entry:
                 self._Width = Width
             if Height:
                 self._Height = Height
-            if Width or Height:
-                self._Frame.Size(Width=self._Width, Height=self._Height)
-                self.Relocate()
-            return self._Frame.Size()
+            if (Width or Height) and self._Initialized and self._Display:
+                if self._Display and not self._Animating:
+                    self._Place_Geometry(self._Left, self._Top, self._Width, self._Height)
+            return [int(self._Width), int(self._Height)]
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Size -> {E}")
+            
+    def Box(self):
+        try:
+            return [self._Widget.winfo_x(), self._Widget.winfo_y(), self._Widget.winfo_width(), self._Widget.winfo_height()]
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Box -> {E}")
         
     def Locate(self, Width, Height, Left, Top):
         try:
             Width = self._Width*(Width/100)
             Height = self._Height*(Height/100)
-            Left = self._Width*(Left/100)-self._Border_Size
-            Top = self._Height*(Top/100)-self._Border_Size
+            Left = self._Width*(Left/100)
+            Top = self._Height*(Top/100)
             return [Width, Height, Left, Top]
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Locate -> {E}")
@@ -312,8 +442,8 @@ class Entry:
         try:
             Width = round((Width/self._Width)*100, 3)
             Height = round((Height/self._Height)*100, 3)
-            Left =  round((Left/self._Width)*100, 3)
-            Top =  round((Top/self._Height)*100, 3)
+            Left = round((Left/self._Width)*100, 3)
+            Top = round((Top/self._Height)*100, 3)
             return [Width, Height, Left, Top]
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Locate_Reverse -> {E}")
@@ -330,14 +460,10 @@ class Entry:
                 self.Update_Color()
             if not self._Initialized:
                 self.Update_Color()
-                self._Width_Current, self._Height_Current, self._Left_Current, self._Top_Current, self._Font_Size_Current = self._Width, self._Height, self._Left, self._Top, self._Font_Size
-                self._Frame.Config(Width=self._Width_Current, Height=self._Height_Current, Left=self._Left_Current, Top=self._Top_Current)
-                self._Frame.Config(Background=self._Background, Border_Size=self._Border_Size, Border_Color=self._Border_Color)
-                self._Frame.Create()
-                Event_Bind(self._Widget, On_Hover_In=lambda E: self.On_Hover_In(E), On_Hover_Out=lambda E: self.On_Hover_Out(E))
                 if not self._Display:
                     self.Hide()
                 self._Main._Widget.append(self)
+                Event_Bind(self._Widget, On_Hover_In=lambda E: self.On_Hover_In(E), On_Hover_Out=lambda E: self.On_Hover_Out(E))
                 self._Initialized = True
             if self._Disable:
                 State = TK.DISABLED
@@ -347,11 +473,17 @@ class Entry:
                 Show = '*'
             else:
                 Show = ''
-            self.Font()
-            self._Font = TK.font.Font(family=self._Font_Family, size=self._Font_Size_Current, weight=self._Font_Weight)
+            
+            self._Font = TK.font.Font(family=self._Font_Family, size=self._Font_Size, weight=self._Font_Weight)
             self._Widget.config(background=self._Background, foreground=self._Foreground, font=self._Font, state=State, show=Show, justify=self._Align, bd=0, highlightthickness=0, relief=TK.FLAT)
             self._Widget.config(disabledbackground=self._Disable_Background, disabledforeground=self._Disable_Foreground, selectbackground=self._Select_Background, selectforeground=self._Select_Foreground)
-            self.Resize()
+            self._Widget['highlightbackground']=self._Border_Color
+            self._Widget['highlightcolor']=self._Border_Color
+            self._Widget['highlightthickness']=self._Border_Size
+            if self._Display:
+                self.Show()
+            else:
+                self.Hide()
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
                     if self._Last_Name in self._Main.__dict__:
@@ -367,90 +499,3 @@ class Entry:
             self._GUI.Initiate_Colors(self)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Update_Color -> {E}")
-            
-    def Font(self):
-        try:
-            if self._Resize_Font:
-                Width_Ratio = self._Frame._Width_Current / self._Frame._Width
-                Height_Ratio = self._Frame._Height_Current / self._Frame._Height
-                if Width_Ratio < Height_Ratio:
-                    self._Font_Size_Current = math.floor(self._Font_Size * Width_Ratio)
-                else:
-                    self._Font_Size_Current = math.floor(self._Font_Size * Height_Ratio)
-            else:
-                self._Font_Size_Current = self._Font_Size
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Font -> {E}")
-            
-    def Adjustment(self):
-        try:
-            Width_Difference = self._Main._Width_Current - self._Main._Width
-            Height_Difference = self._Main._Height_Current - self._Main._Height
-            Width_Ratio = self._Width / (self._Main._Width - self._Main._Border_Size * 2)
-            Height_Ratio = self._Height / (self._Main._Height - self._Main._Border_Size * 2)
-            Center_X = self._Left + self._Width / 2
-            Center_Y = self._Top + self._Height / 2
-            Is_Right = Center_X > self._Main._Width / 2
-            Is_Bottom = Center_Y > self._Main._Height / 2
-            self._Width_Adjustment = Width_Difference * Width_Ratio
-            self._Height_Adjustment = Height_Difference * Height_Ratio
-            if Is_Right:
-                Distance_From_Right = self._Main._Width - (self._Left + self._Width)
-                Ratio = Distance_From_Right / self._Main._Width
-                self._Left_Adjustment = Width_Difference * (1 - Ratio) - self._Width_Adjustment
-            else:
-                Ratio = self._Left / self._Main._Width
-                self._Left_Adjustment = Width_Difference * Ratio
-            if Is_Bottom:
-                Distance_From_Bottom = self._Main._Height - (self._Top + self._Height)
-                Ratio = Distance_From_Bottom / self._Main._Height
-                self._Top_Adjustment = Height_Difference * (1 - Ratio) - self._Height_Adjustment
-            else:
-                Ratio = self._Top / self._Main._Height
-                self._Top_Adjustment = Height_Difference * Ratio
-            if not self._Resize_Width and self._Move_Left and Is_Right:
-                self._Left_Adjustment += self._Width_Adjustment
-            if not self._Resize_Height and self._Move_Top and Is_Bottom:
-                self._Top_Adjustment += self._Height_Adjustment
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Adjustment -> {E}")
-            
-    def Relocate(self, Direct=False):
-        try:
-            if Direct or self._Resizable:
-                self.Adjustment()
-                if Direct or (self._Resize and self._Resize_Width):
-                    self._Width_Current = self._Width + self._Width_Adjustment
-                else:
-                    self._Width_Current = self._Width
-                if Direct or (self._Resize and self._Resize_Height):
-                    self._Height_Current = self._Height + self._Height_Adjustment
-                else:
-                    self._Height_Current = self._Height
-                if Direct or (self._Move and self._Move_Left):
-                    self._Left_Current = self._Left + self._Left_Adjustment
-                else:
-                    self._Left_Current = self._Left
-                if Direct or (self._Move and self._Move_Top):
-                    self._Top_Current = self._Top + self._Top_Adjustment
-                else:
-                    self._Top_Current = self._Top
-            else:
-                self._Width_Current = self._Width
-                self._Height_Current = self._Height
-                self._Left_Current = self._Left
-                self._Top_Current = self._Top
-            if self._Display:
-                self._Font = TK.font.Font(family=self._Font_Family, size=self._Font_Size_Current, weight=self._Font_Weight)
-                self._Widget.config(font=self._Font)
-                self.Display()
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Relocate -> {E}")
-            
-    def Resize(self):
-        try:
-            self._Resize_Index = self._GUI._Resize_Index
-            self.Font()
-            self.Relocate()
-        except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Resize -> {E}")
