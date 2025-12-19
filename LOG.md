@@ -1,5 +1,13 @@
 # Change Log
 
+## V(7.0)
+- Editor Added To Canvas, An Interative Image Editor
+- Support Image Zoom/Pan & Draw Rectangle, Line, Cirlce, Polyline, Polygon & Quadrilateral
+- Support Draw Item Movements, Resize, Rotation
+- All Items Posiiton & Data Is Based Upon Actual Image Size, So It Can Be Easy To Get Item Coords In Image Coords
+- VLC Video Switched To Player, Added New Video Based On CV2
+- New Project Label Bug Fixes On PIP
+
 ## V(6.3)
 - Gluonix Library Speed Optimizations
 - Removed Interactive Image

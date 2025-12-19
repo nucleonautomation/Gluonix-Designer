@@ -49,6 +49,8 @@ from .N_Scale import Scale
 from .N_Select import Select
 from .N_List import List
 from .N_Video import Video
+from .N_Player import Player
+from .N_Editor import Editor
 from .N_Image import Image
 from .N_Dynamic_Image import Dynamic_Image
 from .N_Compound import Compound

@@ -16,7 +16,9 @@ from .N_Canvas_Polygon import Canvas_Polygon
 from .N_Canvas_Image import Canvas_Image
 from .N_Canvas_Text import Canvas_Text
 from .N_Canvas_Text_Old import Canvas_Text_Old
+from .N_Player import Player
 from .N_Video import Video
+from .N_Editor import Editor
 
 class Canvas:
 
@@ -873,9 +875,23 @@ class Canvas:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Text_Old -> {E}")
             
+    def Player(self):
+        try:
+            Item = Player(self)
+            return Item
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Player -> {E}")
+            
     def Video(self):
         try:
             Item = Video(self)
             return Item
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Video -> {E}")
+            
+    def Editor(self):
+        try:
+            Item = Editor(self)
+            return Item
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Editor -> {E}")

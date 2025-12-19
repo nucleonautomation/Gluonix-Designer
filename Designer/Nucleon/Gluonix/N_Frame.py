@@ -3,7 +3,7 @@ import tkinter as TK
 import threading, math, time
 from .N_GUI import GUI
 from .N_Custom import Event_Bind
-from .N_Video import Video
+from .N_Player import Player
 
 class Frame:
 
@@ -467,9 +467,9 @@ class Frame:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Update_Color -> {E}")
             
-    def Video(self):
+    def Player(self):
         try:
-            Item = Video(self)
+            Item = Player(self)
             return Item
         except Exception as E:
-            self._GUI.Error(f"{self._Type} -> Video -> {E}")
+            self._GUI.Error(f"{self._Type} -> Player -> {E}")

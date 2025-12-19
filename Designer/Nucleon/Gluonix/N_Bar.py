@@ -164,6 +164,7 @@ class Bar:
             if 'On_Hide' in Input:
                 self._On_Hide = Input['On_Hide']
             Event_Bind(self._Widget, **Input)
+            self._Frame.Bind(**Input)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Bind -> {E}")
             

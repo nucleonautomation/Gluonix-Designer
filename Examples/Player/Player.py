@@ -19,7 +19,7 @@ if __name__=='__main__':
     Seeking_Event = Event()
     Seeking_Hold_Seconds = 0.3
 
-    Player = Root.Player.Video()
+    Player = Root.Player.Player()
     Player.Volume_Set(160)
 
     Control = Root.Control
