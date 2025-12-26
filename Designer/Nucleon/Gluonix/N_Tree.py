@@ -334,14 +334,33 @@ class Tree:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Expand -> {E}")
             
-    def Select(self, ID=False):
+    def Select(self, ID=None, Keep=False):
         try:
             if ID:
-                self._Widget.selection_set(ID)
-                self._Widget.focus(ID)
+                if Keep:
+                    self._Widget.selection_add(ID)
+                else:
+                    self._Widget.selection_set(ID)
+                if isinstance(ID, (list, tuple)):
+                    if len(ID) > 0:
+                        self._Widget.focus(ID[0])
+                        self._Widget.see(ID[0]) 
+                else:
+                    self._Widget.focus(ID)
+                    self._Widget.see(ID)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Select -> {E}")
             
+    def Unselect(self, ID=None):
+        try:
+            if ID:
+                self._Widget.selection_remove(ID)
+            else:
+                self._Widget.selection_remove(self._Widget.selection())
+            self._Widget.focus('')
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Unselect -> {E}")
+
     def Widget(self):
         try:
             return self._Widget
@@ -465,6 +484,32 @@ class Tree:
             return self._Frame.Size()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Size -> {E}")
+    
+    def Enlarge(self, Value=None):
+        try:
+            if Value is not None:
+                self._Left -= Value
+                self._Top -= Value
+                self._Width += Value
+                self._Height += Value
+                self._Frame.Enlarge(Value)
+                self.Create()
+            return True
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Enlarge -> {E}")
+    
+    def Shrink(self, Value=None):
+        try:
+            if Value is not None:
+                self._Left += Value
+                self._Top += Value
+                self._Width -= Value
+                self._Height -= Value
+                self._Frame.Shrink(Value)
+                self.Create()
+            return True
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Shrink -> {E}")
             
     def Box(self):
         try:

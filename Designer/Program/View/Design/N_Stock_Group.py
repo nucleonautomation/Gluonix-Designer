@@ -101,5 +101,6 @@ class Stock_Group:
                     Widget = getattr(Root, ID)
                     Widget._ID = ID
                     Widget.Create()
+                    setattr(self.Stock.Design.Element, f"{ID}_Widget", Widget)
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))

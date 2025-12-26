@@ -95,6 +95,7 @@ class Design:
             
     def Close_Project(self):
         try:
+            self.Element.Export()
             Temp_Root = getattr(self, self.Display_ID)
             Temp_Root.Close()
             if self.Database:

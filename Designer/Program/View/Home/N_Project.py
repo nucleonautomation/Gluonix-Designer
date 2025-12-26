@@ -118,13 +118,13 @@ class Project:
             
     def Hover_In(self, Widget):
         try:
-            Widget.Config(Font_Size=11)
+            Widget.Config(Font_Weight='bold')
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             
     def Hover_Out(self, Widget):
         try:
-            Widget.Config(Font_Size=10)
+            Widget.Config(Font_Weight='normal')
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
             

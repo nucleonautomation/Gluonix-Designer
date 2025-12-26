@@ -132,6 +132,7 @@ class Stock_Spinner:
                     Widget.Set("7")
                     Widget.Lock = bool(Widget_Data['Lock'])
                     Widget.Create()
+                    setattr(self.Stock.Design.Element, f"{ID}_Widget", Widget)
                     if Latest:
                         Widget.Config(Animate_Left=-1*(Left+Width), Animate_Top=-1*(Top+Height), Animate_Time=0.5)
                         Widget.Animate()

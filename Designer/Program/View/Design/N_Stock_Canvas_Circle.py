@@ -136,6 +136,7 @@ class Stock_Canvas_Circle:
                     Widget.Config(Url=bool(Widget_Data['Url']), Transparent=bool(Widget_Data['Transparent']), Rotate=Widget_Data['Rotate'], Aspect_Ratio=bool(Widget_Data['Aspect_Ratio']))
                     Widget.Lock = bool(Widget_Data['Lock'])
                     Widget.Create()
+                    setattr(self.Stock.Design.Element, f"{ID}_Widget", Widget)
                     if Latest:
                         Widget.Config(Animate_Left=-1*(Left+Radius), Animate_Top=-1*(Top+Radius), Animate_Time=0.5)
                         Widget.Animate()

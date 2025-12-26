@@ -115,6 +115,7 @@ def Load(Global):
             Display = Display[0]
             Global[Display['ID']] = Gluonix.GUI()
             Temp_Root = Global[Display['ID']]
+            Temp_Root.Lib = Gluonix
             Temp_Root.Config(Error_Log=Error_Log)
             Temp_Root.Config(Width=int(Display['Width']), Height=int(Display['Height']), Left=int(Display['Left']), Top=int(Display['Top']))
             Temp_Root.Config(Title=Display['Title'], Background=Display['Background'], Icon=File(Variable_Data['Icon']), Resizable=bool(int(Display['Resizable'])))

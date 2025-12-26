@@ -1,5 +1,12 @@
 # Change Log
 
+## V(7.1)
+- Element Resize In Designer Is Based On Quadrent Position. If Mouse Is In Left-Top Quadrent, Going Left Or Top Will Incease Size In Respective Direction
+- Multi Selection Of Widgets Support Alignment, Designer Has Four Align Button, Left, Top, Right & Bottom
+- Multi Selection Also Support Drag Movement
+- Add Enlarge and Shrink To All Widgets To Change Size By A Value
+- Bug Fix Group Container Widget Visibility Issue In Canvas
+
 ## V(7.0)
 - Editor Added To Canvas, An Interative Image Editor
 - Support Image Zoom/Pan & Draw Rectangle, Line, Cirlce, Polyline, Polygon & Quadrilateral
@@ -14,8 +21,8 @@
 - Added Dynamic Image For Both Regular Image & Canvas Image, Same Behavior As Interactive Image
 - Removed All Lite Widgets
 - Async Image Open For Large & URL Images
-- Scroll Contrainer Scrollbar Optimizations
-- Bug Filex
+- Scroll Container Scrollbar Optimizations
+- Bug Fixes
 
 ## V(6.2)
 - Bux Fixes In ALL Image Widget Open, Error Out With Array

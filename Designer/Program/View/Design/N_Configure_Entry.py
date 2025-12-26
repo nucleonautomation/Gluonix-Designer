@@ -304,14 +304,14 @@ class Configure_Entry:
             
             #Font Family Label
             Top += 7
-            Fixture = self.Frame.Locate(25, 5, 3, 120)
+            Fixture = self.Frame.Locate(25, 5, 3, Top)
             self.Font_Family_Label = self.Global['Gluonix'].Label(self.Frame)
             self.Font_Family_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Font_Family_Label.Config(Foreground='#000000', Value="Font Family:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
             self.Font_Family_Label.Create()
             
             #Font Family Select
-            Fixture = self.Frame.Locate(40, 5, 28, 120)
+            Fixture = self.Frame.Locate(40, 5, 28, Top)
             self.Font_Family_Select = self.Global['Gluonix'].Select(self.Frame)
             self.Font_Family_Select.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Font_Family_Select.Config(Background='#FFFFFF', Foreground='#000000', Font_Size=9, Font_Weight='normal', Align='center', Border_Size=1)

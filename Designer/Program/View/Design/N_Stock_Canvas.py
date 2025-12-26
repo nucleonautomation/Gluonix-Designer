@@ -126,6 +126,7 @@ class Stock_Canvas:
                     Frame.Config(Resize=bool(Frame_Data['Resize']))
                     Frame.Lock = bool(Frame_Data['Lock'])
                     Frame.Create()
+                    setattr(self.Stock.Design.Element, f"{ID}_Widget", Frame)
                     if Latest:
                         Frame.Hide()
                         Frame._Display = True

@@ -294,6 +294,24 @@ class Canvas_Arc:
             return [Width, Height]
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Size -> {E}")
+    
+    def Enlarge(self, Value=None):
+        try:
+            if Value is not None:
+                self._Radius += Value
+                self.Create()
+            return True
+        except Exception as E:
+            self._Canvas._GUI.Error(f"{self._Type} -> Enlarge -> {E}")
+    
+    def Shrink(self, Value=None):
+        try:
+            if Value is not None:
+                self._Radius -= Value
+                self.Create()
+            return True
+        except Exception as E:
+            self._Canvas._GUI.Error(f"{self._Type} -> Shrink -> {E}")
             
     def Box(self):
         try:

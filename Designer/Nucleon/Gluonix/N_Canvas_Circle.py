@@ -274,6 +274,24 @@ class Canvas_Circle:
             return [self._Left, self._Top]
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Position -> {E}")
+    
+    def Enlarge(self, Value=None):
+        try:
+            if Value is not None:
+                self._Radius += Value
+                self.Create()
+            return True
+        except Exception as E:
+            self._Canvas._GUI.Error(f"{self._Type} -> Enlarge -> {E}")
+    
+    def Shrink(self, Value=None):
+        try:
+            if Value is not None:
+                self._Radius -= Value
+                self.Create()
+            return True
+        except Exception as E:
+            self._Canvas._GUI.Error(f"{self._Type} -> Shrink -> {E}")
             
     def Radius(self, Value=False):
         try:

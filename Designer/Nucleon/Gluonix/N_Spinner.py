@@ -264,6 +264,32 @@ class Spinner:
             return self._Frame.Size()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Size -> {E}")
+    
+    def Enlarge(self, Value=None):
+        try:
+            if Value is not None:
+                self._Left -= Value
+                self._Top -= Value
+                self._Width += Value
+                self._Height += Value
+                self._Frame.Enlarge(Value)
+                self.Create()
+            return True
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Enlarge -> {E}")
+    
+    def Shrink(self, Value=None):
+        try:
+            if Value is not None:
+                self._Left += Value
+                self._Top += Value
+                self._Width -= Value
+                self._Height -= Value
+                self._Frame.Shrink(Value)
+                self.Create()
+            return True
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Shrink -> {E}")
             
     def Box(self):
         try:

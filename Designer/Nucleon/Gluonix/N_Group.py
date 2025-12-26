@@ -56,6 +56,8 @@ class Group:
         try:
             self.Clear()
             self._Main._Widget.remove(self)
+            if self._Main!='Frame':
+                self._Main._Item.remove(self)
             if self:
                 del self
         except Exception as E:
@@ -153,6 +155,8 @@ class Group:
                 if not self._Display:
                     self.Hide()
                 self._Main._Widget.append(self)
+                if self._Main!='Frame':
+                    self._Main._Item.append(self)
                 self._Initialized = True
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
@@ -170,12 +174,12 @@ class Group:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Update_Color -> {E}")
             
-    def Resize(self):
+    def Resize(self, Event):
         try:
             for Each in self._Item:
                 try:
                     if Each._Display:
-                        Each.Resize()
+                        Each.Resize(Event)
                 except Exception:
                     self.Nothing = False
         except Exception as E:

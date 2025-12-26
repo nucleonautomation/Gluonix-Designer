@@ -161,6 +161,18 @@ class Canvas_Polygon:
             return [Width, Height]
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Size -> {E}")
+    
+    def Enlarge(self, Value=None):
+        try:
+            return True
+        except Exception as E:
+            self._Canvas._GUI.Error(f"{self._Type} -> Enlarge -> {E}")
+    
+    def Shrink(self, Value=None):
+        try:
+            return True
+        except Exception as E:
+            self._Canvas._GUI.Error(f"{self._Type} -> Shrink -> {E}")
             
     def Box(self):
         try:

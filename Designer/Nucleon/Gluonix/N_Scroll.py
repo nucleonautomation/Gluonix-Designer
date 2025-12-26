@@ -326,6 +326,32 @@ class Scroll:
             return self._Frame_Canvas.Size()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Size -> {E}")
+    
+    def Enlarge(self, Value=None):
+        try:
+            if Value is not None:
+                self._Left -= Value
+                self._Top -= Value
+                self._Width += Value
+                self._Height += Value
+                self.Config(Left=self._Left, Top=self._Top, Width=self._Width, Height=self._Height)
+                self.Create()
+            return True
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Enlarge -> {E}")
+    
+    def Shrink(self, Value=None):
+        try:
+            if Value is not None:
+                self._Left += Value
+                self._Top += Value
+                self._Width -= Value
+                self._Height -= Value
+                self.Config(Left=self._Left, Top=self._Top, Width=self._Width, Height=self._Height)
+                self.Create()
+            return True
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Shrink -> {E}")
             
     def Box(self):
         try:

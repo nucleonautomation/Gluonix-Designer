@@ -134,6 +134,7 @@ class Stock_Select:
                     Widget.Add("Select 03")
                     Widget.Lock = bool(Widget_Data['Lock'])
                     Widget.Create()
+                    setattr(self.Stock.Design.Element, f"{ID}_Widget", Widget)
                     Widget.Set("Select 01")
                     if Latest:
                         Widget.Config(Animate_Left=-1*(Left+Width), Animate_Top=-1*(Top+Height), Animate_Time=0.5)

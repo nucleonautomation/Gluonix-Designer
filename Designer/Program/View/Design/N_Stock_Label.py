@@ -131,6 +131,7 @@ class Stock_Label:
                     Widget.Config(Orient=Widget_Data['Orient'], Ridge=Widget_Data['Ridge'], Height_List=Widget_Data['Height_List'])
                     Widget.Lock = bool(Widget_Data['Lock'])
                     Widget.Create()
+                    setattr(self.Stock.Design.Element, f"{ID}_Widget", Widget)
                     if Latest:
                         Widget.Config(Animate_Left=-1*(Left+Width), Animate_Top=-1*(Top+Height), Animate_Time=0.5)
                         Widget.Animate()
