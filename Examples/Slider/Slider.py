@@ -16,7 +16,7 @@ if __name__=='__main__':
     Entry.Set(0)
     Entry.Bind(On_Key_Release = lambda E : Change('Entry'))
     
-    Scale = Slider(Root, Root.Main.Bar, Root.Main.Frame)
+    Scale = Slider(Root.Main.Bar, Root.Main.Frame)
     Scale.Set(0)
     Scale.Config(Minimum=0, Maximum=100, Increment=1, On_Change = lambda : Change('Scale'))
             

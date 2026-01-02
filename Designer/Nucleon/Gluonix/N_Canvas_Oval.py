@@ -5,6 +5,7 @@ from .N_Custom import Event_Bind_Canvas
 class Canvas_Oval:
     def __init__(self, Main):
         self._Canvas = Main
+        self._Main = Main
         self._Config = ['Name', 'Outline', 'Fill', 'Width', 'Height', 'Left', 'Top', 'Animate_Left', 'Animate_Top', 'Animate_Width', 'Animate_Height', 'Animate_Time', 'Thickness', 'Resize']
         self._Display = True
         self._Resize = True
@@ -322,6 +323,18 @@ class Canvas_Oval:
             return [X1, Y1, Width, Height]
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Box -> {E}")
+        
+    def Ratio(self):
+        try:
+            Box = self._Canvas._Frame.bbox(self._Widget)
+            X1, Y1, X2, Y2 = Box
+            Width = X2 - X1
+            Height = Y2 - Y1
+            Width_Ratio = Width/self._Width
+            Height_Ratio = Height/self._Height
+            return [Width_Ratio, Height_Ratio]
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Ratio -> {E}")
         
     def Create(self):
         try:

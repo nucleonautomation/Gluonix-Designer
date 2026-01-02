@@ -56,6 +56,8 @@ class Scroll:
                 self._On_Show = False
                 self._On_Hide = False
                 self._Configure_After_Id = None
+                self._Last_Width = 0
+                self._Last_Height = 0
             except Exception as E:
                 self._GUI.Error(f"{self._Type} -> Init -> {E}")
         else:
@@ -114,9 +116,12 @@ class Scroll:
             
     def On_Configure(self, Event):
         try:
-            if self._Configure_After_Id is not None:
-                self._Canvas_Scroll.after_cancel(self._Configure_After_Id)
-            self._Configure_After_Id = self._Canvas_Scroll.after(50, self.On_Configure_Debounced)
+            if Event.width!=self._Last_Width or Event.height!=self._Last_Height:
+                self._Last_Width = Event.width
+                self._Last_Height = Event.height
+                if self._Configure_After_Id is not None:
+                    self._Canvas_Scroll.after_cancel(self._Configure_After_Id)
+                self._Configure_After_Id = self._Canvas_Scroll.after(50, self.On_Configure_Debounced)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> On_Configure -> {E}")
                 
@@ -358,6 +363,12 @@ class Scroll:
             return self._Frame_Canvas.Box()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Box -> {E}")
+        
+    def Ratio(self):
+        try:
+            return self._Frame_Canvas.Ratio()
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Ratio -> {E}")
         
     def Locate(self, Width, Height, Left, Top):
         try:

@@ -48,7 +48,6 @@ class GUI():
             self._Border_Size = 0
             self._Menu_Enable = False
             self._On_Close = False
-            self._On_Resize = False
             self._Restore_Width = False
             self._Restore_Height = False
             self._Auto_Dark = True
@@ -78,18 +77,13 @@ class GUI():
             if not os.path.exists(self._Log_Folder):
                 os.makedirs(self._Log_Folder)
             Log_Path = os.path.join(self._Log_Folder, self._Log_File)
-            Date = datetime.datetime.fromtimestamp(Error_Time)
-            Date = Date.strftime('%Y-%m-%d %H:%M:%S')
-            Line = f"{Date} - {E}"
-            File_Content = []
-            if os.path.exists(Log_Path):
-                with open(Log_Path, 'r') as File:
-                    File_Content = File.readlines()
-                if len(File_Content) >= 10000:
-                    File_Content.pop()
-            with open(Log_Path, 'w') as File:
-                File.write(Line.rstrip('\r\n') + '\n')
-                File.writelines(File_Content)
+            Date_Str = datetime.datetime.fromtimestamp(Error_Time).strftime('%Y-%m-%d %H:%M:%S')
+            Line = f"{Date_Str} - {E}\n"
+            try:
+                with open(Log_Path, 'a') as File:
+                    File.write(Line)
+            except Exception as E:
+                print(f"Gluonix -> Critical Logging Error: {E}")
                 
     def Nothing(self):
         return False
@@ -98,24 +92,20 @@ class GUI():
         try:
             if not self._Toolbar:
                 if self._Window:
-                    Hwnd = DLL.user32.GetParent(self._Frame.winfo_id())
+                    User32 = DLL.user32
+                    Hwnd = User32.GetParent(self._Frame.winfo_id())
                     Screen_Width = self._Frame.winfo_screenwidth()
                     Screen_Height = self._Frame.winfo_screenheight()
-                    Current_Width = self._Frame.winfo_width()
-                    Current_Height = self._Frame.winfo_height()
                     if Auto:
-                        if Current_Width >= Screen_Width and Current_Height >= (Screen_Height - 48):
+                        Current_Width = self._Frame.winfo_width()
+                        Current_Height = self._Frame.winfo_height()
+                        if Current_Width >= Screen_Width and Current_Height >= (Screen_Height - 80):
                             self.Restore()
                             return
                     self._Restore_Width = self._Width
                     self._Restore_Height = self._Height
                     SWP_SHOWWINDOW = 0x40
-                    DLL.user32.SetWindowPos(
-                        Hwnd, 0, 0, 0,
-                        int(Screen_Width),
-                        int(Screen_Height - 48),
-                        SWP_SHOWWINDOW
-                    )
+                    User32.SetWindowPos(Hwnd, 0, 0, 0, int(Screen_Width), int(Screen_Height - 80), SWP_SHOWWINDOW)
             else:
                 if Auto:
                     if self._Frame.state() == 'zoomed':
@@ -126,45 +116,37 @@ class GUI():
                 self._Frame.state('zoomed')
         except Exception as E:
             self.Error(f"{self._Type} -> Maximize -> {E}")
-        
+
     def Restore(self):
         try:
             Screen_Width = self._Frame.winfo_screenwidth()
             Screen_Height = self._Frame.winfo_screenheight()
             Current_Width = self._Frame.winfo_width()
             Current_Height = self._Frame.winfo_height()
-            if self._Frame.state() != 'iconic' and not (
-                Current_Width >= Screen_Width and
-                Current_Height >= (Screen_Height - 48)
-            ):
+            if self._Frame.state() != 'iconic' and not (Current_Width >= Screen_Width and Current_Height >= (Screen_Height - 80)):
                 return
             if self._Restore_Width and self._Restore_Height:
                 self._Width = self._Restore_Width
                 self._Height = self._Restore_Height
             if not self._Toolbar:
                 if self._Window:
-                    Hwnd = DLL.user32.GetParent(self._Frame.winfo_id())
+                    User32 = DLL.user32
+                    Hwnd = User32.GetParent(self._Frame.winfo_id())
                     SWP_SHOWWINDOW = 0x40
-                    DLL.user32.SetWindowPos(
-                        Hwnd, 0,
-                        int(self._Left),
-                        int(self._Top),
-                        int(self._Width),
-                        int(self._Height),
-                        SWP_SHOWWINDOW
-                    )
+                    User32.SetWindowPos(Hwnd, 0, int(self._Left), int(self._Top), int(self._Width), int(self._Height), SWP_SHOWWINDOW)
             else:
                 self._Frame.state('normal')
-            self._Frame.event_generate("<Configure>")
+                self._Frame.event_generate("<<Restored>>")
         except Exception as E:
             self.Error(f"{self._Type} -> Restore -> {E}")
-        
+
     def Minimize(self, Hide=False):
         try:
             if not self._Toolbar:
                 if self._Window:
-                    hwnd = DLL.user32.GetParent(self._Frame.winfo_id())
-                    DLL.user32.ShowWindow(hwnd, 0 if Hide else 6)
+                    User32 = DLL.user32
+                    Hwnd = User32.GetParent(self._Frame.winfo_id())
+                    User32.ShowWindow(Hwnd, 0 if Hide else 6)
             else:
                 self._Frame.iconify()
         except Exception as E:
@@ -222,18 +204,18 @@ class GUI():
 
     def Start(self):
         try:
-            if not self._Toolbar:
-                if self._Window:
-                    GWL_EXSTYLE=-20
-                    WS_EX_APPWINDOW=0x00040000
-                    WS_EX_TOOLWINDOW=0x00000080
-                    hwnd = DLL.user32.GetParent(self._Frame.winfo_id())
-                    style = DLL.user32.GetWindowLongW(hwnd, GWL_EXSTYLE)
-                    style = style & ~WS_EX_TOOLWINDOW
-                    style = style | WS_EX_APPWINDOW
-                    res = DLL.user32.SetWindowLongW(hwnd, GWL_EXSTYLE, style)
-                    self._Frame.withdraw()
-                    self._Frame.wm_deiconify()
+            if not self._Toolbar and self._Window:
+                GWL_EXSTYLE = -20
+                WS_EX_APPWINDOW = 0x00040000
+                WS_EX_TOOLWINDOW = 0x00000080
+                User32 = DLL.user32
+                Hwnd = User32.GetParent(self._Frame.winfo_id())
+                Style = User32.GetWindowLongW(Hwnd, GWL_EXSTYLE)
+                Style = Style & ~WS_EX_TOOLWINDOW
+                Style = Style | WS_EX_APPWINDOW
+                User32.SetWindowLongW(Hwnd, GWL_EXSTYLE, Style)
+                self._Frame.withdraw()
+                self._Frame.wm_deiconify()
             self._Frame.mainloop()
         except Exception as E:
             self.Error(f"{self._Type} -> Start -> {E}")
@@ -246,7 +228,7 @@ class GUI():
             
     def Screen(self):
         try:
-            return {'Width': self._Screen_Width, 'Height': self._Screen_Height}
+            return {'Width': self._Frame.winfo_screenwidth(), 'Height': self._Frame.winfo_screenheight()}
         except Exception as E:
             self.Error(f"{self._Type} -> Screen -> {E}")
             
@@ -274,8 +256,6 @@ class GUI():
                 self._On_Show = Input['On_Show']
             if 'On_Hide' in Input:
                 self._On_Hide = Input['On_Hide']
-            if "On_Resize" in Input:
-                self._On_Resize = Input["On_Resize"]
             if 'On_Close' in Input:
                 self._On_Close = Input['On_Close']
             Event_Bind(self._Frame, **Input)
@@ -384,11 +364,27 @@ class GUI():
             
     def Move(self, Left=None, Top=None):
         try:
+            if Left is not None:
+                self._Left += Left
+            if Top is not None:
+                self._Top += Top
             if Left is not None or Top is not None:
-                self.Position(Left=Left, Top=Top)
+                self.Position(Left=self._Left, Top=self._Top)
             return True
         except Exception as E:
             self.Error(f"{self._Type} -> Move -> {E}")
+            
+    def Center(self, Left=None, Top=None):
+        try:
+            if Left is not None:
+                self._Left = Left-self._Width/2
+            if Top is not None:
+                self._Top = Top-self._Height/2
+            if Left is not None or Top is not None:
+                self.Position(Left=self._Left, Top=self._Top)
+            return [self._Left+self._Width/2, self._Top+self._Height/2]
+        except Exception as E:
+            self.Error(f"{self._Type} -> Center -> {E}")
             
     def Position(self, Left=None, Top=None):
         try:
@@ -405,16 +401,57 @@ class GUI():
         except Exception as E:
             self.Error(f"{self._Type} -> Position -> {E}")
             
-    def Size(self):
+    def Size(self, Width=None, Height=None):
         try:
-            return [self._Frame.winfo_width(), self._Frame.winfo_height()]
+            if Width is not None:
+                self._Width = Width
+            if Height is not None:
+                self._Top = Height
+            if Width is not None or Height is not None:
+                if not self._Full_Screen:
+                    self._Frame.geometry(f"{int(self._Width)}x{int(self._Height)}+{int(self._Left)}+{int(self._Top)}")
+            Width = self._Frame.winfo_width()
+            Height = self._Frame.winfo_height()
+            return [Width, Height]
         except Exception as E:
             self.Error(f"{self._Type} -> Size -> {E}")
+    
+    def Enlarge(self, Value=None):
+        try:
+            if Value is not None:
+                self._Left -= Value
+                self._Top -= Value
+                self._Width += Value
+                self._Height += Value
+                if self._Initialized  and not self._Full_Screen:
+                    self._Frame.geometry(f"{int(self._Width)}x{int(self._Height)}+{int(self._Left)}+{int(self._Top)}")
+            return True
+        except Exception as E:
+            self.Error(f"{self._Type} -> Enlarge -> {E}")
+    
+    def Shrink(self, Value=None):
+        try:
+            if Value is not None:
+                self._Left += Value
+                self._Top += Value
+                self._Width -= Value
+                self._Height -= Value
+                if self._Initialized  and not self._Full_Screen:
+                    self._Frame.geometry(f"{int(self._Width)}x{int(self._Height)}+{int(self._Left)}+{int(self._Top)}")
+            return True
+        except Exception as E:
+            self.Error(f"{self._Type} -> Shrink -> {E}")
+            
+    def Box(self):
+        try:
+            return [self._Frame.winfo_x(), self._Frame.winfo_y(), self._Frame.winfo_width(), self._Frame.winfo_height()]
+        except Exception as E:
+            self.Error(f"{self._Type} -> Box -> {E}")
         
     def Ratio(self):
         try:
-            Width_Ratio = self._Width/self._Width
-            Height_Ratio = self._Height/self._Height
+            Width_Ratio = self._Frame.winfo_width()/self._Width
+            Height_Ratio = self._Frame.winfo_height()/self._Height
             return [Width_Ratio, Height_Ratio]
         except Exception as E:
             self.Error(f"{self._Type} -> Ratio -> {E}")

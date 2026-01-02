@@ -31,7 +31,7 @@ class Frame:
                 self._Last_Background = False
                 self._Last_Border_Color = False
                 self._Animating = False
-                self._Anim_Stop = threading.Event()
+                self._Anim_Stop = None
                 self._Anim_Thread = None
                 self._Animate_Ease = lambda t: (1 - (1 - t)**3)
                 self._Animate_Speed = None
@@ -194,7 +194,8 @@ class Frame:
             Target_FPS = 90.0
             Frame_Interval = 1.0 / Target_FPS
             self._Animating = True
-            Stop = self._Anim_Stop
+            Stop = threading.Event()
+            self._Anim_Stop = Stop
             def Worker():
                 T0 = time.perf_counter()
                 Next_Tick = T0
@@ -204,7 +205,7 @@ class Frame:
                     T = (Now - T0) / Duration
                     if T >= 1.0:
                         def Snap_Final():
-                            if not self._Frame.winfo_exists():
+                            if Stop.is_set() or not self._Frame.winfo_exists():
                                 return
                             self._Place_Geometry(Final_Left, Final_Top, Final_Width, Final_Height)
                             self._Animating = False
@@ -223,7 +224,7 @@ class Frame:
                     if Cur != Last:
                         Last = Cur
                         def Post(C=Cur):
-                            if not self._Frame.winfo_exists():
+                            if Stop.is_set() or not self._Frame.winfo_exists():
                                 return
                             if self._Animating:
                                 self._Place_Geometry(C[0], C[1], C[2], C[3])
@@ -236,7 +237,8 @@ class Frame:
                         Next_Tick = time.perf_counter()
                         Sleep_For = Frame_Interval
                     if Sleep_For > 0:
-                        time.sleep(Sleep_For)
+                        if Stop.wait(Sleep_For):
+                            return
             self._Display = True
             if Thread:
                 T = threading.Thread(target=Worker, daemon=True)
@@ -251,14 +253,13 @@ class Frame:
     def Animate_Cancel(self):
         try:
             self._Animating = False
-            if self._Anim_Thread and self._Anim_Thread.is_alive():
+            if self._Anim_Stop is not None:
                 self._Anim_Stop.set()
-                self._Anim_Thread.join(timeout=0.2)
-            self._Anim_Stop.clear()
+            self._Anim_Stop = None
             self._Anim_Thread = None
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Animate_Cancel -> {E}")
-            
+
     def Focus(self):
         try:
             self._Frame.focus_set()
@@ -430,6 +431,14 @@ class Frame:
             return [self._Frame.winfo_x(), self._Frame.winfo_y(), self._Frame.winfo_width(), self._Frame.winfo_height()]
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Box -> {E}")
+        
+    def Ratio(self):
+        try:
+            Width_Ratio = self._Frame.winfo_width()/self._Width
+            Height_Ratio = self._Frame.winfo_height()/self._Height
+            return [Width_Ratio, Height_Ratio]
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Ratio -> {E}")
         
     def Locate(self, Width, Height, Left, Top):
         try:

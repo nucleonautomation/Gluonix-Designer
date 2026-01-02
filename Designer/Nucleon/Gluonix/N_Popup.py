@@ -29,9 +29,6 @@ class Popup():
                     self._Frame = TK.Toplevel(self._Main._Frame)
                 else:
                     self._Frame = TK.Toplevel(None)
-                self._Resize_Timer = False
-                self._Resize_Delay = 200
-                self._Size_Update = False
                 self._Resize_Index = 0
                 self._Title = "Nucleon Gluonix"
                 self._Icon = ""
@@ -72,24 +69,20 @@ class Popup():
         try:
             if not self._Toolbar:
                 if self._Window:
-                    Hwnd = DLL.user32.GetParent(self._Frame.winfo_id())
+                    User32 = DLL.user32
+                    Hwnd = User32.GetParent(self._Frame.winfo_id())
                     Screen_Width = self._Frame.winfo_screenwidth()
                     Screen_Height = self._Frame.winfo_screenheight()
-                    Current_Width = self._Frame.winfo_width()
-                    Current_Height = self._Frame.winfo_height()
                     if Auto:
-                        if Current_Width >= Screen_Width and Current_Height >= (Screen_Height - 48):
+                        Current_Width = self._Frame.winfo_width()
+                        Current_Height = self._Frame.winfo_height()
+                        if Current_Width >= Screen_Width and Current_Height >= (Screen_Height - 80):
                             self.Restore()
                             return
                     self._Restore_Width = self._Width
                     self._Restore_Height = self._Height
                     SWP_SHOWWINDOW = 0x40
-                    DLL.user32.SetWindowPos(
-                        Hwnd, 0, 0, 0,
-                        int(Screen_Width),
-                        int(Screen_Height - 48),
-                        SWP_SHOWWINDOW
-                    )
+                    User32.SetWindowPos(Hwnd, 0, 0, 0, int(Screen_Width), int(Screen_Height - 80), SWP_SHOWWINDOW)
             else:
                 if Auto:
                     if self._Frame.state() == 'zoomed':
@@ -107,29 +100,20 @@ class Popup():
             Screen_Height = self._Frame.winfo_screenheight()
             Current_Width = self._Frame.winfo_width()
             Current_Height = self._Frame.winfo_height()
-            if self._Frame.state() != 'iconic' and not (
-                Current_Width >= Screen_Width and
-                Current_Height >= (Screen_Height - 48)
-            ):
+            if self._Frame.state() != 'iconic' and not (Current_Width >= Screen_Width and Current_Height >= (Screen_Height - 80)):
                 return
             if self._Restore_Width and self._Restore_Height:
                 self._Width = self._Restore_Width
                 self._Height = self._Restore_Height
             if not self._Toolbar:
                 if self._Window:
-                    Hwnd = DLL.user32.GetParent(self._Frame.winfo_id())
+                    User32 = DLL.user32
+                    Hwnd = User32.GetParent(self._Frame.winfo_id())
                     SWP_SHOWWINDOW = 0x40
-                    DLL.user32.SetWindowPos(
-                        Hwnd, 0,
-                        int(self._Left),
-                        int(self._Top),
-                        int(self._Width),
-                        int(self._Height),
-                        SWP_SHOWWINDOW
-                    )
+                    User32.SetWindowPos(Hwnd, 0, int(self._Left), int(self._Top), int(self._Width), int(self._Height), SWP_SHOWWINDOW)
             else:
                 self._Frame.state('normal')
-            self._Frame.event_generate("<Configure>")
+                self._Frame.event_generate("<<Restored>>")
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Restore -> {E}")
         
@@ -137,8 +121,9 @@ class Popup():
         try:
             if not self._Toolbar:
                 if self._Window:
-                    hwnd = DLL.user32.GetParent(self._Frame.winfo_id())
-                    DLL.user32.ShowWindow(hwnd, 0 if Hide else 6)
+                    User32 = DLL.user32
+                    Hwnd = User32.GetParent(self._Frame.winfo_id())
+                    User32.ShowWindow(Hwnd, 0 if Hide else 6)
             else:
                 self._Frame.iconify()
         except Exception as E:
@@ -260,8 +245,6 @@ class Popup():
                 self._On_Show = Input['On_Show']
             if 'On_Hide' in Input:
                 self._On_Hide = Input['On_Hide']
-            if "On_Resize" in Input:
-                self._On_Resize = Input["On_Resize"]
             if 'On_Close' in Input:
                 self._On_Close = Input['On_Close']
             Event_Bind(self._Frame, **Input)
@@ -278,8 +261,6 @@ class Popup():
                     Run = True
             if self._Initialized and Run:
                 self.Create()
-            if "Width" in Input or "Height" in Input or "Left" in Input or "Top" in Input:
-                self._Size_Update = True
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Config -> {E}")
             
@@ -368,16 +349,57 @@ class Popup():
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Position -> {E}")
             
-    def Size(self):
+    def Size(self, Width=None, Height=None):
         try:
-            return [self._Frame.winfo_width(), self._Frame.winfo_height()]
+            if Width is not None:
+                self._Width = Width
+            if Height is not None:
+                self._Top = Height
+            if Width is not None or Height is not None:
+                if not self._Full_Screen:
+                    self._Frame.geometry(f"{int(self._Width)}x{int(self._Height)}+{int(self._Left)}+{int(self._Top)}")
+            Width = self._Frame.winfo_width()
+            Height = self._Frame.winfo_height()
+            return [Width, Height]
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Size -> {E}")
+    
+    def Enlarge(self, Value=None):
+        try:
+            if Value is not None:
+                self._Left -= Value
+                self._Top -= Value
+                self._Width += Value
+                self._Height += Value
+                if self._Initialized  and not self._Full_Screen:
+                    self._Frame.geometry(f"{int(self._Width)}x{int(self._Height)}+{int(self._Left)}+{int(self._Top)}")
+            return True
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Enlarge -> {E}")
+    
+    def Shrink(self, Value=None):
+        try:
+            if Value is not None:
+                self._Left += Value
+                self._Top += Value
+                self._Width -= Value
+                self._Height -= Value
+                if self._Initialized  and not self._Full_Screen:
+                    self._Frame.geometry(f"{int(self._Width)}x{int(self._Height)}+{int(self._Left)}+{int(self._Top)}")
+            return True
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Shrink -> {E}")
+            
+    def Box(self):
+        try:
+            return [self._Frame.winfo_x(), self._Frame.winfo_y(), self._Frame.winfo_width(), self._Frame.winfo_height()]
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Box -> {E}")
         
     def Ratio(self):
         try:
-            Width_Ratio = self._Width/self._Width
-            Height_Ratio = self._Height/self._Height
+            Width_Ratio = self._Frame.winfo_width()/self._Width
+            Height_Ratio = self._Frame.winfo_height()/self._Height
             return [Width_Ratio, Height_Ratio]
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Ratio -> {E}")

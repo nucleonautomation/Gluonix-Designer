@@ -5,6 +5,7 @@ from .N_Custom import Event_Bind_Canvas
 class Canvas_Pie:
     def __init__(self, Main):
         self._Canvas = Main
+        self._Main = Main
         self._Config = ['Name', 'Outline', 'Fill', 'Left', 'Top', 'Animate_Left', 'Animate_Top', 'Animate_Radius', 'Animate_Time', 'Radius', 'Thickness', 'Resize', 'Start', 'Extent', 'Translucent', 'Alpha']
         self._Display = True
         self._Resize = True
@@ -294,6 +295,12 @@ class Canvas_Pie:
             return [Width, Height]
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Size -> {E}")
+        
+    def Ratio(self):
+        try:
+            return [1, 1]
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Ratio -> {E}")
     
     def Enlarge(self, Value=None):
         try:

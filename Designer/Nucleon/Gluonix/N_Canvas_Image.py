@@ -10,6 +10,7 @@ class Canvas_Image:
     
     def __init__(self, Main):
         self._Canvas = Main
+        self._Main = Main
         self._Config = ['Name', 'Width', 'Height', 'Left', 'Top', 'Animate_Left', 'Animate_Top', 'Animate_Width', 'Animate_Height', 'Animate_Time', 'Anchor', 'Photo', 'Resize', 'Rotate', 'Path', 'Path_Initial', 'Transparent', 'Skew_Horizontal', 'Skew_Vertical', 'Aspect_Ratio']
         self._Display = True
         self._Resize = True
@@ -399,6 +400,18 @@ class Canvas_Image:
             return [X1, Y1, Width, Height]
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Box -> {E}")
+        
+    def Ratio(self):
+        try:
+            Box = self._Canvas._Frame.bbox(self._Widget)
+            X1, Y1, X2, Y2 = Box
+            Width = X2 - X1
+            Height = Y2 - Y1
+            Width_Ratio = Width/self._Width
+            Height_Ratio = Height/self._Height
+            return [Width_Ratio, Height_Ratio]
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Ratio -> {E}")
 
     def Is_Large_File(self, Path):
         try:
@@ -511,7 +524,7 @@ class Canvas_Image:
                 if Path_Obj:
                     self._Image = Path_Obj
                 return
-            if hasattr(Path_Obj, "__array_interface__") or Type_Module.startswith("numpy"):
+            if hasattr(Path_Obj, "__class__") and Type_Module.startswith("numpy"):
                 if Path_Obj is not None:
                     self._Image = PIL_Image.fromarray(Path_Obj)
                     self._Image_Width, self._Image_Height = self._Image.size

@@ -6,6 +6,7 @@ class Canvas_Text:
     
     def __init__(self, Main):
         self._Canvas = Main
+        self._Main = Main
         self._Config = ['Name', 'Width', 'Height', 'Left', 'Top', 'Color', 'Background', 'Size', 'Value', 'Weight', 'Font', 'Resize', 'Justify', 'Anchor', 'Resize_Font', 'Vertical', 'Rotate', 'Skew_Horizontal', 'Skew_Vertical']
         self._Display = True
         self._Resize = True
@@ -222,6 +223,12 @@ class Canvas_Text:
             return self._Widget.Box()
         except Exception as E:
             self._Canvas._GUI.Error(f"{self._Type} -> Box -> {E}")
+        
+    def Ratio(self):
+        try:
+            return self._Widget.Ratio()
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Ratio -> {E}")
 
     def Bind(self, **Input):
         try:

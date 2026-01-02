@@ -1,421 +1,128 @@
+Event_Map = {
+    'On_Click': '<Button-1>',
+    'On_Release': '<ButtonRelease-1>',
+    'On_Double_Click': '<Double-Button-1>',
+    'On_Triple_Click': '<Triple-Button-1>',
+    'On_Right_Click': '<Button-3>',
+    'On_Right_Release': '<ButtonRelease-3>',
+    'On_Right_Double_Click': '<Double-Button-3>',
+    'On_Right_Triple_Click': '<Triple-Button-3>',
+    'On_Middle_Click': '<Button-2>',
+    'On_Middle_Release': '<ButtonRelease-2>',
+    'On_Middle_Double_Click': '<Double-Button-2>',
+    'On_Middle_Triple_Click': '<Triple-Button-2>',
+    'On_Drag': '<B1-Motion>',
+    'On_Right_Drag': '<B3-Motion>',
+    'On_Middle_Drag': '<B2-Motion>',
+    'On_Hover_In': '<Enter>',
+    'On_Hover_Out': '<Leave>',
+    'On_Motion': '<Motion>',
+    'On_Focus_In': '<FocusIn>',
+    'On_Focus_Out': '<FocusOut>',
+    'On_Key': '<KeyPress>',
+    'On_Key_Release': '<KeyRelease>',
+    'On_Configure': '<Configure>',
+    'On_Map': '<Map>',
+    'On_Unmap': '<Unmap>',
+    'On_Destroy': '<Destroy>',
+    'On_Expose': '<Expose>',
+    'On_Visibility': '<Visibility>',
+    'On_Mouse_Wheel': ['<MouseWheel>', '<Button-4>', '<Button-5>'],
+    'On_Copy': '<<Copy>>',
+    'On_Paste': '<<Paste>>',
+    'On_Cut': '<<Cut>>',
+    'On_Undo': '<<Undo>>',
+    'On_Redo': '<<Redo>>',
+    'On_Control_Click': '<Control-Button-1>',
+    'On_Control_Release': '<Control-ButtonRelease-1>',
+    'On_Control_Double_Click': '<Control-Double-Button-1>',
+    'On_Control_Triple_Click': '<Control-Triple-Button-1>',
+    'On_Control_Right_Click': '<Control-Button-3>',
+    'On_Control_Right_Release': '<Control-ButtonRelease-3>',
+    'On_Control_Right_Double_Click': '<Control-Double-Button-3>',
+    'On_Control_Right_Triple_Click': '<Control-Triple-Button-3>',
+    'On_Control_Middle_Click': '<Control-Button-2>',
+    'On_Control_Middle_Release': '<Control-ButtonRelease-2>',
+    'On_Control_Middle_Double_Click': '<Control-Double-Button-2>',
+    'On_Control_Middle_Triple_Click': '<Control-Triple-Button-2>',
+    'On_Control_Drag': '<Control-B1-Motion>',
+    'On_Control_Right_Drag': '<Control-B3-Motion>',
+    'On_Control_Middle_Drag': '<Control-B2-Motion>',
+    'On_Control_Hover_In': '<Control-Enter>',
+    'On_Control_Hover_Out': '<Control-Leave>',
+    'On_Control_Mouse_Wheel': ['<Control-MouseWheel>', '<Control-Button-4>', '<Control-Button-5>'],
+    'On_Shift_Click': '<Shift-Button-1>',
+    'On_Shift_Release': '<Shift-ButtonRelease-1>',
+    'On_Shift_Double_Click': '<Shift-Double-Button-1>',
+    'On_Shift_Triple_Click': '<Shift-Triple-Button-1>',
+    'On_Shift_Right_Click': '<Shift-Button-3>',
+    'On_Shift_Right_Release': '<Shift-ButtonRelease-3>',
+    'On_Shift_Right_Double_Click': '<Shift-Double-Button-3>',
+    'On_Shift_Right_Triple_Click': '<Shift-Triple-Button-3>',
+    'On_Shift_Middle_Click': '<Shift-Button-2>',
+    'On_Shift_Middle_Release': '<Shift-ButtonRelease-2>',
+    'On_Shift_Middle_Double_Click': '<Shift-Double-Button-2>',
+    'On_Shift_Middle_Triple_Click': '<Shift-Triple-Button-2>',
+    'On_Shift_Drag': '<Shift-B1-Motion>',
+    'On_Shift_Right_Drag': '<Shift-B3-Motion>',
+    'On_Shift_Middle_Drag': '<Shift-B2-Motion>',
+    'On_Shift_Hover_In': '<Shift-Enter>',
+    'On_Shift_Hover_Out': '<Shift-Leave>',
+    'On_Shift_Mouse_Wheel': ['<Shift-MouseWheel>', '<Shift-Button-4>', '<Shift-Button-5>'],
+    'On_Alt_Click': '<Alt-Button-1>',
+    'On_Alt_Release': '<Alt-ButtonRelease-1>',
+    'On_Alt_Double_Click': '<Alt-Double-Button-1>',
+    'On_Alt_Triple_Click': '<Alt-Triple-Button-1>',
+    'On_Alt_Right_Click': '<Alt-Button-3>',
+    'On_Alt_Right_Release': '<Alt-ButtonRelease-3>',
+    'On_Alt_Right_Double_Click': '<Alt-Double-Button-3>',
+    'On_Alt_Right_Triple_Click': '<Alt-Triple-Button-3>',
+    'On_Alt_Middle_Click': '<Alt-Button-2>',
+    'On_Alt_Middle_Release': '<Alt-ButtonRelease-2>',
+    'On_Alt_Middle_Double_Click': '<Alt-Double-Button-2>',
+    'On_Alt_Middle_Triple_Click': '<Alt-Triple-Button-2>',
+    'On_Alt_Drag': '<Alt-B1-Motion>',
+    'On_Alt_Right_Drag': '<Alt-B3-Motion>',
+    'On_Alt_Middle_Drag': '<Alt-B2-Motion>',
+    'On_Alt_Hover_In': '<Alt-Enter>',
+    'On_Alt_Hover_Out': '<Alt-Leave>',
+    'On_Alt_Mouse_Wheel': ['<Alt-MouseWheel>', '<Alt-Button-4>', '<Alt-Button-5>'],
+}
+
 def Event_Bind(Widget, **Input):
     Bind_Add = "+"
     if 'Add' in Input and Input['Add'] is False:
         Bind_Add = ""
-    if 'Cursor_Hand' in Input:
-        if Input['Cursor_Hand']:
-            Widget.config(cursor="hand2")
-    if 'Cursor_Loading' in Input:
-        if Input['Cursor_Loading']:
-            Widget.config(cursor="watch")
-    if 'Cursor_Resize_Vertical' in Input:
-        if Input['Cursor_Resize_Vertical']:
-            Widget.config(cursor='sb_h_double_arrow')
-    if 'Cursor_Resize_Horizontal' in Input:
-        if Input['Cursor_Resize_Horizontal']:
-            Widget.config(cursor='sb_v_double_arrow')
-    if 'Cursor_Arrow' in Input:
-        if Input['Cursor_Arrow']:
-            Widget.config(cursor="")
     if 'Cursor' in Input:
-        if Input['Cursor']:
-            Widget.config(cursor=Input['Cursor'])
-    if "On_Configure" in Input:
-        Widget.bind("<Configure>", Input["On_Configure"], add=Bind_Add)
-    if "On_Destroy" in Input:
-        Widget.bind("<Destroy>", Input["On_Destroy"], add=Bind_Add)
-    if "On_Expose" in Input:
-        Widget.bind("<Expose>", Input["On_Expose"], add=Bind_Add)
-    if "On_Visibility" in Input:
-        Widget.bind("<Visibility>", Input["On_Visibility"], add=Bind_Add)
-    if "On_Motion" in Input:
-        Widget.bind("<Motion>", Input["On_Motion"], add=Bind_Add)
-    if "On_Click" in Input:
-        Widget.bind("<ButtonPress-1>", Input["On_Click"], add=Bind_Add)
-    if "On_Release" in Input:
-        Widget.bind("<ButtonRelease-1>", Input["On_Release"], add=Bind_Add)
-    if "On_Double_Click" in Input:
-        Widget.bind("<Double-1>", Input["On_Double_Click"], add=Bind_Add)
-    if "On_Triple_Click" in Input:
-        Widget.bind("<Triple-1>", Input["On_Triple_Click"], add=Bind_Add)
-    if "On_Middle_Click" in Input:
-        Widget.bind("<ButtonPress-2>", Input["On_Middle_Click"], add=Bind_Add)
-    if "On_Middle_Release" in Input:
-        Widget.bind("<ButtonRelease-2>", Input["On_Middle_Release"], add=Bind_Add)
-    if "On_Middle_Double_Click" in Input:
-        Widget.bind("<Double-2>", Input["On_Middle_Double_Click"], add=Bind_Add)
-    if "On_Middle_Triple_Click" in Input:
-        Widget.bind("<Triple-2>", Input["On_Middle_Triple_Click"], add=Bind_Add)
-    if "On_Right_Click" in Input:
-        Widget.bind("<ButtonPress-3>", Input["On_Right_Click"], add=Bind_Add)
-    if "On_Right_Release" in Input:
-        Widget.bind("<ButtonRelease-3>", Input["On_Right_Release"], add=Bind_Add)
-    if "On_Right_Double_Click" in Input:
-        Widget.bind("<Double-3>", Input["On_Right_Double_Click"], add=Bind_Add)
-    if "On_Right_Triple_Click" in Input:
-        Widget.bind("<Triple-3>", Input["On_Right_Triple_Click"], add=Bind_Add)
-    if "On_Drag" in Input:
-        Widget.bind("<B1-Motion>", Input["On_Drag"], add=Bind_Add)
-    if "On_Middle_Drag" in Input:
-        Widget.bind("<B2-Motion>", Input["On_Middle_Drag"], add=Bind_Add)
-    if "On_Right_Drag" in Input:
-        Widget.bind("<B3-Motion>", Input["On_Right_Drag"], add=Bind_Add)
-    if "On_Mouse_Wheel" in Input:
-        Func = Input["On_Mouse_Wheel"]
-        def Mouse_Wheel_Handler(Event, Func=Func):
-            if not hasattr(Event, "delta"):
-                Num = getattr(Event, "num", 0)
-                if Num == 4:
-                    Event.delta = 120
-                elif Num == 5:
-                    Event.delta = -120
-                else:
-                    Event.delta = 0
-            Func(Event)
-        Widget.bind("<MouseWheel>", Mouse_Wheel_Handler, add=Bind_Add)
-        Widget.bind("<Button-4>", Mouse_Wheel_Handler, add=Bind_Add)
-        Widget.bind("<Button-5>", Mouse_Wheel_Handler, add=Bind_Add)
-    if "On_Hover_In" in Input:
-        Widget.bind("<Enter>", Input["On_Hover_In"], add=Bind_Add)
-    if "On_Hover_Out" in Input:
-        Widget.bind("<Leave>", Input["On_Hover_Out"], add=Bind_Add)
-    if "On_Key" in Input:
-        Widget.bind("<KeyPress>", Input["On_Key"], add=Bind_Add)
-    if "On_Key_Release" in Input:
-        Widget.bind("<KeyRelease>", Input["On_Key_Release"], add=Bind_Add)
-    if "On_Focus_In" in Input:
-        Widget.bind("<FocusIn>", Input["On_Focus_In"], add=Bind_Add)
-    if "On_Focus_Out" in Input:
-        Widget.bind("<FocusOut>", Input["On_Focus_Out"], add=Bind_Add)
-    if "On_Map" in Input:
-        Widget.bind("<Map>", Input["On_Map"], add=Bind_Add)
-    if "On_Unmap" in Input:
-        Widget.bind("<Unmap>", Input["On_Unmap"], add=Bind_Add)
-    if "On_Copy" in Input:
-        Widget.bind("<<Copy>>", Input["On_Copy"], add=Bind_Add)
-    if "On_Cut" in Input:
-        Widget.bind("<<Cut>>", Input["On_Cut"], add=Bind_Add)
-    if "On_Paste" in Input:
-        Widget.bind("<<Paste>>", Input["On_Paste"], add=Bind_Add)
-    if "On_Undo" in Input:
-        Widget.bind("<<Undo>>", Input["On_Undo"], add=Bind_Add)
-    if "On_Redo" in Input:
-        Widget.bind("<<Redo>>", Input["On_Redo"], add=Bind_Add)
-    if "On_Control_Click" in Input:
-        Widget.bind("<Control-Button-1>", Input["On_Control_Click"], add=Bind_Add)
-    if "On_Control_Release" in Input:
-        Widget.bind("<Control-ButtonRelease-1>", Input["On_Control_Release"], add=Bind_Add)
-    if "On_Control_Double_Click" in Input:
-        Widget.bind("<Control-Double-1>", Input["On_Control_Double_Click"], add=Bind_Add)
-    if "On_Control_Triple_Click" in Input:
-        Widget.bind("<Control-Triple-1>", Input["On_Control_Triple_Click"], add=Bind_Add)
-    if "On_Control_Middle_Click" in Input:
-        Widget.bind("<Control-Button-2>", Input["On_Control_Middle_Click"], add=Bind_Add)
-    if "On_Control_Middle_Release" in Input:
-        Widget.bind("<Control-ButtonRelease-2>", Input["On_Control_Middle_Release"], add=Bind_Add)
-    if "On_Control_Middle_Double_Click" in Input:
-        Widget.bind("<Control-Double-2>", Input["On_Control_Middle_Double_Click"], add=Bind_Add)
-    if "On_Control_Middle_Triple_Click" in Input:
-        Widget.bind("<Control-Triple-2>", Input["On_Control_Middle_Triple_Click"], add=Bind_Add)
-    if "On_Control_Right_Click" in Input:
-        Widget.bind("<Control-Button-3>", Input["On_Control_Right_Click"], add=Bind_Add)
-    if "On_Control_Right_Release" in Input:
-        Widget.bind("<Control-ButtonRelease-3>", Input["On_Control_Right_Release"], add=Bind_Add)
-    if "On_Control_Right_Double_Click" in Input:
-        Widget.bind("<Control-Double-3>", Input["On_Control_Right_Double_Click"], add=Bind_Add)
-    if "On_Control_Right_Triple_Click" in Input:
-        Widget.bind("<Control-Triple-3>", Input["On_Control_Right_Triple_Click"], add=Bind_Add)
-    if "On_Control_Drag" in Input:
-        Widget.bind("<Control-B1-Motion>", Input["On_Control_Drag"], add=Bind_Add)
-    if "On_Control_Middle_Drag" in Input:
-        Widget.bind("<Control-B2-Motion>", Input["On_Control_Middle_Drag"], add=Bind_Add)
-    if "On_Control_Right_Drag" in Input:
-        Widget.bind("<Control-B3-Motion>", Input["On_Control_Right_Drag"], add=Bind_Add)
-    if "On_Control_Mouse_Wheel" in Input:
-        Func = Input["On_Control_Mouse_Wheel"]
-        def Control_Mouse_Wheel_Handler(Event, Func=Func):
-            if not hasattr(Event, "delta"):
-                Num = getattr(Event, "num", 0)
-                if Num == 4:
-                    Event.delta = 120
-                elif Num == 5:
-                    Event.delta = -120
-                else:
-                    Event.delta = 0
-            Func(Event)
-        Widget.bind("<Control-MouseWheel>", Control_Mouse_Wheel_Handler, add=Bind_Add)
-        Widget.bind("<Control-Button-4>", Control_Mouse_Wheel_Handler, add=Bind_Add)
-        Widget.bind("<Control-Button-5>", Control_Mouse_Wheel_Handler, add=Bind_Add)
-    if "On_Control_Hover_In" in Input:
-        Widget.bind("<Control-Enter>", Input["On_Control_Hover_In"], add=Bind_Add)
-    if "On_Control_Hover_Out" in Input:
-        Widget.bind("<Control-Leave>", Input["On_Control_Hover_Out"], add=Bind_Add)
-    if "On_Alt_Click" in Input:
-        Widget.bind("<Alt-Button-1>", Input["On_Alt_Click"], add=Bind_Add)
-    if "On_Alt_Release" in Input:
-        Widget.bind("<Alt-ButtonRelease-1>", Input["On_Alt_Release"], add=Bind_Add)
-    if "On_Alt_Double_Click" in Input:
-        Widget.bind("<Alt-Double-1>", Input["On_Alt_Double_Click"], add=Bind_Add)
-    if "On_Alt_Triple_Click" in Input:
-        Widget.bind("<Alt-Triple-1>", Input["On_Alt_Triple_Click"], add=Bind_Add)
-    if "On_Alt_Middle_Click" in Input:
-        Widget.bind("<Alt-Button-2>", Input["On_Alt_Middle_Click"], add=Bind_Add)
-    if "On_Alt_Middle_Release" in Input:
-        Widget.bind("<Alt-ButtonRelease-2>", Input["On_Alt_Middle_Release"], add=Bind_Add)
-    if "On_Alt_Middle_Double_Click" in Input:
-        Widget.bind("<Alt-Double-2>", Input["On_Alt_Middle_Double_Click"], add=Bind_Add)
-    if "On_Alt_Middle_Triple_Click" in Input:
-        Widget.bind("<Alt-Triple-2>", Input["On_Alt_Middle_Triple_Click"], add=Bind_Add)
-    if "On_Alt_Right_Click" in Input:
-        Widget.bind("<Alt-Button-3>", Input["On_Alt_Right_Click"], add=Bind_Add)
-    if "On_Alt_Right_Release" in Input:
-        Widget.bind("<Alt-ButtonRelease-3>", Input["On_Alt_Right_Release"], add=Bind_Add)
-    if "On_Alt_Right_Double_Click" in Input:
-        Widget.bind("<Alt-Double-3>", Input["On_Alt_Right_Double_Click"], add=Bind_Add)
-    if "On_Alt_Right_Triple_Click" in Input:
-        Widget.bind("<Alt-Triple-3>", Input["On_Alt_Right_Triple_Click"], add=Bind_Add)
-    if "On_Alt_Drag" in Input:
-        Widget.bind("<Alt-B1-Motion>", Input["On_Alt_Drag"], add=Bind_Add)
-    if "On_Alt_Middle_Drag" in Input:
-        Widget.bind("<Alt-B2-Motion>", Input["On_Alt_Middle_Drag"], add=Bind_Add)
-    if "On_Alt_Right_Drag" in Input:
-        Widget.bind("<Alt-B3-Motion>", Input["On_Alt_Right_Drag"], add=Bind_Add)
-    if "On_Alt_Mouse_Wheel" in Input:
-        Func = Input["On_Alt_Mouse_Wheel"]
-        def Alt_Mouse_Wheel_Handler(Event, Func=Func):
-            if not hasattr(Event, "delta"):
-                Num = getattr(Event, "num", 0)
-                if Num == 4:
-                    Event.delta = 120
-                elif Num == 5:
-                    Event.delta = -120
-                else:
-                    Event.delta = 0
-            Func(Event)
-        Widget.bind("<Alt-MouseWheel>", Alt_Mouse_Wheel_Handler, add=Bind_Add)
-        Widget.bind("<Alt-Button-4>", Alt_Mouse_Wheel_Handler, add=Bind_Add)
-        Widget.bind("<Alt-Button-5>", Alt_Mouse_Wheel_Handler, add=Bind_Add)
-    if "On_Alt_Hover_In" in Input:
-        Widget.bind("<Alt-Enter>", Input["On_Alt_Hover_In"], add=Bind_Add)
-    if "On_Alt_Hover_Out" in Input:
-        Widget.bind("<Alt-Leave>", Input["On_Alt_Hover_Out"], add=Bind_Add)
-    if "On_Shift_Click" in Input:
-        Widget.bind("<Shift-Button-1>", Input["On_Shift_Click"], add=Bind_Add)
-    if "On_Shift_Release" in Input:
-        Widget.bind("<Shift-ButtonRelease-1>", Input["On_Shift_Release"], add=Bind_Add)
-    if "On_Shift_Double_Click" in Input:
-        Widget.bind("<Shift-Double-1>", Input["On_Shift_Double_Click"], add=Bind_Add)
-    if "On_Shift_Triple_Click" in Input:
-        Widget.bind("<Shift-Triple-1>", Input["On_Shift_Triple_Click"], add=Bind_Add)
-    if "On_Shift_Middle_Click" in Input:
-        Widget.bind("<Shift-Button-2>", Input["On_Shift_Middle_Click"], add=Bind_Add)
-    if "On_Shift_Middle_Release" in Input:
-        Widget.bind("<Shift-ButtonRelease-2>", Input["On_Shift_Middle_Release"], add=Bind_Add)
-    if "On_Shift_Middle_Double_Click" in Input:
-        Widget.bind("<Shift-Double-2>", Input["On_Shift_Middle_Double_Click"], add=Bind_Add)
-    if "On_Shift_Middle_Triple_Click" in Input:
-        Widget.bind("<Shift-Triple-2>", Input["On_Shift_Middle_Triple_Click"], add=Bind_Add)
-    if "On_Shift_Right_Click" in Input:
-        Widget.bind("<Shift-Button-3>", Input["On_Shift_Right_Click"], add=Bind_Add)
-    if "On_Shift_Right_Release" in Input:
-        Widget.bind("<Shift-ButtonRelease-3>", Input["On_Shift_Right_Release"], add=Bind_Add)
-    if "On_Shift_Right_Double_Click" in Input:
-        Widget.bind("<Shift-Double-3>", Input["On_Shift_Right_Double_Click"], add=Bind_Add)
-    if "On_Shift_Right_Triple_Click" in Input:
-        Widget.bind("<Shift-Triple-3>", Input["On_Shift_Right_Triple_Click"], add=Bind_Add)
-    if "On_Shift_Drag" in Input:
-        Widget.bind("<Shift-B1-Motion>", Input["On_Shift_Drag"], add=Bind_Add)
-    if "On_Shift_Middle_Drag" in Input:
-        Widget.bind("<Shift-B2-Motion>", Input["On_Shift_Middle_Drag"], add=Bind_Add)
-    if "On_Shift_Right_Drag" in Input:
-        Widget.bind("<Shift-B3-Motion>", Input["On_Shift_Right_Drag"], add=Bind_Add)
-    if "On_Shift_Mouse_Wheel" in Input:
-        Func = Input["On_Shift_Mouse_Wheel"]
-        def Shift_Mouse_Wheel_Handler(Event, Func=Func):
-            if not hasattr(Event, "delta"):
-                Num = getattr(Event, "num", 0)
-                if Num == 4:
-                    Event.delta = 120
-                elif Num == 5:
-                    Event.delta = -120
-                else:
-                    Event.delta = 0
-            Func(Event)
-        Widget.bind("<Shift-MouseWheel>", Shift_Mouse_Wheel_Handler, add=Bind_Add)
-        Widget.bind("<Shift-Button-4>", Shift_Mouse_Wheel_Handler, add=Bind_Add)
-        Widget.bind("<Shift-Button-5>", Shift_Mouse_Wheel_Handler, add=Bind_Add)
-    if "On_Shift_Hover_In" in Input:
-        Widget.bind("<Shift-Enter>", Input["On_Shift_Hover_In"], add=Bind_Add)
-    if "On_Shift_Hover_Out" in Input:
-        Widget.bind("<Shift-Leave>", Input["On_Shift_Hover_Out"], add=Bind_Add)
+        Widget.config(cursor=Input['Cursor'])
+    elif 'Cursor_Hand' in Input and Input['Cursor_Hand']:
+        Widget.config(cursor="hand2")
+    elif 'Cursor_Loading' in Input and Input['Cursor_Loading']:
+        Widget.config(cursor="watch")
+    elif 'Cursor_Resize_Vertical' in Input and Input['Cursor_Resize_Vertical']:
+        Widget.config(cursor='sb_v_double_arrow')
+    elif 'Cursor_Resize_Horizontal' in Input and Input['Cursor_Resize_Horizontal']:
+        Widget.config(cursor='sb_h_double_arrow')
+    elif 'Cursor_Arrow' in Input and Input['Cursor_Arrow']:
+        Widget.config(cursor='arrow')
+    for Key, Value in Input.items():
+        if Key in Event_Map:
+            Sequences = Event_Map[Key]
+            if isinstance(Sequences, list):
+                for Seq in Sequences:
+                    Widget.bind(Seq, Value, add=Bind_Add)
+            else:
+                Widget.bind(Sequences, Value, add=Bind_Add)
 
 def Event_Bind_Canvas(Widget, Item, **Input):
     Bind_Add = "+"
     if 'Add' in Input and Input['Add'] is False:
         Bind_Add = ""
-    if "On_Motion" in Input:
-        Widget.tag_bind(Item, "<Motion>", Input["On_Motion"], add=Bind_Add)
-    if "On_Click" in Input:
-        Widget.tag_bind(Item, "<ButtonPress-1>", Input["On_Click"], add=Bind_Add)
-    if "On_Release" in Input:
-        Widget.tag_bind(Item, "<ButtonRelease-1>", Input["On_Release"], add=Bind_Add)
-    if "On_Double_Click" in Input:
-        Widget.tag_bind(Item, "<Double-1>", Input["On_Double_Click"], add=Bind_Add)
-    if "On_Triple_Click" in Input:
-        Widget.tag_bind(Item, "<Triple-1>", Input["On_Triple_Click"], add=Bind_Add)
-    if "On_Middle_Click" in Input:
-        Widget.tag_bind(Item, "<ButtonPress-2>", Input["On_Middle_Click"], add=Bind_Add)
-    if "On_Middle_Release" in Input:
-        Widget.tag_bind(Item, "<ButtonRelease-2>", Input["On_Middle_Release"], add=Bind_Add)
-    if "On_Middle_Double_Click" in Input:
-        Widget.tag_bind(Item, "<Double-2>", Input["On_Middle_Double_Click"], add=Bind_Add)
-    if "On_Middle_Triple_Click" in Input:
-        Widget.tag_bind(Item, "<Triple-2>", Input["On_Middle_Triple_Click"], add=Bind_Add)
-    if "On_Right_Click" in Input:
-        Widget.tag_bind(Item, "<ButtonPress-3>", Input["On_Right_Click"], add=Bind_Add)
-    if "On_Right_Release" in Input:
-        Widget.tag_bind(Item, "<ButtonRelease-3>", Input["On_Right_Release"], add=Bind_Add)
-    if "On_Right_Double_Click" in Input:
-        Widget.tag_bind(Item, "<Double-3>", Input["On_Right_Double_Click"], add=Bind_Add)
-    if "On_Right_Triple_Click" in Input:
-        Widget.tag_bind(Item, "<Triple-3>", Input["On_Right_Triple_Click"], add=Bind_Add)
-    if "On_Drag" in Input:
-        Widget.tag_bind(Item, "<B1-Motion>", Input["On_Drag"], add=Bind_Add)
-    if "On_Middle_Drag" in Input:
-        Widget.tag_bind(Item, "<B2-Motion>", Input["On_Middle_Drag"], add=Bind_Add)
-    if "On_Right_Drag" in Input:
-        Widget.tag_bind(Item, "<B3-Motion>", Input["On_Right_Drag"], add=Bind_Add)
-    if "On_Mouse_Wheel" in Input:
-        Func = Input["On_Mouse_Wheel"]
-        def Mouse_Wheel_Handler(Event, Func=Func):
-            if not hasattr(Event, "delta"):
-                Num = getattr(Event, "num", 0)
-                if Num == 4:
-                    Event.delta = 120
-                elif Num == 5:
-                    Event.delta = -120
-                else:
-                    Event.delta = 0
-            Func(Event)
-        Widget.tag_bind(Item, "<Button-4>", Mouse_Wheel_Handler, add=Bind_Add)
-        Widget.tag_bind(Item, "<Button-5>", Mouse_Wheel_Handler, add=Bind_Add)
-    if "On_Hover_In" in Input:
-        Widget.tag_bind(Item, "<Enter>", Input["On_Hover_In"], add=Bind_Add)
-    if "On_Hover_Out" in Input:
-        Widget.tag_bind(Item, "<Leave>", Input["On_Hover_Out"], add=Bind_Add)
-    if "On_Key" in Input:
-        Widget.tag_bind(Item, "<KeyPress>", Input["On_Key"], add=Bind_Add)
-    if "On_Key_Release" in Input:
-        Widget.tag_bind(Item, "<KeyRelease>", Input["On_Key_Release"], add=Bind_Add)
-    if "On_Copy" in Input:
-        Widget.tag_bind(Item, "<<Copy>>", Input["On_Copy"], add=Bind_Add)
-    if "On_Cut" in Input:
-        Widget.tag_bind(Item, "<<Cut>>", Input["On_Cut"], add=Bind_Add)
-    if "On_Paste" in Input:
-        Widget.tag_bind(Item, "<<Paste>>", Input["On_Paste"], add=Bind_Add)
-    if "On_Undo" in Input:
-        Widget.tag_bind(Item, "<<Undo>>", Input["On_Undo"], add=Bind_Add)
-    if "On_Redo" in Input:
-        Widget.tag_bind(Item, "<<Redo>>", Input["On_Redo"], add=Bind_Add)
-    if "On_Control_Click" in Input:
-        Widget.tag_bind(Item, "<Control-Button-1>", Input["On_Control_Click"], add=Bind_Add)
-    if "On_Control_Release" in Input:
-        Widget.tag_bind(Item, "<Control-ButtonRelease-1>", Input["On_Control_Release"], add=Bind_Add)
-    if "On_Control_Double_Click" in Input:
-        Widget.tag_bind(Item, "<Control-Double-1>", Input["On_Control_Double_Click"], add=Bind_Add)
-    if "On_Control_Triple_Click" in Input:
-        Widget.tag_bind(Item, "<Control-Triple-1>", Input["On_Control_Triple_Click"], add=Bind_Add)
-    if "On_Control_Middle_Click" in Input:
-        Widget.tag_bind(Item, "<Control-Button-2>", Input["On_Control_Middle_Click"], add=Bind_Add)
-    if "On_Control_Middle_Release" in Input:
-        Widget.tag_bind(Item, "<Control-ButtonRelease-2>", Input["On_Control_Middle_Release"], add=Bind_Add)
-    if "On_Control_Middle_Double_Click" in Input:
-        Widget.tag_bind(Item, "<Control-Double-2>", Input["On_Control_Middle_Double_Click"], add=Bind_Add)
-    if "On_Control_Middle_Triple_Click" in Input:
-        Widget.tag_bind(Item, "<Control-Triple-2>", Input["On_Control_Middle_Triple_Click"], add=Bind_Add)
-    if "On_Control_Right_Click" in Input:
-        Widget.tag_bind(Item, "<Control-Button-3>", Input["On_Control_Right_Click"], add=Bind_Add)
-    if "On_Control_Right_Release" in Input:
-        Widget.tag_bind(Item, "<Control-ButtonRelease-3>", Input["On_Control_Right_Release"], add=Bind_Add)
-    if "On_Control_Right_Double_Click" in Input:
-        Widget.tag_bind(Item, "<Control-Double-3>", Input["On_Control_Right_Double_Click"], add=Bind_Add)
-    if "On_Control_Right_Triple_Click" in Input:
-        Widget.tag_bind(Item, "<Control-Triple-3>", Input["On_Control_Right_Triple_Click"], add=Bind_Add)
-    if "On_Control_Drag" in Input:
-        Widget.tag_bind(Item, "<Control-B1-Motion>", Input["On_Control_Drag"], add=Bind_Add)
-    if "On_Control_Middle_Drag" in Input:
-        Widget.tag_bind(Item, "<Control-B2-Motion>", Input["On_Control_Middle_Drag"], add=Bind_Add)
-    if "On_Control_Right_Drag" in Input:
-        Widget.tag_bind(Item, "<Control-B3-Motion>", Input["On_Control_Right_Drag"], add=Bind_Add)
-    if "On_Control_Hover_In" in Input:
-        Widget.tag_bind(Item, "<Control-Enter>", Input["On_Control_Hover_In"], add=Bind_Add)
-    if "On_Control_Hover_Out" in Input:
-        Widget.tag_bind(Item, "<Control-Leave>", Input["On_Control_Hover_Out"], add=Bind_Add)
-    if "On_Alt_Click" in Input:
-        Widget.tag_bind(Item, "<Alt-Button-1>", Input["On_Alt_Click"], add=Bind_Add)
-    if "On_Alt_Release" in Input:
-        Widget.tag_bind(Item, "<Alt-ButtonRelease-1>", Input["On_Alt_Release"], add=Bind_Add)
-    if "On_Alt_Double_Click" in Input:
-        Widget.tag_bind(Item, "<Alt-Double-1>", Input["On_Alt_Double_Click"], add=Bind_Add)
-    if "On_Alt_Triple_Click" in Input:
-        Widget.tag_bind(Item, "<Alt-Triple-1>", Input["On_Alt_Triple_Click"], add=Bind_Add)
-    if "On_Alt_Middle_Click" in Input:
-        Widget.tag_bind(Item, "<Alt-Button-2>", Input["On_Alt_Middle_Click"], add=Bind_Add)
-    if "On_Alt_Middle_Release" in Input:
-        Widget.tag_bind(Item, "<Alt-ButtonRelease-2>", Input["On_Alt_Middle_Release"], add=Bind_Add)
-    if "On_Alt_Middle_Double_Click" in Input:
-        Widget.tag_bind(Item, "<Alt-Double-2>", Input["On_Alt_Middle_Double_Click"], add=Bind_Add)
-    if "On_Alt_Middle_Triple_Click" in Input:
-        Widget.tag_bind(Item, "<Alt-Triple-2>", Input["On_Alt_Middle_Triple_Click"], add=Bind_Add)
-    if "On_Alt_Right_Click" in Input:
-        Widget.tag_bind(Item, "<Alt-Button-3>", Input["On_Alt_Right_Click"], add=Bind_Add)
-    if "On_Alt_Right_Release" in Input:
-        Widget.tag_bind(Item, "<Alt-ButtonRelease-3>", Input["On_Alt_Right_Release"], add=Bind_Add)
-    if "On_Alt_Right_Double_Click" in Input:
-        Widget.tag_bind(Item, "<Alt-Double-3>", Input["On_Alt_Right_Double_Click"], add=Bind_Add)
-    if "On_Alt_Right_Triple_Click" in Input:
-        Widget.tag_bind(Item, "<Alt-Triple-3>", Input["On_Alt_Right_Triple_Click"], add=Bind_Add)
-    if "On_Alt_Drag" in Input:
-        Widget.tag_bind(Item, "<Alt-B1-Motion>", Input["On_Alt_Drag"], add=Bind_Add)
-    if "On_Alt_Middle_Drag" in Input:
-        Widget.tag_bind(Item, "<Alt-B2-Motion>", Input["On_Alt_Middle_Drag"], add=Bind_Add)
-    if "On_Alt_Right_Drag" in Input:
-        Widget.tag_bind(Item, "<Alt-B3-Motion>", Input["On_Alt_Right_Drag"], add=Bind_Add)
-    if "On_Alt_Hover_In" in Input:
-        Widget.tag_bind(Item, "<Alt-Enter>", Input["On_Alt_Hover_In"], add=Bind_Add)
-    if "On_Alt_Hover_Out" in Input:
-        Widget.tag_bind(Item, "<Alt-Leave>", Input["On_Alt_Hover_Out"], add=Bind_Add)
-    if "On_Shift_Click" in Input:
-        Widget.tag_bind(Item, "<Shift-Button-1>", Input["On_Shift_Click"], add=Bind_Add)
-    if "On_Shift_Release" in Input:
-        Widget.tag_bind(Item, "<Shift-ButtonRelease-1>", Input["On_Shift_Release"], add=Bind_Add)
-    if "On_Shift_Double_Click" in Input:
-        Widget.tag_bind(Item, "<Shift-Double-1>", Input["On_Shift_Double_Click"], add=Bind_Add)
-    if "On_Shift_Triple_Click" in Input:
-        Widget.tag_bind(Item, "<Shift-Triple-1>", Input["On_Shift_Triple_Click"], add=Bind_Add)
-    if "On_Shift_Middle_Click" in Input:
-        Widget.tag_bind(Item, "<Shift-Button-2>", Input["On_Shift_Middle_Click"], add=Bind_Add)
-    if "On_Shift_Middle_Release" in Input:
-        Widget.tag_bind(Item, "<Shift-ButtonRelease-2>", Input["On_Shift_Middle_Release"], add=Bind_Add)
-    if "On_Shift_Middle_Double_Click" in Input:
-        Widget.tag_bind(Item, "<Shift-Double-2>", Input["On_Shift_Middle_Double_Click"], add=Bind_Add)
-    if "On_Shift_Middle_Triple_Click" in Input:
-        Widget.tag_bind(Item, "<Shift-Triple-2>", Input["On_Shift_Middle_Triple_Click"], add=Bind_Add)
-    if "On_Shift_Right_Click" in Input:
-        Widget.tag_bind(Item, "<Shift-Button-3>", Input["On_Shift_Right_Click"], add=Bind_Add)
-    if "On_Shift_Right_Release" in Input:
-        Widget.tag_bind(Item, "<Shift-ButtonRelease-3>", Input["On_Shift_Right_Release"], add=Bind_Add)
-    if "On_Shift_Right_Double_Click" in Input:
-        Widget.tag_bind(Item, "<Shift-Double-3>", Input["On_Shift_Right_Double_Click"], add=Bind_Add)
-    if "On_Shift_Right_Triple_Click" in Input:
-        Widget.tag_bind(Item, "<Shift-Triple-3>", Input["On_Shift_Right_Triple_Click"], add=Bind_Add)
-    if "On_Shift_Drag" in Input:
-        Widget.tag_bind(Item, "<Shift-B1-Motion>", Input["On_Shift_Drag"], add=Bind_Add)
-    if "On_Shift_Middle_Drag" in Input:
-        Widget.tag_bind(Item, "<Shift-B2-Motion>", Input["On_Shift_Middle_Drag"], add=Bind_Add)
-    if "On_Shift_Right_Drag" in Input:
-        Widget.tag_bind(Item, "<Shift-B3-Motion>", Input["On_Shift_Right_Drag"], add=Bind_Add)
-    if "On_Shift_Hover_In" in Input:
-        Widget.tag_bind(Item, "<Shift-Enter>", Input["On_Shift_Hover_In"], add=Bind_Add)
-    if "On_Shift_Hover_Out" in Input:
-        Widget.tag_bind(Item, "<Shift-Leave>", Input["On_Shift_Hover_Out"], add=Bind_Add)
+    for Key, Value in Input.items():
+        if Key in Event_Map:
+            Sequences = Event_Map[Key]
+            if isinstance(Sequences, list):
+                for Seq in Sequences:
+                    Widget.tag_bind(Item, Seq, Value, add=Bind_Add)
+            else:
+                Widget.tag_bind(Item, Sequences, Value, add=Bind_Add)

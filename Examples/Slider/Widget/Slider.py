@@ -3,9 +3,8 @@
 #################################################################################################################################
 class Slider():
 
-    def __init__(self, Root, Bar, Frame):
+    def __init__(self, Bar, Frame):
         self._Config = ['On_Change', 'Minimum', 'Maximum', 'Increment']
-        self._Root = Root
         self._Bar = Bar
         self._Frame = Frame
         self._On_Change = False
@@ -59,7 +58,7 @@ class Slider():
         self._Start = E.x
 
     def Progress_Change(self, E):
-        Ratio = self._Root.Ratio()
+        Ratio = self._Bar.Ratio()
         Width = self._Bar.Config_Get('Width')['Width']
         Progress = (E.x/Ratio[0]/Width)*100
         self.Set(Progress, Percentage=True)
@@ -70,7 +69,7 @@ class Slider():
         self._Frame.Config(Left=Value)
 
     def Progress(self, E):
-        Ratio = self._Root.Ratio()
+        Ratio = self._Bar.Ratio()
         Frame_Data = self._Frame.Config_Get('Left', 'Width')
         Frame_Left = Frame_Data['Left'] + E.x/Ratio[0] - self._Start/Ratio[0]
         Bar_Data = self._Bar.Config_Get('Left', 'Width')

@@ -532,6 +532,7 @@ class Element:
             self.Delete_Confirm_Image.Hide()
             self.Delete_Image.Set(self.Global['Image']('Delete'))
             self.Delete_Image.Bind(Add=False, On_Click=lambda E: self.Show_Delete())
+            self.Delete_Image.Show()
             self.Copy_Image.Show()
             if self.Copy_ID:
                 self.Paste_Image.Show()

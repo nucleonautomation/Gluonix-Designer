@@ -1,5 +1,12 @@
 # Change Log
 
+## V(7.2)
+- Delete Button Hidden Bud Fix
+- Gluonix Lib Maximize/Minimize/Restore Bug Fixes
+- Gluonix Lib Animation Bug Fix
+- Slider Example Updated
+- Login Example Updated
+
 ## V(7.1)
 - Element Resize In Designer Is Based On Quadrent Position. If Mouse Is In Left-Top Quadrent, Going Left Or Top Will Incease Size In Respective Direction
 - Multi Selection Of Widgets Support Alignment, Designer Has Four Align Button, Left, Top, Right & Bottom
