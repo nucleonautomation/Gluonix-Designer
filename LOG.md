@@ -1,7 +1,10 @@
 # Change Log
 
+## V(7.3)
+- Canvas Pie Auto Resize Bug Fix
+
 ## V(7.2)
-- Delete Button Hidden Bud Fix
+- Delete Button Hidden Bug Fix
 - Gluonix Lib Maximize/Minimize/Restore Bug Fixes
 - Gluonix Lib Animation Bug Fix
 - Slider Example Updated

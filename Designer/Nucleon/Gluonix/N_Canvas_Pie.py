@@ -360,7 +360,7 @@ class Canvas_Pie:
             self._Y2 = abs(self._Top + self._Radius)
             Stripple = f'gray{self.Stripple()}' if self._Translucent else ''
             self._Canvas._Frame.itemconfig(self._Widget, start=self._Start, extent=self._Extent, outline=self._Outline, width=self._Thickness, fill=self._Fill, stipple=Stripple)
-            self._Canvas._Frame.coords(self._Widget, self._X1, self._Y1, self._X2, self._Y2)
+            self._Canvas._Frame.coords(self._Widget, self._X1*Width_Ratio, self._Y1*Height_Ratio, self._X2*Width_Ratio, self._Y2*Height_Ratio)
             if self._Name!=self._Last_Name:
                 if self._Last_Name:
                     if self._Last_Name in self._Canvas.__dict__:
