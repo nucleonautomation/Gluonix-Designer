@@ -27,10 +27,10 @@ class Group:
             print("Error: Gluonix -> GUI Instance Has Not Been Created")
 
     def __str__(self):
-        return "Nucleon_Glunoix_Canvas_Group[]"
+        return "Nucleon_Glunoix_Group[]"
 
     def __repr__(self):
-        return "Nucleon_Glunoix_Canvas_Group[]"
+        return "Nucleon_Glunoix_Group[]"
         
     def __getattr__(self, Name):
         return getattr(self._Main, Name)
@@ -56,7 +56,7 @@ class Group:
         try:
             self.Clear()
             self._Main._Widget.remove(self)
-            if self._Main!='Frame':
+            if self._Main._Type in ['Canvas', 'Scroll']:
                 self._Main._Item.remove(self)
             if self:
                 del self
@@ -65,7 +65,9 @@ class Group:
 
     def Clear(self):
         try:
-            for Each in self._Widget:
+            for Each in list(self._Widget):
+                Each.Delete()
+            for Each in list(self._Item):
                 Each.Delete()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Clear -> {E}")
@@ -155,7 +157,7 @@ class Group:
                 if not self._Display:
                     self.Hide()
                 self._Main._Widget.append(self)
-                if self._Main!='Frame':
+                if self._Main._Type in ['Canvas', 'Scroll']:
                     self._Main._Item.append(self)
                 self._Initialized = True
             if self._Name!=self._Last_Name:

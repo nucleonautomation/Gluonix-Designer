@@ -1,5 +1,10 @@
 # Change Log
 
+## V(7.4)
+- Canvas Image Based Editor Chnaged To Viewport
+- Canvas Added New Editor, Raw Canvas Based, No Image, With Fill Color Items
+- New Example Added For Boht Editor/Viewport
+
 ## V(7.3)
 - Canvas Pie Auto Resize Bug Fix
 

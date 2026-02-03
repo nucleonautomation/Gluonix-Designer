@@ -101,7 +101,9 @@ class Scroll:
 
     def Clear(self):
         try:
-            for Each in self._Widget:
+            for Each in list(self._Widget):
+                Each.Delete()
+            for Each in list(self._Item):
                 Each.Delete()
             for Each in self._Frame.winfo_children():
                 Each.destroy()

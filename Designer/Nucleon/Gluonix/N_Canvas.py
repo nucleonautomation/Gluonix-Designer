@@ -18,6 +18,7 @@ from .N_Canvas_Text import Canvas_Text
 from .N_Canvas_Text_Old import Canvas_Text_Old
 from .N_Player import Player
 from .N_Video import Video
+from .N_Viewport import Viewport
 from .N_Editor import Editor
 
 class Canvas:
@@ -120,7 +121,9 @@ class Canvas:
 
     def Clear(self):
         try:
-            for Each in self._Widget:
+            for Each in list(self._Widget):
+                Each.Delete()
+            for Each in list(self._Item):
                 Each.Delete()
             for Each in self._Frame.find_all():
                 self._Frame.delete(Each)
@@ -931,6 +934,13 @@ class Canvas:
             return Item
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Video -> {E}")
+            
+    def Viewport(self):
+        try:
+            Item = Viewport(self)
+            return Item
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Viewport -> {E}")
             
     def Editor(self):
         try:
