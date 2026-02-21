@@ -25,8 +25,8 @@ class GUI():
 
     def __init__(self, *args, **kwargs):
         if not hasattr(self, '_Initialized'):
-            self._Config = ['Error_Display', 'Error_Log', 'Resize_Delay', 'Title', 'Icon', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Persistent', 'Resizable', 'Full_Screen', 'Toolbar', 'Menu_Enable', 'Width', 'Height', 'Left', 'Top', 'Alignment']
-            self._Config_Get = ['Error_Display', 'Error_Log', 'Resize_Delay', 'Title', 'Icon', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Persistent', 'Resizable', 'Full_Screen', 'Toolbar', 'Menu_Enable', 'Width', 'Height', 'Left', 'Top', 'Alignment', 'Full_Screen', 'Screen_Width', 'Screen_Height']
+            self._Config = ['Error_Display', 'Error_Log', 'Resize_Delay', 'Title', 'Icon', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Persistent', 'Override', 'Resizable', 'Full_Screen', 'Toolbar', 'Menu_Enable', 'Width', 'Height', 'Left', 'Top', 'Alignment']
+            self._Config_Get = ['Error_Display', 'Error_Log', 'Resize_Delay', 'Title', 'Icon', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Persistent', 'Override', 'Resizable', 'Full_Screen', 'Toolbar', 'Menu_Enable', 'Width', 'Height', 'Left', 'Top', 'Alignment', 'Full_Screen', 'Screen_Width', 'Screen_Height']
             self._Initialized = False
             self._Error_Display = False
             self._Error_Log = False
@@ -42,6 +42,7 @@ class GUI():
             self._Background = "#F0F0F0"
             self._Alignment = 'Pixel'
             self._Persistent = False
+            self._Override = True
             self._Toolbar = True
             self._Full_Screen = False
             self._Resizable = True
@@ -178,7 +179,7 @@ class GUI():
             self._Left = Event.x
             self._Top = Event.y
         except Exception as E:
-            self._GUI.Error(f"{self._Type} -> On_Configure -> {E}")
+            self.Error(f"{self._Type} -> On_Configure -> {E}")
             
     def Hide(self):
         try:
@@ -232,15 +233,51 @@ class GUI():
         except Exception as E:
             self.Error(f"{self._Type} -> Screen -> {E}")
             
+    def Is_Windows(self):
+        try:
+            return os.name == 'nt'
+        except Exception:
+            return False
+
+    def Apply_Override(self):
+        try:
+            if self._Toolbar:
+                try:
+                    self._Frame.wm_attributes('-type', 'normal')
+                except Exception:
+                    pass
+                self._Frame.overrideredirect(False)
+                return
+            if not self._Override:
+                try:
+                    self._Frame.wm_attributes('-type', 'normal')
+                except Exception:
+                    pass
+                self._Frame.overrideredirect(False)
+                return
+            if not self.Is_Windows():
+                try:
+                    self._Frame.overrideredirect(False)
+                    self._Frame.wm_attributes('-type', 'splash')
+                    return
+                except Exception:
+                    self._Frame.overrideredirect(False)
+                    return
+            self._Frame.overrideredirect(True)
+        except Exception as E:
+            self.Error(f"{self._Type} -> Apply_Override -> {E}")
+
     def Full_Screen(self, Toggle):
         try:
-            if not self._Full_Screen:
-                self._Frame.overrideredirect(False)
-                self._Frame.attributes('-fullscreen', Toggle)
-                if self._Toolbar:
-                    self._Frame.overrideredirect(False)
-                else:
-                    self._Frame.overrideredirect(True)
+            if Toggle:
+                self._Frame.attributes('-fullscreen', True)
+                self._Frame.geometry(f"{int(self._Frame.winfo_screenwidth())}x{int(self._Frame.winfo_screenheight())}+{0}+{0}")
+                self._Full_Screen = True
+            else:
+                self._Frame.attributes('-fullscreen', False)
+                self._Frame.geometry(f"{int(self._Width)}x{int(self._Height)}+{int(self._Left)}+{int(self._Top)}")
+                self._Full_Screen = False
+            self.Apply_Override()
         except Exception as E:
             self.Error(f"{self._Type} -> Full_Screen -> {E}")
             
@@ -406,7 +443,7 @@ class GUI():
             if Width is not None:
                 self._Width = Width
             if Height is not None:
-                self._Top = Height
+                self._Height = Height
             if Width is not None or Height is not None:
                 if not self._Full_Screen:
                     self._Frame.geometry(f"{int(self._Width)}x{int(self._Height)}+{int(self._Left)}+{int(self._Top)}")
@@ -493,14 +530,24 @@ class GUI():
             if not self._Initialized:
                 self.Update_Color()
                 self._Screen_Width = self._Frame.winfo_screenwidth()
-                self._Screen_Height = self._Frame.winfo_screenheight()
+                self._Screen_Height = self._Frame.winfo_screenheight()                
                 if self._Full_Screen:
-                    self._Height = self._Frame.winfo_screenheight()
-                    self._Width = self._Frame.winfo_screenwidth()
-                    self._Left = 0
-                    self._Top = 0
-                    self._Frame.attributes('-fullscreen',True)
-                    self._Frame.overrideredirect(True)
+                    self._Frame.geometry(f"{int(self._Frame.winfo_screenwidth())}x{int(self._Frame.winfo_screenheight())}+{0}+{0}")
+                    self._Frame.attributes('-fullscreen', True)
+                    if os.name == 'nt':
+                        self._Frame.overrideredirect(self._Override)
+                    else:
+                        if self._Toolbar:
+                            self._Frame.overrideredirect(False)
+                        else:
+                            if self._Override:
+                                try:
+                                    self._Frame.overrideredirect(False)
+                                    self._Frame.wm_attributes('-type', 'splash')
+                                except Exception:
+                                    self._Frame.overrideredirect(False)
+                            else:
+                                self._Frame.overrideredirect(False)
                 else:
                     if self._Alignment == 'Percentage':
                         self._Width = int(self._Frame.winfo_screenwidth() * (self._Width/100))
@@ -510,17 +557,15 @@ class GUI():
                     self._Frame.geometry(f"{int(self._Width)}x{int(self._Height)}+{int(self._Left)}+{int(self._Top)}")
                     self._Frame.resizable(self._Resizable, self._Resizable)
                     self._Frame.attributes('-fullscreen', False)
-                    if self._Toolbar:
-                        self._Frame.overrideredirect(False)
-                    else:
-                        self._Frame.overrideredirect(True)
+                    self.Apply_Override()
                 self._Frame.bind("<Configure>", self.On_Configure, add="+")
-                self._Width, self._Height, self._Left, self._Top = self._Width, self._Height, self._Left, self._Top
                 if self._Menu_Enable:
                     self._Menu = TK.Menu(self._Frame)
                     self._Frame.config(menu=self._Menu)
                 self._Initialized = True
-            if not self._Full_Screen:
+            if self._Full_Screen:
+                self._Frame.geometry(f"{int(self._Frame.winfo_screenwidth())}x{int(self._Frame.winfo_screenheight())}+{0}+{0}")
+            else:
                 self._Frame.geometry(f"{int(self._Width)}x{int(self._Height)}+{int(self._Left)}+{int(self._Top)}")
             self._Frame.config(bg=self._Background)
             if not hasattr(self, "_Light_Background"):

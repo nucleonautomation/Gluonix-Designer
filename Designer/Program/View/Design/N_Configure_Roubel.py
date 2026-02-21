@@ -110,7 +110,6 @@ class Configure_Roubel:
             self.Border_Color.Create()
             
             #Radius Label
-            Top += 7
             Fixture = self.Frame.Locate(15, 5, 53, Top)
             self.Radius_Label = self.Global['Gluonix'].Label(self.Frame)
             self.Radius_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
@@ -275,15 +274,14 @@ class Configure_Roubel:
             self.Shadow_Color.Create()
             
             #Shadow Full Label
-            Top += 7
-            Fixture = self.Frame.Locate(30, 5, 45, Top)
+            Fixture = self.Frame.Locate(30, 5, 70, Top)
             self.Shadow_Full_Label = self.Global['Gluonix'].Label(self.Frame)
             self.Shadow_Full_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
-            self.Shadow_Full_Label.Config(Foreground='#000000', Value="Shadow Full:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
+            self.Shadow_Full_Label.Config(Foreground='#000000', Value="Full:", Font_Size=10, Font_Weight='normal', Align='w', Border_Size=0)
             self.Shadow_Full_Label.Create()
             
             #Shadow Full Check
-            Fixture = self.Frame.Locate(7, 5, 85, Top)
+            Fixture = self.Frame.Locate(7, 5, 78, Top)
             self.Shadow_Full_Check = self.Global['Gluonix'].Check(self.Frame)
             self.Shadow_Full_Check.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3], Resize=False, Move=False)
             self.Shadow_Full_Check.Config(Border_Size=0)

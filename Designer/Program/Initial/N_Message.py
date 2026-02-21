@@ -22,19 +22,13 @@ class Message:
             self.Top_Bar.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Top_Bar.Config(Background='#5a1b1b', Border_Size=0)
             self.Top_Bar.Create()
-                #Close Label
-            Fixture = self.Frame.Locate(7, 20, 93, 0)
-            self.Close_Label = self.Global['Gluonix'].Label(self.Frame)
-            self.Close_Label.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
-            self.Close_Label.Config(Background='#5a1b1b', Foreground='white', Value="", Font_Size=12, Font_Weight='normal', Align='w', Border_Size=0)
-            self.Close_Label.Bind(On_Click=lambda E: self.Hide(), On_Hover_In=lambda E: self.Close_Highlight_On(), On_Hover_Out=lambda E: self.Close_Highlight_Off())
-            self.Close_Label.Create()
                 #Close Image
-            Fixture = self.Frame.Locate(5, 10, 94, 5)
+            Fixture = self.Frame.Locate(5, 10, 94, 4)
             self.Close = self.Global['Gluonix'].Image(self.Frame)
             self.Close.Config(Width=Fixture[0], Height=Fixture[1], Left=Fixture[2], Top=Fixture[3])
             self.Close.Config(Background='#5a1b1b', Path=self.Global['Image']('Cross_White'), Border_Size=0)
-            self.Close.Bind(On_Click=lambda E: self.Hide(), On_Hover_In=lambda E: self.Close_Highlight_On(), On_Hover_Out=lambda E: self.Close_Highlight_Off())
+            self.Close.Config(Foreground='#FFFFFF', Hover_Foreground='#F36D6D', Use_Foreground=True)
+            self.Close.Bind(On_Click=lambda E: self.Hide())
             self.Close.Create()
                 #Status Image
             Fixture = self.Frame.Locate(20, 77, 4, 21)
@@ -49,20 +43,6 @@ class Message:
             self.Label.Config(Foreground='black', Value="Message", Font_Size=9, Font_Weight='normal', Align='center', Border_Size=0)
             self.Label.Create()
             
-        except Exception as E:
-            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
-            
-    def Close_Highlight_On(self):
-        try:
-            self.Close_Label.Config(Background='red')
-            self.Close.Config(Background='red')
-        except Exception as E:
-            self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
-        
-    def Close_Highlight_Off(self):
-        try:
-            self.Close_Label.Config(Background='#5a1b1b')
-            self.Close.Config(Background='#5a1b1b')
         except Exception as E:
             self.Global['Error'](__class__.__name__+" -> "+inspect.currentframe().f_code.co_name+" -> "+str(E))
 

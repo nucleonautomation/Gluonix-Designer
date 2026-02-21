@@ -325,6 +325,14 @@ class Frame:
             return Return
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Config_Get -> {E}")
+            
+    def Reset_Widget(self):
+        try:
+            for Each in list(self._Widget):
+                Width, Height = Each.Size()
+                Each.Size(Width, Height)
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Reset_Widget -> {E}")
                 
     def Config(self, **Input):
         try:
@@ -347,6 +355,8 @@ class Frame:
                                 Each.Config(Radius=Each._Radius)
                     except Exception:
                         self.Nothing = False
+            if "Width" in Input or "Height" in Input:
+                self.Reset_Widget()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Config -> {E}")
             
@@ -396,6 +406,7 @@ class Frame:
             if Width or Height:
                 if self._Display:
                     self._Place_Geometry(self._Left, self._Top, self._Width, self._Height)
+                    self.Reset_Widget()
             return [int(self._Width), int(self._Height)]
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Size -> {E}")
@@ -409,6 +420,7 @@ class Frame:
                 self._Height += Value
                 if self._Initialized and self._Display and not self._Animating:
                     self._Place_Geometry(self._Left, self._Top, self._Width, self._Height)
+                    self.Reset_Widget()
             return True
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Enlarge -> {E}")
@@ -422,6 +434,7 @@ class Frame:
                 self._Height -= Value
                 if self._Initialized and self._Display and not self._Animating:
                     self._Place_Geometry(self._Left, self._Top, self._Width, self._Height)
+                    self.Reset_Widget()
             return True
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Shrink -> {E}")
@@ -444,8 +457,8 @@ class Frame:
         try:
             Width = self._Width*(Width/100)
             Height = self._Height*(Height/100)
-            Left = self._Width*(Left/100)-self._Border_Size
-            Top = self._Height*(Top/100)-self._Border_Size
+            Left = self._Width*(Left/100)
+            Top = self._Height*(Top/100)
             return [Width, Height, Left, Top]
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Locate -> {E}")

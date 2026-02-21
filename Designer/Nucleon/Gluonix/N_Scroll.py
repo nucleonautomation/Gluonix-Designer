@@ -376,8 +376,8 @@ class Scroll:
         try:
             Width = self._Width*(Width/100)
             Height = self._Height*(Height/100)
-            Left = self._Width*(Left/100)-self._Border_Size
-            Top = self._Height*(Top/100)-self._Border_Size
+            Left = self._Width*(Left/100)
+            Top = self._Height*(Top/100)
             return [Width, Height, Left, Top]
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Locate -> {E}")
@@ -421,6 +421,9 @@ class Scroll:
                 self._Initialized = True
             self._Scrollbar_Vertical.config(orient="vertical", command=self._Canvas_Scroll.yview, width=self._Scrollbar_Size)
             self._Scrollbar_Horizontal.config(orient="horizontal", command=self._Canvas_Scroll.xview, width=self._Scrollbar_Size)
+            self._Frame_Canvas.Config(Background=self._Background, Border_Size=self._Border_Size, Border_Color=self._Border_Color)
+            self._Canvas_Scroll.config(background=self._Background, highlightthickness=0)
+            self._Frame.config(background=self._Background, highlightthickness=0)
             self._Frame.place(relx=0, rely=0, relwidth=(self._Width-self._Scrollbar_Size)/self._Width, relheight=(self._Height-self._Scrollbar_Size)/self._Height)
             self._Frame['highlightthickness']=0
             if not self._Frame_Scroll:

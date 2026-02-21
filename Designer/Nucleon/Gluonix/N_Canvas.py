@@ -20,6 +20,7 @@ from .N_Player import Player
 from .N_Video import Video
 from .N_Viewport import Viewport
 from .N_Editor import Editor
+from .N_Flowchart import Flowchart
 
 class Canvas:
 
@@ -489,6 +490,14 @@ class Canvas:
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> On_Hover_Out -> {E}")
             
+    def Reset_Widget(self):
+        try:
+            for Each in list(self._Widget):
+                Width, Height = Each.Size()
+                Each.Size(Width, Height)
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Reset_Widget -> {E}")
+            
     def Config_Get(self, *Input):
         try:
             Return = {}
@@ -520,6 +529,8 @@ class Canvas:
                                 Each.Config(Radius=Each._Radius)
                     except Exception:
                         self.Nothing = False
+            if "Width" in Input or "Height" in Input:
+                self.Reset_Widget()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Config -> {E}")
             
@@ -569,6 +580,7 @@ class Canvas:
             if Width or Height:
                 if self._Display and not self._Animating:
                     self._Place_Geometry(self._Left, self._Top, self._Width, self._Height)
+                    self.Reset_Widget()
             return [int(self._Width), int(self._Height)]
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Size -> {E}")
@@ -582,6 +594,7 @@ class Canvas:
                 self._Height += Value
                 if self._Initialized and self._Display and not self._Animating:
                     self._Place_Geometry(self._Left, self._Top, self._Width, self._Height)
+                    self.Reset_Widget()
             return True
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Enlarge -> {E}")
@@ -595,6 +608,7 @@ class Canvas:
                 self._Height -= Value
                 if self._Initialized and self._Display and not self._Animating:
                     self._Place_Geometry(self._Left, self._Top, self._Width, self._Height)
+                    self.Reset_Widget()
             return True
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Shrink -> {E}")
@@ -617,8 +631,8 @@ class Canvas:
         try:
             Width = self._Width*(Width/100)
             Height = self._Height*(Height/100)
-            Left = self._Width*(Left/100)
-            Top = self._Height*(Top/100)
+            Left = self._Width*(Left/100)+self._Border_Size
+            Top = self._Height*(Top/100)+self._Border_Size
             return [Width, Height, Left, Top]
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Locate -> {E}")
@@ -627,8 +641,8 @@ class Canvas:
         try:
             Width = round((Width/self._Width)*100, 3)
             Height = round((Height/self._Height)*100, 3)
-            Left =  round((Left/self._Width)*100, 3)
-            Top =  round((Top/self._Height)*100, 3)
+            Left =  round((Left+self._Border_Size/self._Width)*100, 3)
+            Top =  round((Top+self._Border_Size/self._Height)*100, 3)
             return [Width, Height, Left, Top]
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Locate_Reverse -> {E}")
@@ -683,9 +697,9 @@ class Canvas:
                 self._Frame.delete(Each)
             self._Rounded = []
             if not Width:
-                Width = getattr(self, "_Width", 0)
+                Width = self._Frame.winfo_width()
             if not Height:
-                Height = getattr(self, "_Height", 0)
+                Height = self._Frame.winfo_height()
             Radius = min(self._Radius, Width / 2, Height / 2) if Width>0 and Height>0 else 0
             X1 = self._Shadow_Size
             Y1 = self._Shadow_Size
@@ -948,3 +962,10 @@ class Canvas:
             return Item
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Editor -> {E}")
+            
+    def Flowchart(self):
+        try:
+            Item = Flowchart(self)
+            return Item
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Flowchart -> {E}")

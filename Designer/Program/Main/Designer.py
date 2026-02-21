@@ -6,8 +6,14 @@
 # Import Libraries
 # -------------------------------------------------------------------------------------------------------------------------------
 # Custom Libraries
-from Nucleon import Gluonix
-from Program.Base import Custom
+try:
+    from Nucleon import Gluonix
+except:
+    from ...Nucleon import Gluonix
+try:
+    from Program.Base import Custom
+except:
+    from ..Base import Custom
 
 # Default Libraries
 import os
@@ -20,8 +26,14 @@ import warnings
 import urllib.request
 
 # Program
-from Program import Initial
-from Program import View
+try:
+    from Program import Initial
+except:
+    from ...Program import Initial
+try:
+    from Program import View
+except:
+    from ...Program import View
 
 # -------------------------------------------------------------------------------------------------------------------------------
 # Customization
@@ -33,7 +45,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 # -------------------------------------------------------------------------------------------------------------------------------
 Title = "Gluonix Designer - Nucleon Automation"
 Version = 7
-Revision = 4
+Revision = 5
 Error_List = []
 Error_Display = True
 Error_Log = True

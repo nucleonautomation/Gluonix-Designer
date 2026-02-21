@@ -821,16 +821,12 @@ class Image:
                 Width = self._Image_Width * Height_Ratio
                 Top = 0
                 Left = (Frame_Width - Width) / 2
-            if self._Transparent and self._Convert_Type=='RGBA' and self._Foreground and self._Use_Foreground:
-                Temp_Image = Temp_Image.convert(self._Convert_Type)
+            if self._Transparent and self._Convert_Type == 'RGBA' and self._Foreground and self._Use_Foreground:
+                Temp_Image = Temp_Image.convert('RGBA')
                 Temp_Color = self.RGB(self._Foreground)
-                Pixel_Data = Temp_Image.load()
-                Temp_Width, Temp_Height = Temp_Image.size
-                for Y in range(Temp_Height):
-                    for X in range(Temp_Width):
-                        R, G, B, A = Pixel_Data[X, Y]
-                        if R == 0 and G == 0 and B == 0:
-                            Pixel_Data[X, Y] = (*Temp_Color, A)
+                Alpha = Temp_Image.getchannel('A')
+                Temp_Image = PIL_Image.new('RGBA', Temp_Image.size, (*Temp_Color, 255))
+                Temp_Image.putalpha(Alpha)
             if self._Aspect_Ratio:
                 if int(Width)<=0 or int(Height)<=0:
                     return False

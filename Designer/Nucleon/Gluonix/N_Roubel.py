@@ -77,6 +77,7 @@ class Roubel:
     def Delete(self):
         try:
             self._Main._Widget.remove(self)
+            self._Frame._Item.remove(self)
             self._Frame._Frame.delete(self._Widget)
             self._Frame.Delete()
             if self:
@@ -334,13 +335,12 @@ class Roubel:
                 self._Frame.Config(Width=self._Width, Height=self._Height, Left=self._Left, Top=self._Top)
                 self._Frame.Config(Background=self._Background, Border_Size=self._Border_Size, Border_Color=self._Border_Color)
                 self._Frame.Create()
-                self._Frame._Item.append(self)
                 self._Frame.Bind(On_Hover_In=lambda E: self.On_Hover_In(E), On_Hover_Out=lambda E: self.On_Hover_Out(E))
+                self._Frame._Item.append(self)
                 if not self._Display:
                     self.Hide()
                 self._Main._Widget.append(self)
                 self._Initialized = True
-            
             self._Frame._Frame.itemconfig(self._Widget, text=self._Value, fill=self._Foreground, font=(self._Font_Family, self._Font_Size, self._Font_Weight), width=self._Width)
             if self._Display:
                 self.Show()

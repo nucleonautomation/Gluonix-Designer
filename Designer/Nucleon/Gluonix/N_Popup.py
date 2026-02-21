@@ -17,8 +17,8 @@ class Popup():
         if self._GUI is not None:
             self._Type = "Popup"
             try:
-                self._Config = ['Error_Display', 'Resize_Delay', 'Title', 'Icon', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Topmost', 'Persistent', 'Resizable', 'Full_Screen', 'Toolbar', 'Menu_Enable', 'Width', 'Height', 'Left', 'Top', 'Alignment', 'Minimize']
-                self._Config_Get = ['Error_Display', 'Resize_Delay', 'Title', 'Icon', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Topmost','Persistent', 'Resizable', 'Full_Screen', 'Toolbar', 'Menu_Enable', 'Width', 'Height', 'Left', 'Top', 'Alignment', 'Full_Screen', 'Screen_Width', 'Screen_Height', 'Minimize']
+                self._Config = ['Error_Display', 'Resize_Delay', 'Title', 'Icon', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Topmost', 'Persistent', 'Override', 'Resizable', 'Full_Screen', 'Toolbar', 'Menu_Enable', 'Width', 'Height', 'Left', 'Top', 'Alignment', 'Minimize']
+                self._Config_Get = ['Error_Display', 'Resize_Delay', 'Title', 'Icon', 'Auto_Dark', 'Background', 'Light_Background', 'Dark_Background', 'Topmost','Persistent', 'Override', 'Resizable', 'Full_Screen', 'Toolbar', 'Menu_Enable', 'Width', 'Height', 'Left', 'Top', 'Alignment', 'Full_Screen', 'Screen_Width', 'Screen_Height', 'Minimize']
                 self._Initialized = False
                 self._Error_Display = True
                 self._Error = []
@@ -36,6 +36,7 @@ class Popup():
                 self._Alignment = 'Pixel'
                 self._Topmost = False
                 self._Persistent = False
+                self._Override = True
                 self._Toolbar = True
                 self._Full_Screen = False
                 self._Resizable = True
@@ -132,12 +133,14 @@ class Popup():
     def Close(self):
         try:
             if not self._Restricted:
+                self.Release_Grab()
                 self._Frame.destroy()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Close -> {E}")
             
     def On_Close(self):
         try:
+            self.Release_Grab()
             if self._On_Close:
                 self._On_Close()
             self._GUI._Popup.remove(self)
@@ -154,6 +157,7 @@ class Popup():
             
     def Hide(self):
         try:
+            self.Release_Grab()
             self._Frame.withdraw()
             if self._On_Hide:
                 self._On_Hide()
@@ -180,15 +184,95 @@ class Popup():
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> After -> {E}")
             
+    def Is_Windows(self):
+        try:
+            return os.name == 'nt'
+        except Exception:
+            return False
+
+    def Apply_Override(self):
+        try:
+            if self._Toolbar:
+                try:
+                    self._Frame.wm_attributes('-type', 'normal')
+                except Exception:
+                    pass
+                self._Frame.overrideredirect(False)
+                return
+            if not self._Override:
+                try:
+                    self._Frame.wm_attributes('-type', 'normal')
+                except Exception:
+                    pass
+                self._Frame.overrideredirect(False)
+                return
+            if not self.Is_Windows():
+                try:
+                    self._Frame.overrideredirect(False)
+                    self._Frame.wm_attributes('-type', 'splash')
+                    return
+                except Exception:
+                    self._Frame.overrideredirect(False)
+                    return
+            self._Frame.overrideredirect(True)
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Apply_Override -> {E}")
+
+    def Release_Grab(self):
+        try:
+            try:
+                self._Frame.grab_release()
+            except Exception:
+                pass
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Release_Grab -> {E}")
+
+    def Apply_Topmost(self):
+        try:
+            self._Frame.attributes("-topmost", self._Topmost)
+            if self._Topmost:
+                try:
+                    self._Frame.wait_visibility()
+                except Exception:
+                    pass
+                try:
+                    self._Frame.focus_force()
+                except Exception:
+                    try:
+                        self._Frame.focus_set()
+                    except Exception:
+                        pass
+                if self._Main:
+                    self._Frame.transient(self._Main._Frame)
+                if self.Is_Windows():
+                    try:
+                        self._Frame.grab_set()
+                    except Exception:
+                        pass
+                else:
+                    if not self._Override:
+                        try:
+                            self._Frame.grab_set()
+                        except Exception:
+                            pass
+            else:
+                self.Release_Grab()
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Apply_Topmost -> {E}")
+
     def Full_Screen(self, Toggle):
         try:
-            if not self._Full_Screen:
-                self._Frame.overrideredirect(False)
-                self._Frame.attributes('-fullscreen', Toggle)
-                if self._Toolbar:
-                    self._Frame.overrideredirect(False)
-                else:
-                    self._Frame.overrideredirect(True)
+            if Toggle:
+                self._Frame.attributes('-fullscreen', True)
+                self._Frame.geometry(f"{int(self._Frame.winfo_screenwidth())}x{int(self._Frame.winfo_screenheight())}+{0}+{0}")
+                self._Full_Screen = True
+            else:
+                self._Frame.attributes('-fullscreen', False)
+                self._Frame.geometry(f"{int(self._Width)}x{int(self._Height)}+{int(self._Left)}+{int(self._Top)}")
+                self._Full_Screen = False
+            self.Apply_Override()
+            if self._Topmost:
+                self.Apply_Topmost()
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Full_Screen -> {E}")
 
@@ -354,7 +438,7 @@ class Popup():
             if Width is not None:
                 self._Width = Width
             if Height is not None:
-                self._Top = Height
+                self._Height = Height
             if Width is not None or Height is not None:
                 if not self._Full_Screen:
                     self._Frame.geometry(f"{int(self._Width)}x{int(self._Height)}+{int(self._Left)}+{int(self._Top)}")
@@ -435,12 +519,19 @@ class Popup():
                 self._Screen_Width = self._Frame.winfo_screenwidth()
                 self._Screen_Height = self._Frame.winfo_screenheight()
                 if self._Full_Screen:
-                    self._Height = self._Frame.winfo_screenheight()
-                    self._Width = self._Frame.winfo_screenwidth()
-                    self._Left = 0
-                    self._Top = 0
-                    self._Frame.attributes('-fullscreen',True)
-                    self._Frame.overrideredirect(True)
+                    self._Frame.geometry(f"{int(self._Frame.winfo_screenwidth())}x{int(self._Frame.winfo_screenheight())}+{0}+{0}")
+                    self._Frame.attributes('-fullscreen', True)
+                    if os.name == 'nt':
+                        self._Frame.overrideredirect(self._Override)
+                    else:
+                        if self._Override:
+                            try:
+                                self._Frame.overrideredirect(False)
+                                self._Frame.wm_attributes('-type', 'splash')
+                            except Exception:
+                                self._Frame.overrideredirect(False)
+                        else:
+                            self._Frame.overrideredirect(False)
                 else:
                     if self._Alignment == 'Percentage':
                         self._Width = int(self._Frame.winfo_screenwidth() * (self._Width/100))
@@ -450,10 +541,7 @@ class Popup():
                     self._Frame.geometry(f"{int(self._Width)}x{int(self._Height)}+{int(self._Left)}+{int(self._Top)}")
                     self._Frame.resizable(self._Resizable, self._Resizable)
                     self._Frame.attributes('-fullscreen', False)
-                    if self._Toolbar:
-                        self._Frame.overrideredirect(False)
-                    else:
-                        self._Frame.overrideredirect(True)
+                    self.Apply_Override()
                 self._Frame.bind("<Configure>", self.On_Configure, add="+")
                 self._Width, self._Height, self._Left, self._Top = self._Width, self._Height, self._Left, self._Top
                 if self._Menu_Enable:
@@ -461,14 +549,12 @@ class Popup():
                     self._Frame.config(menu=self._Menu)
                 self._Initialized = True
                 self._GUI._Popup.append(self)
-            if not self._Full_Screen:
+            if self._Full_Screen:
+                self._Frame.geometry(f"{int(self._Frame.winfo_screenwidth())}x{int(self._Frame.winfo_screenheight())}+{0}+{0}")
+            else:
                 self._Frame.geometry(f"{int(self._Width)}x{int(self._Height)}+{int(self._Left)}+{int(self._Top)}")
             if self._Topmost:
-                self._Frame.focus_set()
-                self._Frame.grab_set()
-                self._Frame.attributes("-topmost", self._Topmost)
-                if self._Main:
-                    self._Frame.transient(self._Main._Frame)
+                self.Apply_Topmost()
             self._Frame.config(bg=self._Background)
             if not self._Title:
                 if self._GUI._Title:
