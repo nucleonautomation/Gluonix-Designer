@@ -1,5 +1,9 @@
 # Change Log
 
+## V(7.6)
+- Flowchart ID Increment Fixed In From_Dict, Undo, Redo & Updates
+- Flowchart Support Value Arg In Add, Which Could Be Int, Str, List or Dict
+
 ## V(7.5)
 - Canvas Added New Flowchart. Drag & Connects Nodes, With Colorful Ports
 - New Example Added For Flowchart

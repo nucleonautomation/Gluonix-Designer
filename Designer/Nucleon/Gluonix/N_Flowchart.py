@@ -1,4 +1,5 @@
 import json
+import copy
 import math
 import time
 import tkinter as Tk
@@ -459,6 +460,8 @@ class Flowchart:
         try:
             self.Remove_Node("all")
             self.Remove_Edge("all")
+            self._Node_Id_Next = 1
+            self._Edge_Id_Next = 1
             self._Selected_Node_Id = None
             self._Selected_Edge_Id = None
             self._Pending_Connect = None
@@ -1924,6 +1927,7 @@ class Flowchart:
                 Port_Counts = dict(N.get("PortCounts", self._Node_Port_Counts_Default())),
                 Port_Names  = dict(N.get("PortNames", self._Node_Port_Names_Default())),
                 Port_Colors = dict(N.get("PortColors", self._Node_Port_Colors_Default())),
+                Value = N.get("Value", None),
             )
             self.Select_Node(ID)
             self._Callback_Invoke("Flowchart", Event = "Paste", Data = {"ID": ID})
@@ -2717,7 +2721,7 @@ class Flowchart:
         except Exception as E:
             self._GUI.Error(f"{self._Type} - _Context_Disable_Selected - {E}")
 
-    def Add_Node(self, X = None, Y = None, Width = None, Height = None, Color = "#4F8EF7", Fill = "#DC7633", Title = "", Description = "", Type = "", Ports = None, Port_Counts = None, Port_Names = None, Port_Colors = None):
+    def Add_Node(self, X = None, Y = None, Width = None, Height = None, Color = "#4F8EF7", Fill = "#DC7633", Title = "", Description = "", Type = "", Ports = None, Port_Counts = None, Port_Names = None, Port_Colors = None, Node_Id = None, Value = None):
         try:
             self._Undo_Push()
             CW = self.Canvas_Width()
@@ -2731,8 +2735,15 @@ class Flowchart:
             if Height is None:
                 Height = 100.0
             X, Y = self._Clamp_Pos(X, Y)
-            ID = int(self._Node_Id_Next)
-            self._Node_Id_Next += 1
+            try:
+                ID = int(self._Node_Id_Next) if Node_Id is None else int(Node_Id)
+            except:
+                ID = int(self._Node_Id_Next)
+            if ID <= 0:
+                ID = int(self._Node_Id_Next)
+            while ID in self._Nodes:
+                ID += 1
+            self._Node_Id_Next = max(int(self._Node_Id_Next), int(ID) + 1)
             if Ports is None:
                 Ports = self._Node_Ports_Default()
             if Port_Counts is None:
@@ -2742,6 +2753,10 @@ class Flowchart:
             if Port_Colors is None:
                 Port_Colors = self._Node_Port_Colors_Default()
             NormCounts = self._Node_Port_Counts_Normalize(Port_Counts)
+            try:
+                Value2 = copy.deepcopy(Value)
+            except:
+                Value2 = Value
             self._Nodes[ID] = {
                 "X": float(X),
                 "Y": float(Y),
@@ -2756,6 +2771,7 @@ class Flowchart:
                 "PortCounts": NormCounts,
                 "PortNames":  self._Node_Port_Names_Normalize(Port_Names, Port_Counts = NormCounts),
                 "PortColors": self._Node_Port_Colors_Normalize(Port_Colors, Port_Counts = NormCounts),
+                "Value": Value2,
                 "Item": None,
                 "TitleItem": None,
                 "DescItem": None,
@@ -2776,7 +2792,7 @@ class Flowchart:
     def Add_Object(self, *Args, **Kwargs):
         return self.Add_Node(*Args, **Kwargs)
 
-    def Update_Node(self, ID = None, X = None, Y = None, Width = None, Height = None, Color = None, Fill = None, Title = None, Description = None, Type = None, Ports = None, Port_Counts = None, Port_Names = None, Port_Colors = None, Disabled = None, Locked = None):
+    def Update_Node(self, ID = None, X = None, Y = None, Width = None, Height = None, Color = None, Fill = None, Title = None, Description = None, Type = None, Ports = None, Port_Counts = None, Port_Names = None, Port_Colors = None, Disabled = None, Locked = None, Value = None, Value_Set = False):
         try:
             if ID is None:
                 if not self._Nodes:
@@ -2819,11 +2835,17 @@ class Flowchart:
                 N["PortColors"] = self._Node_Port_Colors_Normalize(Port_Colors, Port_Counts = CurCounts)
             elif CountsChanged:
                 N["PortColors"] = self._Node_Port_Colors_Normalize(N.get("PortColors", {}), Port_Counts = CurCounts)
+            if Value_Set:
+                try:
+                    N["Value"] = copy.deepcopy(Value)
+                except:
+                    N["Value"] = Value
             if Disabled is not None:
                 self._Disabled_Nodes[ID] = bool(Disabled)
             if Locked is not None:
                 self._Locked_Nodes[ID] = bool(Locked)
-            self._Update_Edges_For_Node(ID)
+            self._Node_Draw(ID)
+            self.Update_Edges_For_Node(ID)
             self.Render()
             self._Callback_Invoke("Node", ID = ID, Event = "Update")
         except Exception as E:
@@ -2985,7 +3007,12 @@ class Flowchart:
             if ID is None or ID not in self._Nodes:
                 return None
             N = self._Nodes[ID]
-            return {"ID": int(ID), "X": float(N.get("X", 0.0)), "Y": float(N.get("Y", 0.0)), "Width": float(N.get("Width", 0.0)), "Height": float(N.get("Height", 0.0)), "Color": str(N.get("Color", "")), "Fill": str(N.get("Fill", "")), "Title": str(N.get("Title", "")), "Description": str(N.get("Description", "")), "Type": str(N.get("Type", "")), "Ports": dict(N.get("Ports", self._Node_Ports_Default())), "PortCounts": dict(N.get("PortCounts", self._Node_Port_Counts_Default())), "PortNames": dict(N.get("PortNames", self._Node_Port_Names_Default())), "PortColors": dict(N.get("PortColors", self._Node_Port_Colors_Default())), "Disabled": bool(self._Disabled_Nodes.get(ID, False)), "Locked": bool(self._Locked_Nodes.get(ID, False))}
+            Value = N.get("Value", None)
+            try:
+                Value = copy.deepcopy(Value)
+            except:
+                pass
+            return {"ID": int(ID), "X": float(N.get("X", 0.0)), "Y": float(N.get("Y", 0.0)), "Width": float(N.get("Width", 0.0)), "Height": float(N.get("Height", 0.0)), "Color": str(N.get("Color", "")), "Fill": str(N.get("Fill", "")), "Title": str(N.get("Title", "")), "Description": str(N.get("Description", "")), "Type": str(N.get("Type", "")), "Ports": dict(N.get("Ports", self._Node_Ports_Default())), "PortCounts": dict(N.get("PortCounts", self._Node_Port_Counts_Default())), "PortNames": dict(N.get("PortNames", self._Node_Port_Names_Default())), "PortColors": dict(N.get("PortColors", self._Node_Port_Colors_Default())), "Value": Value, "Disabled": bool(self._Disabled_Nodes.get(ID, False)), "Locked": bool(self._Locked_Nodes.get(ID, False))}
         except Exception as E:
             self._GUI.Error(f"{self._Type} - Get_Node - {E}")
             return None
@@ -3031,7 +3058,7 @@ class Flowchart:
             self._GUI.Error(f"{self._Type} - _Port_Color_Effective - {E}")
             return "#000000"
 
-    def Add_Edge(self, From_Id, From_Side, To_Id, To_Side, Color = None, From_Index = 0, To_Index = 0):
+    def Add_Edge(self, From_Id, From_Side, To_Id, To_Side, Color = None, From_Index = 0, To_Index = 0, Edge_Id = None):
         try:
             if From_Id not in self._Nodes or To_Id not in self._Nodes:
                 return None
@@ -3073,8 +3100,15 @@ class Flowchart:
             if Color is None:
                 Color = str(self._Port_Color_Effective(From_Id, From_Side, From_Index))
             self._Undo_Push()
-            ID = int(self._Edge_Id_Next)
-            self._Edge_Id_Next += 1
+            try:
+                ID = int(self._Edge_Id_Next) if Edge_Id is None else int(Edge_Id)
+            except:
+                ID = int(self._Edge_Id_Next)
+            if ID <= 0:
+                ID = int(self._Edge_Id_Next)
+            while ID in self._Edges:
+                ID += 1
+            self._Edge_Id_Next = max(int(self._Edge_Id_Next), int(ID) + 1)
             Points = self._Edge_Route(
                 From_Id, str(From_Side), To_Id, str(To_Side),
                 int(From_Index), int(To_Index),
@@ -3309,19 +3343,36 @@ class Flowchart:
             for Sid in Nodes:
                 N = Nodes[Sid]
                 NormCounts = self._Node_Port_Counts_Normalize(dict(N.get("PortCounts", self._Node_Port_Counts_Default())))
-                NewId = self.Add_Node(X = float(N.get("X", 40.0)), Y = float(N.get("Y", 40.0)), Width = float(N.get("Width", 160.0)), Height = float(N.get("Height", 100.0)), Color = str(N.get("Color", "#4F8EF7")), Fill = str(N.get("Fill", "#DC7633")), Title = str(N.get("Title", "")), Description = str(N.get("Description", "")), Type = str(N.get("Type", "")), Ports = dict(N.get("Ports", self._Node_Ports_Default())), Port_Counts = self._Node_Port_Counts_Normalize(dict(N.get("PortCounts", self._Node_Port_Counts_Default()))), Port_Names = self._Node_Port_Names_Normalize(dict(N.get("PortNames", self._Node_Port_Names_Default())), Port_Counts = NormCounts), Port_Colors = self._Node_Port_Colors_Normalize(dict(N.get("PortColors", self._Node_Port_Colors_Default())), Port_Counts = NormCounts))
+                try:
+                    OrigId = int(N.get("ID", int(Sid)))
+                except:
+                    try:
+                        OrigId = int(Sid)
+                    except:
+                        OrigId = None
+                NewId = self.Add_Node(X = float(N.get("X", 40.0)), Y = float(N.get("Y", 40.0)), Width = float(N.get("Width", 160.0)), Height = float(N.get("Height", 100.0)), Color = str(N.get("Color", "#4F8EF7")), Fill = str(N.get("Fill", "#DC7633")), Title = str(N.get("Title", "")), Description = str(N.get("Description", "")), Type = str(N.get("Type", "")), Ports = dict(N.get("Ports", self._Node_Ports_Default())), Port_Counts = self._Node_Port_Counts_Normalize(dict(N.get("PortCounts", self._Node_Port_Counts_Default()))), Port_Names = self._Node_Port_Names_Normalize(dict(N.get("PortNames", self._Node_Port_Names_Default())), Port_Counts = NormCounts), Port_Colors = self._Node_Port_Colors_Normalize(dict(N.get("PortColors", self._Node_Port_Colors_Default())), Port_Counts = NormCounts), Node_Id = OrigId, Value = N.get("Value", None))
+                if NewId is None:
+                    continue
                 if bool(N.get("Disabled", False)):
                     self._Disabled_Nodes[NewId] = True
                 if bool(N.get("Locked", False)):
                     self._Locked_Nodes[NewId] = True
-                IdMap[int(N.get("ID", int(Sid)))] = int(NewId)
+                if OrigId is not None:
+                    IdMap[int(OrigId)] = int(NewId)
             for Sid in Edges:
                 E = Edges[Sid]
+                try:
+                    EdgeId = int(E.get("ID", int(Sid)))
+                except:
+                    try:
+                        EdgeId = int(Sid)
+                    except:
+                        EdgeId = None
                 A = int(E.get("FromID", 0))
                 B = int(E.get("ToID", 0))
                 FromId = int(IdMap.get(A, A))
                 ToId = int(IdMap.get(B, B))
-                Eid = self.Add_Edge(From_Id = FromId, From_Side = str(E.get("FromSide", "Right")), To_Id = ToId, To_Side = str(E.get("ToSide", "Left")), Color = str(E.get("Color", "#000000")), From_Index = int(E.get("FromIndex", 0)), To_Index = int(E.get("ToIndex", 0)))
+                Eid = self.Add_Edge(From_Id = FromId, From_Side = str(E.get("FromSide", "Right")), To_Id = ToId, To_Side = str(E.get("ToSide", "Left")), Color = str(E.get("Color", "#000000")), From_Index = int(E.get("FromIndex", 0)), To_Index = int(E.get("ToIndex", 0)), Edge_Id = EdgeId)
                 if Eid is not None and bool(E.get("Disabled", False)):
                     self._Disabled_Edges[Eid] = True
                 if Eid is not None and bool(E.get("Locked", False)):
