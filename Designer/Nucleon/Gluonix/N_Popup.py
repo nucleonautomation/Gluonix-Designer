@@ -8,8 +8,10 @@ if os.name == 'nt':
     from ctypes import windll as DLL
 else:
     from ctypes import CDLL as DLL
+    
+from .N_Menu import Menu
 
-# GUI
+# Popup
 class Popup():
 
     def __init__(self, Main=False, **kwargs):
@@ -582,3 +584,10 @@ class Popup():
             self._GUI.Initiate_Colors(self)
         except Exception as E:
             self._GUI.Error(f"{self._Type} -> Update_Color -> {E}")
+            
+    def Menu(self, Main=False):
+        try:
+            Item = Menu(Main if Main else self)
+            return Item
+        except Exception as E:
+            self._GUI.Error(f"{self._Type} -> Menu -> {E}")

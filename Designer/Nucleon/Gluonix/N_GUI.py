@@ -762,3 +762,11 @@ class GUI():
             self.Initiate_Colors(self)
         except Exception as E:
             self.Error(f"{self._Type} -> Update_Color -> {E}")
+            
+    def Menu(self, Main=False):
+        try:
+            from .N_Menu import Menu
+            Item = Menu(Main if Main else self)
+            return Item
+        except Exception as E:
+            self.Error(f"{self._Type} -> Menu -> {E}")

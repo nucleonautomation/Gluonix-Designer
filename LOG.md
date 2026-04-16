@@ -1,5 +1,8 @@
 # Change Log
 
+## V(7.7)
+- Menu Added Which Can Be Triggered By Any Event
+
 ## V(7.6)
 - Flowchart ID Increment Fixed In From_Dict, Undo, Redo & Updates
 - Flowchart Support Value Arg In Add, Which Could Be Int, Str, List or Dict

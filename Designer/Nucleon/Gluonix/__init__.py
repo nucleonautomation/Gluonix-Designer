@@ -18,6 +18,7 @@ from tkinter import ttk
 # IMPORT CUSTOM GUI LIBRARIES
 from .N_GUI import GUI
 from .N_Popup import Popup
+from .N_Menu import Menu
 from .N_Frame import Frame
 from .N_Group import Group
 from .N_Canvas import Canvas
